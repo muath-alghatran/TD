@@ -1,26 +1,328 @@
 @import "tailwindcss";
 
+/*═══════════════════════════════════════════════════════════════
+  TRUST DRIVE · نظام التصميم
+  منقول حرفياً من docs/prototype-parts.html (كتلة :root)
+  قاعدة اللون الوحيدة: اللون المشبع = حالة (توفر أو ثقة قراءة).
+═══════════════════════════════════════════════════════════════*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink: #0c1116;
+  --ink-2: #141b22;
+  --ink-3: #1d2831;
+  --stroke: #33454f;
+  --stroke-2: #4a6270;
+  --glint: #8fa6b4;
+  --paper: #e4e6e1;
+  --sheet: #f3f4f0;
+  --sheet-2: #dcdfd9;
+  --rule: #c4c9c1;
+  --rule-2: #d5d9d1;
+  --text: #12171a;
+  --text-2: #4b565c;
+  --text-3: #7c878d;
+  --steel: #233039;
+  --steel-2: #38505e;
+  --ok: #12764f;
+  --ok-lit: #3fd9a0;
+  --ok-film: #12764f16;
+  --wait: #96660a;
+  --wait-lit: #f2b33c;
+  --wait-film: #96660a16;
+  --spec: #68767f;
+  --spec-lit: #9fb2bd;
+  --spec-film: #68767f16;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-stroke: var(--stroke);
+  --color-stroke-2: var(--stroke-2);
+  --color-glint: var(--glint);
+  --color-paper: var(--paper);
+  --color-sheet: var(--sheet);
+  --color-sheet-2: var(--sheet-2);
+  --color-rule: var(--rule);
+  --color-rule-2: var(--rule-2);
+  --color-text: var(--text);
+  --color-text-2: var(--text-2);
+  --color-text-3: var(--text-3);
+  --color-steel: var(--steel);
+  --color-steel-2: var(--steel-2);
+  --color-ok: var(--ok);
+  --color-ok-lit: var(--ok-lit);
+  --color-ok-film: var(--ok-film);
+  --color-wait: var(--wait);
+  --color-wait-lit: var(--wait-lit);
+  --color-wait-film: var(--wait-film);
+  --color-spec: var(--spec);
+  --color-spec-lit: var(--spec-lit);
+  --color-spec-film: var(--spec-film);
+  --font-disp: var(--font-alexandria), var(--font-ibm-plex-sans-arabic), system-ui, sans-serif;
+  --font-body: var(--font-ibm-plex-sans-arabic), system-ui, sans-serif;
+  --font-data: var(--font-ibm-plex-mono), ui-monospace, monospace;
+  --ease-td: var(--ease);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+:focus-visible {
+  outline: 2px solid var(--steel-2);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/*── أدوار النص الثلاثة ──*/
+.t-disp {
+  font-family: var(--font-disp);
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  line-height: 1.16;
+}
+.t-data {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+  unicode-bidi: isolate;
+  letter-spacing: -0.01em;
+}
+.t-eyebrow {
+  font-family: var(--font-data);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/*── علامات التسجيل — زوايا الألواح ──*/
+.regmark {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  pointer-events: none;
+  opacity: 0.5;
+  color: var(--text-3);
+}
+.regmark::before,
+.regmark::after {
+  content: "";
+  position: absolute;
+  background: currentColor;
+}
+.regmark::before {
+  top: 0;
+  left: 0;
+  width: 11px;
+  height: 1px;
+}
+.regmark::after {
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 11px;
+}
+.rm-tr {
+  top: 9px;
+  right: 9px;
+  transform: scaleX(-1);
+}
+.rm-tl {
+  top: 9px;
+  left: 9px;
+}
+.rm-br {
+  bottom: 9px;
+  right: 9px;
+  transform: scale(-1);
+}
+.rm-bl {
+  bottom: 9px;
+  left: 9px;
+  transform: scaleY(-1);
+}
+
+/*── لوح الورق ──*/
+.sheet {
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 24px;
+  position: relative;
+  color: var(--text-3);
+}
+.sheet > * {
+  color: var(--text);
+}
+
+/*── حقل الحبر ──*/
+.field {
+  background: var(--ink);
+  border: 1px solid var(--ink-3);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+  color: var(--stroke-2);
+}
+.field::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 47px, #ffffff07 47px 48px),
+    repeating-linear-gradient(90deg, transparent 0 47px, #ffffff07 47px 48px),
+    radial-gradient(120% 90% at 50% 0%, #2b3d4a55, transparent 62%);
+}
+.field-hd {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 15px 18px 0;
+  position: relative;
+  z-index: 2;
+}
+.field-hd .t-eyebrow {
+  color: var(--stroke-2);
+}
+.field-hd .t-data {
+  margin-inline-start: auto;
+  font-size: 10.5px;
+  color: var(--stroke);
+  letter-spacing: 0.1em;
+}
+
+/*── مسطرة الإحداثيات ──*/
+.ruler {
+  fill: #3a4c57;
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+/*── شارات الحالة ──*/
+.tag {
+  font-size: 11px;
+  padding: 3px 9px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  color: var(--text-2);
+}
+.tag.oe {
+  border-color: var(--steel);
+  color: var(--steel);
+  font-weight: 500;
+}
+.stat {
+  font-size: 11.5px;
+  padding: 4px 10px;
+  border-radius: 2px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.stat i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: none;
+  background: currentColor;
+}
+.stat.ok {
+  background: var(--ok-film);
+  color: var(--ok);
+}
+.stat.wait {
+  background: var(--wait-film);
+  color: var(--wait);
+}
+.stat.spec {
+  background: var(--spec-film);
+  color: var(--spec);
+}
+
+/*── الدائرة المرقّمة ──*/
+.callout {
+  width: 25px;
+  height: 25px;
+  flex: none;
+  border: 1px solid var(--steel);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-data);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--steel);
+}
+.callout.gap {
+  border-style: dashed;
+  border-color: var(--text-3);
+  color: var(--text-3);
+}
+
+/*── الأزرار ──*/
+.act {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  border-radius: 2px;
+  background: var(--ink);
+  color: var(--sheet);
+  font-family: var(--font-disp);
+  font-weight: 500;
+  font-size: 14.5px;
+  transition: 0.2s var(--ease);
+  text-align: center;
+}
+.act:hover {
+  background: var(--steel);
+}
+.act:active {
+  transform: translateY(1px);
+}
+.act:disabled {
+  background: var(--sheet-2);
+  color: var(--text-3);
+  cursor: not-allowed;
+  border: 1px solid var(--rule);
+}
+.act-2 {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--rule);
+}
+.act-2:hover {
+  background: var(--sheet-2);
+  border-color: var(--steel);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
 }
