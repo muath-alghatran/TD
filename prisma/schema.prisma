@@ -1,0 +1,280 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+//
+// نموذج البيانات — من docs/brief.md §5 + docs/auth-spec.md §9 + docs/payment-spec.md §6
+// راجع docs/CLAUDE.md للقواعد الحاكمة (خصوصاً Fitment وSetting).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/*── الحساب والدخول — docs/auth-spec.md §9 ──*/
+
+model User {
+  id          String    @id @default(cuid())
+  phone       String    @unique
+  fullName    String?
+  createdAt   DateTime  @default(now())
+  lastLoginAt DateTime?
+  status      String    @default("active")
+
+  vehicles Vehicle[]
+  orders   Order[]
+  sessions Session[]
+}
+
+model OtpRequest {
+  id         String    @id @default(cuid())
+  phoneHash  String
+  codeHash   String
+  channel    String // whatsapp | sms
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime  @default(now())
+
+  @@index([phoneHash])
+}
+
+model Session {
+  id               String    @id @default(cuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id])
+  refreshTokenHash String
+  deviceLabel      String?
+  lastSeenAt       DateTime  @default(now())
+  expiresAt        DateTime
+  revokedAt        DateTime?
+
+  @@index([userId])
+}
+
+/*── المركبات والقطع ──*/
+
+model Vehicle {
+  id             String   @id @default(cuid())
+  vin            String?
+  make           String
+  model          String
+  year           Int
+  trim           String?
+  engine         String?
+  generationCode String?
+  userId         String?
+  user           User?    @relation(fields: [userId], references: [id])
+  guestToken     String?
+  createdAt      DateTime @default(now())
+
+  orders Order[]
+
+  @@index([userId])
+}
+
+model Part {
+  id             String   @id @default(cuid())
+  sku            String   @unique
+  oemNumber      String
+  nameAr         String
+  nameEn         String?
+  category       String
+  zoneId         String?
+  zone           Zone?    @relation(fields: [zoneId], references: [id])
+  qualityTier    String
+  warrantyMonths Int
+  laborHours     Decimal  @db.Decimal(6, 2)
+  isActive       Boolean  @default(true)
+
+  fitments   Fitment[]
+  inventory  Inventory[]
+  zoneParts  ZonePart[]
+  orderItems OrderItem[]
+  demandGaps DemandGap[]
+
+  @@index([oemNumber])
+}
+
+/// أخطر جدول في النظام — يربط بـ generationCode (XV70, E210, AN120, J300…) لا بالسنة.
+/// خطأ هنا = قطعة تُباع لسيارة لا تناسبها. راجع docs/CLAUDE.md قاعدة 7.
+model Fitment {
+  id             String  @id @default(cuid())
+  partId         String
+  part           Part    @relation(fields: [partId], references: [id])
+  make           String
+  model          String
+  generationCode String
+  trim           String?
+
+  @@index([make, model, generationCode])
+}
+
+model Supplier {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  name            String
+  area            String?
+  reliabilityRate Decimal  @db.Decimal(4, 2)
+  leadTimeHours   Decimal  @db.Decimal(6, 2)
+
+  inventory Inventory[]
+}
+
+model Inventory {
+  id            String   @id @default(cuid())
+  partId        String
+  part          Part     @relation(fields: [partId], references: [id])
+  supplierId    String
+  supplier      Supplier @relation(fields: [supplierId], references: [id])
+  cost          Decimal  @db.Decimal(10, 2)
+  marginRate    Decimal  @db.Decimal(4, 2)
+  stockInternal Int      @default(0)
+  stockSupplier Int      @default(0)
+  updatedAt     DateTime @updatedAt
+
+  @@unique([partId, supplierId])
+}
+
+model City {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  region      String?
+  shipDaysMin Int
+  shipDaysMax Int
+  shipCost    Decimal @db.Decimal(8, 2)
+  trustFactor Decimal @db.Decimal(4, 2)
+
+  orders     Order[]
+  demandGaps DemandGap[]
+}
+
+/// مناطق المخطط الثماني (المستوى الأول في docs/prototype-parts.html)
+model Zone {
+  id     String @id @default(cuid())
+  nameAr String
+  layer  String
+  svgX   Int
+  svgY   Int
+
+  parts     Part[]
+  zoneParts ZonePart[]
+}
+
+model ZonePart {
+  id            String @id @default(cuid())
+  zoneId        String
+  zone          Zone   @relation(fields: [zoneId], references: [id])
+  partId        String
+  part          Part   @relation(fields: [partId], references: [id])
+  calloutNumber Int
+
+  @@unique([zoneId, partId])
+}
+
+/*── الطلبات والدفع — docs/payment-spec.md v3.0 ──*/
+
+/// حالات الطلب. لا حجز/Authorization في أي حالة — راجع docs/CLAUDE.md قواعد الدفع 10-20.
+enum OrderStatus {
+  requested // طلب تأكيد — بلا دفع (أصفر ورمادي)
+  awaiting_supplier
+  confirmed // متوفرة — بانتظار الدفع (رابط 12 ساعة)
+  unavailable
+  expired
+  paid // العدّاد يبدأ هنا (paidAt)
+  reserved // محجوز كاش — 48 ساعة
+  processing
+  ready
+  shipped
+  fitted
+  completed
+  cancelled
+}
+
+model Order {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  vehicleId String
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+
+  cityId String
+  city   City   @relation(fields: [cityId], references: [id])
+
+  mode   String // ship | fit
+  status OrderStatus @default(requested)
+
+  promisedDays       Int
+  actualDays         Int?
+  confidenceAtOrder  Decimal @db.Decimal(4, 2)
+  paymentStatus      String  @default("unpaid")
+  compensationIssued Boolean @default(false)
+
+  // عدّاد الوعد يبدأ من paidAt لا من requestedAt — قاعدة حرجة، راجع docs/payment-spec.md §4.
+  requestedAt          DateTime  @default(now())
+  confirmedAt          DateTime?
+  paidAt               DateTime?
+  priceLockedAt        DateTime?
+  paymentLinkExpiresAt DateTime?
+
+  items OrderItem[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+  partId  String
+  part    Part   @relation(fields: [partId], references: [id])
+
+  qty       Int
+  unitPrice Decimal @db.Decimal(10, 2)
+  laborCost Decimal @default(0) @db.Decimal(10, 2)
+  discount  Decimal @default(0) @db.Decimal(10, 2)
+}
+
+/*── الطلب المفقود — أصل استراتيجي، من اليوم الأول ──*/
+
+model DemandGap {
+  id         String   @id @default(cuid())
+  searchText String?
+  oemNumber  String?
+  make       String?
+  model      String?
+  year       Int?
+  cityId     String?
+  city       City?    @relation(fields: [cityId], references: [id])
+  vehicleId  String?
+  partId     String?
+  part       Part?    @relation(fields: [partId], references: [id])
+  reason     String
+  createdAt  DateTime @default(now())
+
+  @@index([oemNumber])
+  @@index([createdAt])
+}
+
+/*── الإعدادات والمزامنة ──*/
+
+/// كل عتبات محرك الوعد ونسب الخصم تُقرأ من هنا — لا تُكتب في الكود. راجع docs/CLAUDE.md قاعدة 4.
+model Setting {
+  key         String  @id
+  value       String
+  description String?
+}
+
+model SyncLog {
+  id          String   @id @default(cuid())
+  source      String
+  rowsChanged Int
+  triggeredBy String?
+  createdAt   DateTime @default(now())
+}
