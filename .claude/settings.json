@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": ["Bash(npm run:*)","Bash(npm test:*)","Bash(npx prisma:*)","Bash(git status)","Bash(git diff:*)"],
+    "deny": ["Bash(rm -rf:*)","Read(./.env)","Read(./.env.*)"]
+  },
+  "hooks": {
+    "Stop": [{ "hooks": [{ "type": "command", "command": "npm test --silent 2>&1 | tail -20" }] }]
+  }
+}
