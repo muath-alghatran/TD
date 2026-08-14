@@ -1094,4 +1094,7 @@ select:focus {
   .scanline {
     display: none;
   }
+  .drawn {
+    stroke-dashoffset: 0;
+  }
 }

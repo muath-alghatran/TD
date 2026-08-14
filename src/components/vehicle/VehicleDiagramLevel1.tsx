@@ -5,6 +5,7 @@ import { Ruler } from "@/components/ui/Ruler";
 import { STATUS_LABEL } from "@/components/ui/StatusPill";
 import { CITIES } from "@/lib/city-catalog";
 import { zoneStatus } from "@/lib/catalog-promise";
+import { toArabicDigits } from "@/lib/format";
 import { LAYERS, ZONES, type CatalogZone } from "@/lib/zone-catalog";
 
 const LIT: Record<string, string> = {
@@ -141,7 +142,8 @@ export function VehicleDiagramLevel1({
             <>
               <span className="t-data">{readout.zone.ref}</span>
               <span>
-                <b>{readout.zone.name}</b> · {covered(readout.zone)} من {readout.zone.total} قطعة مغطاة
+                <b>{readout.zone.name}</b> · {toArabicDigits(covered(readout.zone))} من{" "}
+                {toArabicDigits(readout.zone.total)} قطعة مغطاة
               </span>
               <span className={`stat ${readout.status}`} style={{ marginInlineStart: "auto" }}>
                 <i />

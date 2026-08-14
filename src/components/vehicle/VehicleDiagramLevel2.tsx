@@ -15,7 +15,7 @@ const LIT: Record<string, string> = {
   ok: "var(--ok-lit)",
   wait: "var(--wait-lit)",
   spec: "var(--spec-lit)",
-  gap: "var(--stroke)",
+  gap: "#3A4C57",
 };
 
 const DEFAULT_CITY = CITIES[0];
