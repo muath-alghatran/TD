@@ -1,69 +1,144 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { VehicleConfirmCard, type ConfirmRow } from "@/components/vehicle/VehicleConfirmCard";
+import { VehicleIdentifyForm, type VehicleIdentifyResult } from "@/components/vehicle/VehicleIdentifyForm";
+import { saveVehicleToGarage, type GaragedVehicle } from "@/lib/garage";
+
+interface PendingVehicle {
+  make: string;
+  model: string;
+  year: number;
+  trim: string;
+  vin: string;
+  plate: string;
+  trimConfirmed: boolean;
+}
+
+function fromIdentifyResult(result: VehicleIdentifyResult): PendingVehicle {
+  if (result.source === "ocr") {
+    const { extraction } = result;
+    return {
+      make: extraction.make.value,
+      model: extraction.model.value,
+      year: extraction.year.value,
+      trim: extraction.trim.value,
+      vin: extraction.vin.value,
+      plate: extraction.plate.value,
+      trimConfirmed: false,
+    };
+  }
+  return {
+    make: result.make,
+    model: result.model,
+    year: result.year,
+    trim: "الفئة غير محددة — قد تختلف بعض القطع",
+    vin: "",
+    plate: "",
+    trimConfirmed: false,
+  };
+}
+
+function toArabicDigits(n: number): string {
+  return String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[Number(d)]);
+}
+
+function buildRows(car: PendingVehicle): ConfirmRow[] {
+  return [
+    { key: "make", label: "الصانع", value: car.make, ok: true },
+    { key: "model", label: "الطراز", value: car.model, ok: true },
+    { key: "year", label: "سنة الصنع", value: toArabicDigits(car.year), ok: true },
+    { key: "vin", label: "رقم الهيكل", value: car.vin || "لم يُقرأ", ok: car.vin.length > 0, monospace: true },
+    { key: "plate", label: "رقم اللوحة", value: car.plate || "—", ok: car.plate.length > 0 },
+    { key: "trim", label: "الفئة والمحرك", value: car.trim, ok: car.trimConfirmed },
+  ];
+}
 
 export default function Home() {
+  const [step, setStep] = useState<"identify" | "confirm" | "saved">("identify");
+  const [pending, setPending] = useState<PendingVehicle | null>(null);
+  const [saved, setSaved] = useState<GaragedVehicle | null>(null);
+
+  function handleIdentified(result: VehicleIdentifyResult) {
+    setPending(fromIdentifyResult(result));
+    setStep("confirm");
+  }
+
+  function handleApplyTrimFix(trim: string) {
+    setPending((prev) => (prev ? { ...prev, trim, trimConfirmed: true } : prev));
+  }
+
+  function handleConfirm() {
+    if (!pending) return;
+    const record = saveVehicleToGarage({
+      make: pending.make,
+      model: pending.model,
+      year: pending.year,
+      trim: pending.trim,
+      vin: pending.vin || "بلا رقم هيكل",
+      plate: pending.plate || "—",
+    });
+    setSaved(record);
+    setStep("saved");
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className="stage">
+      {step === "identify" && <VehicleIdentifyForm onIdentified={handleIdentified} />}
+
+      {step === "confirm" && pending && (
+        <VehicleConfirmCard
+          rows={buildRows(pending)}
+          onApplyTrimFix={handleApplyTrimFix}
+          onConfirm={handleConfirm}
+          onRetake={() => {
+            setPending(null);
+            setStep("identify");
+          }}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+      )}
+
+      {step === "saved" && saved && (
+        <section>
+          <div className="lede">
+            <span className="t-eyebrow">تم الحفظ</span>
+            <h1>
+              سيارتك في كراجي
+              <br />
+              <em>جاهزة الآن</em>
+            </h1>
+          </div>
+          <div className="vplate">
+            <div className="ic">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#8FA6B4" strokeWidth="1.5" strokeLinecap="round">
+                <path d="M3 13.5l1.7-4.8A2.2 2.2 0 0 1 6.8 7h10.4a2.2 2.2 0 0 1 2.1 1.7L21 13.5V18h-2.4M3 18v-4.5M3 18h2.4m13.2 0H5.4" />
+                <circle cx="7.4" cy="18" r="1.8" />
+                <circle cx="16.6" cy="18" r="1.8" />
+              </svg>
+            </div>
+            <div>
+              <strong>
+                {saved.make} {saved.model} {toArabicDigits(saved.year)}
+              </strong>
+              <small>{saved.trim}</small>
+              <div className="t-data">{saved.vin}</div>
+            </div>
+            <button
+              className="chg"
+              onClick={() => {
+                setSaved(null);
+                setPending(null);
+                setStep("identify");
+              }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+              تغيير
+            </button>
+          </div>
+          <div className="memo">
+            المخطط التفاعلي (مناطق المركبة الثماني) ومسار اختيار القطع لم يُبنَ بعد — المرحلة 4 القادمة.
+          </div>
+        </section>
+      )}
+    </main>
   );
 }
