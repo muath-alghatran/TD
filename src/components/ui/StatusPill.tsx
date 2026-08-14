@@ -1,6 +1,8 @@
-export type PromiseStatus = "ok" | "wait" | "spec";
+import type { PromiseStatus } from "@/lib/promise-engine";
 
-const DEFAULT_LABEL: Record<PromiseStatus, string> = {
+export type { PromiseStatus };
+
+export const STATUS_LABEL: Record<PromiseStatus, string> = {
   ok: "متوفر ومؤكد",
   wait: "يحتاج تأكيد",
   spec: "طلب خاص",
@@ -18,7 +20,7 @@ export function StatusPill({
   return (
     <span className={`stat ${status} ${className ?? ""}`}>
       <i />
-      {label ?? DEFAULT_LABEL[status]}
+      {label ?? STATUS_LABEL[status]}
     </span>
   );
 }

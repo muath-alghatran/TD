@@ -1,9 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { StatusPill } from "@/components/ui/StatusPill";
 import { VehicleConfirmCard, type ConfirmRow } from "@/components/vehicle/VehicleConfirmCard";
+import { VehicleDiagramLevel1 } from "@/components/vehicle/VehicleDiagramLevel1";
+import { VehicleDiagramLevel2 } from "@/components/vehicle/VehicleDiagramLevel2";
 import { VehicleIdentifyForm, type VehicleIdentifyResult } from "@/components/vehicle/VehicleIdentifyForm";
+import { catalogPartPromise } from "@/lib/catalog-promise";
+import { CITIES } from "@/lib/city-catalog";
+import { dayWord, formatPrice, toArabicDigits } from "@/lib/format";
 import { saveVehicleToGarage, type GaragedVehicle } from "@/lib/garage";
+import { ZONES, type CatalogPart, type CatalogZone } from "@/lib/zone-catalog";
+
+type Step = "identify" | "confirm" | "diagram1" | "diagram2" | "partSelected";
 
 interface PendingVehicle {
   make: string;
@@ -39,10 +48,6 @@ function fromIdentifyResult(result: VehicleIdentifyResult): PendingVehicle {
   };
 }
 
-function toArabicDigits(n: number): string {
-  return String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[Number(d)]);
-}
-
 function buildRows(car: PendingVehicle): ConfirmRow[] {
   return [
     { key: "make", label: "الصانع", value: car.make, ok: true },
@@ -55,9 +60,11 @@ function buildRows(car: PendingVehicle): ConfirmRow[] {
 }
 
 export default function Home() {
-  const [step, setStep] = useState<"identify" | "confirm" | "saved">("identify");
+  const [step, setStep] = useState<Step>("identify");
   const [pending, setPending] = useState<PendingVehicle | null>(null);
   const [saved, setSaved] = useState<GaragedVehicle | null>(null);
+  const [selectedZone, setSelectedZone] = useState<CatalogZone | null>(null);
+  const [selectedPart, setSelectedPart] = useState<CatalogPart | null>(null);
 
   function handleIdentified(result: VehicleIdentifyResult) {
     setPending(fromIdentifyResult(result));
@@ -79,7 +86,15 @@ export default function Home() {
       plate: pending.plate || "—",
     });
     setSaved(record);
-    setStep("saved");
+    setStep("diagram1");
+  }
+
+  function resetToIdentify() {
+    setPending(null);
+    setSaved(null);
+    setSelectedZone(null);
+    setSelectedPart(null);
+    setStep("identify");
   }
 
   return (
@@ -98,44 +113,60 @@ export default function Home() {
         />
       )}
 
-      {step === "saved" && saved && (
+      {step === "diagram1" && saved && (
+        <VehicleDiagramLevel1
+          vehicleLabel={`${saved.make} ${saved.model} ${toArabicDigits(saved.year)}`}
+          vehicleTrim={saved.trim}
+          vehicleVin={saved.vin}
+          onSelectZone={(zoneId) => {
+            const zone = ZONES.find((z) => z.id === zoneId) ?? null;
+            setSelectedZone(zone);
+            setStep("diagram2");
+          }}
+          onChangeVehicle={resetToIdentify}
+        />
+      )}
+
+      {step === "diagram2" && saved && selectedZone && (
+        <VehicleDiagramLevel2
+          zone={selectedZone}
+          vehicle={{ make: saved.make, model: saved.model, year: saved.year }}
+          onBack={() => setStep("diagram1")}
+          onPickPart={(part) => {
+            setSelectedPart(part);
+            setStep("partSelected");
+          }}
+        />
+      )}
+
+      {step === "partSelected" && selectedPart && (
         <section>
+          <button className="retreat" onClick={() => setStep("diagram2")}>
+            ← رجوع للقطع
+          </button>
           <div className="lede">
-            <span className="t-eyebrow">تم الحفظ</span>
-            <h1>
-              سيارتك في كراجي
-              <br />
-              <em>جاهزة الآن</em>
-            </h1>
+            <span className="t-eyebrow">القطعة المختارة</span>
+            <h1>{selectedPart.n}</h1>
+            <p className="t-data" style={{ color: "var(--text-3)" }}>
+              {selectedPart.oem}
+            </p>
           </div>
-          <div className="vplate">
-            <div className="ic">
-              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#8FA6B4" strokeWidth="1.5" strokeLinecap="round">
-                <path d="M3 13.5l1.7-4.8A2.2 2.2 0 0 1 6.8 7h10.4a2.2 2.2 0 0 1 2.1 1.7L21 13.5V18h-2.4M3 18v-4.5M3 18h2.4m13.2 0H5.4" />
-                <circle cx="7.4" cy="18" r="1.8" />
-                <circle cx="16.6" cy="18" r="1.8" />
-              </svg>
+          <div className="sheet">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 14 }}>
+              <div>
+                <div className="t-disp" style={{ fontSize: 22, fontWeight: 600 }}>
+                  {formatPrice(selectedPart.price ?? 0)} ريال
+                </div>
+                <div style={{ fontSize: 12.5, color: "var(--text-2)", marginTop: 4 }}>شامل الضريبة</div>
+              </div>
+              {(() => {
+                const result = catalogPartPromise(selectedPart, CITIES[0], "ship");
+                return <StatusPill status={result.status} label={`${dayWord(result.days)}`} />;
+              })()}
             </div>
-            <div>
-              <strong>
-                {saved.make} {saved.model} {toArabicDigits(saved.year)}
-              </strong>
-              <small>{saved.trim}</small>
-              <div className="t-data">{saved.vin}</div>
+            <div className="memo">
+              شاشتا الاستلام والوعد والدفع لم تُبنيا بعد — المرحلة 5 القادمة. هذا ملخص عرضي فقط.
             </div>
-            <button
-              className="chg"
-              onClick={() => {
-                setSaved(null);
-                setPending(null);
-                setStep("identify");
-              }}
-            >
-              تغيير
-            </button>
-          </div>
-          <div className="memo">
-            المخطط التفاعلي (مناطق المركبة الثماني) ومسار اختيار القطع لم يُبنَ بعد — المرحلة 4 القادمة.
           </div>
         </section>
       )}

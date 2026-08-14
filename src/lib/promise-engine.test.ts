@@ -1,17 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { calcPromise, type PromiseSettings } from "./promise-engine";
-
-/** يطابق docs/data/settings.csv بعد إضافة صفوف محرك الوعد */
-const SETTINGS: PromiseSettings = {
-  hiConf: 0.85,
-  midConf: 0.65,
-  reliableSupplierThreshold: 0.55,
-  reliablePrepDays: 2,
-  specialPrepDays: 5,
-  fitDays: 1,
-  internalStockConfidence: 0.99,
-  weakSupplierBaseConfidence: 0.5,
-};
+import { DEFAULT_PROMISE_SETTINGS as SETTINGS } from "./default-promise-settings";
+import { calcPromise } from "./promise-engine";
 
 const HAIL = { shipDaysMax: 1, trustFactor: 1.0 };
 const ABHA = { shipDaysMax: 4, trustFactor: 0.85 };
