@@ -67,6 +67,9 @@ model Vehicle {
   trim           String?
   engine         String?
   generationCode String?
+  /// رقم اللوحة بالعربي — استمارة "رخصة سير" الحقيقية تحمل تمثيلين منفصلين (عربي ولاتيني)
+  plateArabic    String?
+  plateLatin     String?
   userId         String?
   user           User?    @relation(fields: [userId], references: [id])
   guestToken     String?
