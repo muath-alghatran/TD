@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { Sheet } from "@/components/ui/Sheet";
 import { extractVehicleForm, type VehicleFormExtraction } from "@/lib/ocr";
 import { VEHICLE_CATALOG } from "@/lib/vehicle-catalog";
 
@@ -48,7 +49,7 @@ export function VehicleIdentifyForm({ onIdentified }: { onIdentified: (result: V
         <p>نقرأ الماركة والموديل وسنة الصنع ورقم الهيكل من الصورة مباشرة — ثم نعرض عليك ما قرأناه لتؤكده.</p>
       </div>
 
-      <div className="sheet">
+      <Sheet>
         {status === "idle" && (
           <div
             className="drop"
@@ -155,7 +156,7 @@ export function VehicleIdentifyForm({ onIdentified }: { onIdentified: (result: V
           <b>لماذا لا نطلب منك رقم الهيكل؟</b> لأنه مكتوب في الاستمارة أصلاً. نقرأه ونحفظه بصمت — فهو ما يفرّق بين
           فئتين من نفس الموديل، وسنحتاجه في الضمان وسجل التركيب.
         </div>
-      </div>
+      </Sheet>
     </section>
   );
 }

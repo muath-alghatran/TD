@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { ActButton } from "@/components/ui/ActButton";
+import { Sheet } from "@/components/ui/Sheet";
 import { catalogPartPromise } from "@/lib/catalog-promise";
 import { CITIES } from "@/lib/city-catalog";
-import { dayWord, formatPrice } from "@/lib/format";
+import { dayWord, formatPrice, toArabicDigits } from "@/lib/format";
 import { PRICING_SETTINGS } from "@/lib/pricing-settings";
 import type { PromiseMode } from "@/lib/promise-engine";
 import type { CatalogPart } from "@/lib/zone-catalog";
@@ -37,7 +38,7 @@ export function ReceivingStep({
         <p>المدة ونسبة الثقة تُحسبان من التزام المورد وأداء الشحن لمدينتك تحديداً.</p>
       </div>
 
-      <div className="sheet">
+      <Sheet>
         <label className="t-eyebrow" style={{ color: "var(--text-3)", display: "block", marginBottom: 9 }}>
           المدينة
         </label>
@@ -55,7 +56,8 @@ export function ReceivingStep({
             <div>
               <strong>توصيل إلى عنواني</strong>
               <p>
-                {city.n} — خلال {dayWord(shipResult.days)} · شحن {city.c === 0 ? "مجاني (داخل حائل)" : `${city.c} ريال`}
+                {city.n} — خلال {dayWord(shipResult.days)} · شحن{" "}
+                {city.c === 0 ? "مجاني (داخل حائل)" : `${toArabicDigits(city.c)} ريال`}
               </p>
             </div>
           </div>
@@ -74,7 +76,7 @@ export function ReceivingStep({
         <ActButton style={{ marginTop: 20 }} onClick={() => onIssuePromise(cityName, mode)}>
           إصدار الوعد
         </ActButton>
-      </div>
+      </Sheet>
     </section>
   );
 }

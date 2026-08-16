@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Sheet } from "@/components/ui/Sheet";
 
 export interface ConfirmRow {
   key: string;
@@ -52,7 +53,7 @@ export function VehicleConfirmCard({
         <p>الحقول المؤكدة قرأناها بثقة عالية. الحقل المبرَز بالأصفر يحتاج نظرة منك قبل أن نعتمده.</p>
       </div>
 
-      <div className="sheet">
+      <Sheet>
         <div>
           {rows.map((row) => (
             <div key={row.key} className={`conf-row ${row.ok ? "" : "low"}`}>
@@ -98,7 +99,7 @@ export function VehicleConfirmCard({
         <div className="memo">
           <b>يُحفظ مرة واحدة.</b> بعد التأكيد لن نسألك عن سيارتك مجدداً — ستجدها في «كراجي» مع سجل قطعها وضماناتها.
         </div>
-      </div>
+      </Sheet>
     </section>
   );
 }

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { verifyPrice, type VerifiedPrice } from "@/app/actions/verify-price";
 import { ActButton } from "@/components/ui/ActButton";
+import { Sheet } from "@/components/ui/Sheet";
 import { dayWord, formatPrice, toArabicDigits } from "@/lib/format";
 import { createLocalOrder, type LocalOrder } from "@/lib/orders";
 import { capturePaymentMock } from "@/lib/payment";
@@ -66,23 +67,33 @@ export function PromiseVerdict({
 
   useEffect(() => {
     if (!verified) return;
-    // dashOffset/displayPercent يبدآن بالفعل من القيم الابتدائية (CIRCUMFERENCE و"—")
-    // عبر useState — لا حاجة لإعادة ضبطهما هنا، فـ verified يتغيّر مرة واحدة فقط لكل تحميل للشاشة.
+    const target = Math.round(verified.confidence * 100);
+    // النموذج (docs/prototype-parts.html) لا يراعي prefers-reduced-motion في عدّاده الرقمي —
+    // فجوة موروثة نُصلحها هنا: نقفز للقيمة النهائية فوراً بدل setInterval.
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let intervalId: ReturnType<typeof setInterval> | undefined;
+
     const startTimer = setTimeout(() => {
       setDashOffset(CIRCUMFERENCE * (1 - verified.confidence));
-      const target = Math.round(verified.confidence * 100);
+      if (reduceMotion) {
+        setDisplayPercent(`${target}%`);
+        return;
+      }
       let current = 0;
-      const interval = setInterval(() => {
+      intervalId = setInterval(() => {
         current += Math.max(1, Math.ceil((target - current) / 6));
         if (current >= target) {
           current = target;
-          clearInterval(interval);
+          clearInterval(intervalId);
         }
         setDisplayPercent(`${current}%`);
       }, 28);
-      return () => clearInterval(interval);
     }, 90);
-    return () => clearTimeout(startTimer);
+
+    return () => {
+      clearTimeout(startTimer);
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [verified]);
 
   async function handleAction() {
@@ -117,9 +128,9 @@ export function PromiseVerdict({
         <button className="retreat" onClick={onBack}>
           ← تعديل الاستلام
         </button>
-        <div className="sheet">
+        <Sheet>
           <span className="idle">جارٍ التحقق من السعر والتوفر…</span>
-        </div>
+        </Sheet>
       </section>
     );
   }
@@ -174,7 +185,7 @@ export function PromiseVerdict({
         </div>
       </div>
 
-      <div className="sheet" style={{ marginTop: 14 }}>
+      <Sheet className="mt-3.5">
         <span className="t-eyebrow" style={{ color: "var(--text-3)" }}>
           تفصيل الحساب
         </span>
@@ -226,7 +237,7 @@ export function PromiseVerdict({
             </>
           )}
         </div>
-      </div>
+      </Sheet>
     </section>
   );
 }
