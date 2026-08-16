@@ -31,3 +31,13 @@ export function logDemandGap(entry: Omit<DemandGapEntry, "createdAt">): void {
     // تخزين محلي غير حرج — فشله لا يوقف تجربة المستخدم
   }
 }
+
+export function listDemandGaps(): DemandGapEntry[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as DemandGapEntry[]) : [];
+  } catch {
+    return [];
+  }
+}

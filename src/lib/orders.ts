@@ -4,13 +4,13 @@
  * بكتابة Prisma فعلية عبر Server Action لاحقاً تغييراً في ملف واحد.
  *
  * قاعدة حرجة (docs/CLAUDE.md، docs/payment-spec.md §4): عدّاد الوعد
- * يبدأ من paidAt لا من requestedAt. paidAt يُضبط فقط لمسار الأخضر —
- * الأصفر والرمادي ينتهيان بـ status:"requested" بلا paidAt إطلاقاً.
+ * يبدأ من paidAt لا من requestedAt. paidAt يُضبط فقط عند الدفع الفعلي —
+ * أخضر فوراً، أو أصفر/رمادي بعد تأكيد إداري ثم دفع عبر رابط /pay/[id].
  */
 
 const STORAGE_KEY = "td-orders-local";
 
-export type OrderStatus = "requested" | "paid";
+export type OrderStatus = "requested" | "confirmed" | "unavailable" | "paid";
 
 export interface LocalOrder {
   id: string;
@@ -24,7 +24,11 @@ export interface LocalOrder {
   confidenceAtOrder: number;
   totalPrice: number;
   requestedAt: string;
+  confirmedAt: string | null;
+  paymentLinkExpiresAt: string | null;
   paidAt: string | null;
+  /** أيام التسليم الفعلية — لمقارنة الوعد مقابل الفعل، تُسجَّل يدوياً من لوحة التحكم */
+  actualDays: number | null;
 }
 
 export function listLocalOrders(): LocalOrder[] {
@@ -37,13 +41,36 @@ export function listLocalOrders(): LocalOrder[] {
   }
 }
 
-export function createLocalOrder(order: Omit<LocalOrder, "id" | "requestedAt">): LocalOrder {
+export function getLocalOrder(id: string): LocalOrder | null {
+  return listLocalOrders().find((o) => o.id === id) ?? null;
+}
+
+export function createLocalOrder(
+  order: Omit<LocalOrder, "id" | "requestedAt" | "confirmedAt" | "paymentLinkExpiresAt" | "actualDays">,
+): LocalOrder {
   const record: LocalOrder = {
     ...order,
     id: crypto.randomUUID(),
     requestedAt: new Date().toISOString(),
+    confirmedAt: null,
+    paymentLinkExpiresAt: null,
+    actualDays: null,
   };
   const existing = listLocalOrders();
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify([...existing, record]));
   return record;
+}
+
+export function updateLocalOrder(id: string, patch: Partial<LocalOrder>): LocalOrder | null {
+  const existing = listLocalOrders();
+  let updated: LocalOrder | null = null;
+  const next = existing.map((order) => {
+    if (order.id !== id) return order;
+    updated = { ...order, ...patch };
+    return updated;
+  });
+  if (updated) {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  }
+  return updated;
 }
