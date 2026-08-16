@@ -1,18 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { StatusPill } from "@/components/ui/StatusPill";
+import { PromiseVerdict } from "@/components/vehicle/PromiseVerdict";
+import { ReceivingStep } from "@/components/vehicle/ReceivingStep";
 import { VehicleConfirmCard, type ConfirmRow } from "@/components/vehicle/VehicleConfirmCard";
 import { VehicleDiagramLevel1 } from "@/components/vehicle/VehicleDiagramLevel1";
 import { VehicleDiagramLevel2 } from "@/components/vehicle/VehicleDiagramLevel2";
 import { VehicleIdentifyForm, type VehicleIdentifyResult } from "@/components/vehicle/VehicleIdentifyForm";
-import { catalogPartPromise } from "@/lib/catalog-promise";
-import { CITIES } from "@/lib/city-catalog";
-import { dayWord, formatPrice, toArabicDigits } from "@/lib/format";
+import { toArabicDigits } from "@/lib/format";
 import { saveVehicleToGarage, type GaragedVehicle } from "@/lib/garage";
+import { type LocalOrder } from "@/lib/orders";
+import type { PromiseMode } from "@/lib/promise-engine";
 import { ZONES, type CatalogPart, type CatalogZone } from "@/lib/zone-catalog";
 
-type Step = "identify" | "confirm" | "diagram1" | "diagram2" | "partSelected";
+type Step = "identify" | "confirm" | "diagram1" | "diagram2" | "receiving" | "verdict" | "outcome";
 
 interface PendingVehicle {
   make: string;
@@ -22,6 +23,11 @@ interface PendingVehicle {
   vin: string;
   plate: string;
   trimConfirmed: boolean;
+}
+
+interface ReceivingChoice {
+  cityName: string;
+  mode: PromiseMode;
 }
 
 function fromIdentifyResult(result: VehicleIdentifyResult): PendingVehicle {
@@ -65,6 +71,8 @@ export default function Home() {
   const [saved, setSaved] = useState<GaragedVehicle | null>(null);
   const [selectedZone, setSelectedZone] = useState<CatalogZone | null>(null);
   const [selectedPart, setSelectedPart] = useState<CatalogPart | null>(null);
+  const [receivingChoice, setReceivingChoice] = useState<ReceivingChoice | null>(null);
+  const [finalOrder, setFinalOrder] = useState<LocalOrder | null>(null);
 
   function handleIdentified(result: VehicleIdentifyResult) {
     setPending(fromIdentifyResult(result));
@@ -94,6 +102,8 @@ export default function Home() {
     setSaved(null);
     setSelectedZone(null);
     setSelectedPart(null);
+    setReceivingChoice(null);
+    setFinalOrder(null);
     setStep("identify");
   }
 
@@ -134,39 +144,74 @@ export default function Home() {
           onBack={() => setStep("diagram1")}
           onPickPart={(part) => {
             setSelectedPart(part);
-            setStep("partSelected");
+            setStep("receiving");
           }}
         />
       )}
 
-      {step === "partSelected" && selectedPart && (
+      {step === "receiving" && selectedPart && (
+        <ReceivingStep
+          part={selectedPart}
+          onBack={() => setStep("diagram2")}
+          onIssuePromise={(cityName, mode) => {
+            setReceivingChoice({ cityName, mode });
+            setStep("verdict");
+          }}
+        />
+      )}
+
+      {step === "verdict" && selectedPart && receivingChoice && saved && (
+        <PromiseVerdict
+          part={selectedPart}
+          cityName={receivingChoice.cityName}
+          mode={receivingChoice.mode}
+          vehicleVin={saved.vin}
+          onBack={() => setStep("receiving")}
+          onOutcome={(order) => {
+            setFinalOrder(order);
+            setStep("outcome");
+          }}
+        />
+      )}
+
+      {step === "outcome" && finalOrder && (
         <section>
-          <button className="retreat" onClick={() => setStep("diagram2")}>
-            ← رجوع للقطع
-          </button>
           <div className="lede">
-            <span className="t-eyebrow">القطعة المختارة</span>
-            <h1>{selectedPart.n}</h1>
-            <p className="t-data" style={{ color: "var(--text-3)" }}>
-              {selectedPart.oem}
+            <span className="t-eyebrow">{finalOrder.status === "paid" ? "تم الدفع" : "الطلب قيد المراجعة"}</span>
+            <h1>
+              {finalOrder.status === "paid" ? (
+                <>
+                  طلبك مؤكد
+                  <br />
+                  <em>وسيصلك حسب الوعد</em>
+                </>
+              ) : (
+                <>
+                  استلمنا طلبك
+                  <br />
+                  <em>سنؤكد التوفر خلال ٢٤ ساعة</em>
+                </>
+              )}
+            </h1>
+            <p>
+              {finalOrder.partName} · {finalOrder.partOem}
             </p>
           </div>
           <div className="sheet">
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 14 }}>
-              <div>
-                <div className="t-disp" style={{ fontSize: 22, fontWeight: 600 }}>
-                  {formatPrice(selectedPart.price ?? 0)} ريال
-                </div>
-                <div style={{ fontSize: 12.5, color: "var(--text-2)", marginTop: 4 }}>شامل الضريبة</div>
-              </div>
-              {(() => {
-                const result = catalogPartPromise(selectedPart, CITIES[0], "ship");
-                return <StatusPill status={result.status} label={`${dayWord(result.days)}`} />;
-              })()}
-            </div>
             <div className="memo">
-              شاشتا الاستلام والوعد والدفع لم تُبنيا بعد — المرحلة 5 القادمة. هذا ملخص عرضي فقط.
+              {finalOrder.status === "paid" ? (
+                <>
+                  <b>الدفع تم بنجاح.</b> عدّاد الوعد بدأ الآن من لحظة الدفع، لا من لحظة الطلب.
+                </>
+              ) : (
+                <>
+                  <b>لم يُخصم أي مبلغ.</b> سنرسل رسالة واتساب عند تأكيد التوفر، ومعها رابط دفع صالح ١٢ ساعة.
+                </>
+              )}
             </div>
+            <button className="act act-2" style={{ marginTop: 14 }} onClick={resetToIdentify}>
+              تجربة من البداية
+            </button>
           </div>
         </section>
       )}
