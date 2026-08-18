@@ -44,7 +44,7 @@ export function VehicleDiagramLevel1({
     <section>
       <div className="vplate">
         <div className="ic">
-          <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#8FA6B4" strokeWidth="1.5" strokeLinecap="round">
+          <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#8FA6B4" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
             <path d="M3 13.5l1.7-4.8A2.2 2.2 0 0 1 6.8 7h10.4a2.2 2.2 0 0 1 2.1 1.7L21 13.5V18h-2.4M3 18v-4.5M3 18h2.4m13.2 0H5.4" />
             <circle cx="7.4" cy="18" r="1.8" />
             <circle cx="16.6" cy="18" r="1.8" />

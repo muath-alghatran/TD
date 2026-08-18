@@ -153,7 +153,8 @@ export function PromiseVerdict({
         </span>
         <div className="gauge-wrap">
           <div className="gauge">
-            <svg viewBox="0 0 120 120">
+            {/* المقياس زخرفي — نفس المعلومة (الحالة والأيام) متاحة نصياً في say/why بجانبه */}
+            <svg viewBox="0 0 120 120" aria-hidden="true">
               <g>
                 {GAUGE_TICKS.map((t, i) => (
                   <line key={i} className="g-tick" x1={t.x1.toFixed(1)} y1={t.y1.toFixed(1)} x2={t.x2.toFixed(1)} y2={t.y2.toFixed(1)} />
