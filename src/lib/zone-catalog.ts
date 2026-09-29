@@ -65,7 +65,7 @@ export const ZONES: CatalogZone[] = [
   {
     id: "Z3",
     ref: "C4",
-    layer: "عفشة وفرامل",
+    layer: "عضلات السيارة",
     name: "الفرامل والعفشة الأمامية",
     x: 240,
     y: 300,
@@ -124,7 +124,7 @@ export const ZONES: CatalogZone[] = [
   {
     id: "Z7",
     ref: "G4",
-    layer: "عفشة وفرامل",
+    layer: "عضلات السيارة",
     name: "الفرامل والعفشة الخلفية",
     x: 664,
     y: 300,
@@ -151,4 +151,4 @@ export const ZONES: CatalogZone[] = [
   },
 ];
 
-export const LAYERS = ["الكل", "بدي", "ميكانيكا", "كهرباء", "عفشة وفرامل"];
+export const LAYERS = ["الكل", "بدي", "ميكانيكا", "كهرباء", "عضلات السيارة"];

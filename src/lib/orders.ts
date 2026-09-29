@@ -4,8 +4,9 @@
  * بكتابة Prisma فعلية عبر Server Action لاحقاً تغييراً في ملف واحد.
  *
  * قاعدة حرجة (docs/CLAUDE.md، docs/payment-spec.md §4): عدّاد الوعد
- * يبدأ من paidAt لا من requestedAt. paidAt يُضبط فقط عند الدفع الفعلي —
- * أخضر فوراً، أو أصفر/رمادي بعد تأكيد إداري ثم دفع عبر رابط /pay/[id].
+ * يبدأ من paidAt لا من requestedAt. كل الطلبات تُنشأ بحالة "requested" وتُسلَّم
+ * عبر واتساب (src/lib/whatsapp-checkout.ts) — التأكيد والدفع يحدثان بمحادثة
+ * بشرية خارج التطبيق، ثم تُحدَّث الحالة يدوياً من /admin/orders.
  */
 
 const STORAGE_KEY = "td-orders-local";

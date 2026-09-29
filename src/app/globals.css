@@ -31,6 +31,15 @@
   --spec: #68767f;
   --spec-lit: #9fb2bd;
   --spec-film: #68767f16;
+  /* ألوان هوية الخدمات — زخرفية فقط للتمييز البصري بين البطاقات، لا علاقة لها بحالة التوفر/الثقة (تبقى --ok/--wait/--spec وحدها) */
+  --acc-parts: #2c5ba6;
+  --acc-parts-film: #2c5ba614;
+  --acc-booking: #6a3fa0;
+  --acc-booking-film: #6a3fa014;
+  --acc-tow: #b54a2c;
+  --acc-tow-film: #b54a2c14;
+  --acc-support: #1a7a87;
+  --acc-support-film: #1a7a8714;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -60,6 +69,10 @@
   --color-spec: var(--spec);
   --color-spec-lit: var(--spec-lit);
   --color-spec-film: var(--spec-film);
+  --color-acc-parts: var(--acc-parts);
+  --color-acc-booking: var(--acc-booking);
+  --color-acc-tow: var(--acc-tow);
+  --color-acc-support: var(--acc-support);
   --font-disp: var(--font-alexandria), var(--font-ibm-plex-sans-arabic), system-ui, sans-serif;
   --font-body: var(--font-ibm-plex-sans-arabic), system-ui, sans-serif;
   --font-data: var(--font-ibm-plex-mono), ui-monospace, monospace;
@@ -350,6 +363,49 @@ body {
   margin-top: 11px;
   max-width: 52ch;
   font-weight: 300;
+}
+/*── شعار TD وسطر تعريف المركز ──*/
+.td-lede {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.td-mark {
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border-radius: 11px;
+  background: var(--ink);
+  color: var(--sheet);
+  font-family: var(--font-disp);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.01em;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.td-mark::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  inset-inline: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--acc-parts), var(--acc-booking), var(--acc-support), var(--acc-tow));
+}
+.td-blurb {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: var(--text-2);
+  margin-top: 8px;
+  font-weight: 300;
+}
+.td-blurb b {
+  color: var(--text);
+  font-weight: 600;
 }
 .retreat {
   font-family: var(--font-data);
@@ -1274,6 +1330,145 @@ select:focus {
 }
 .tally .ln-i.cr span {
   color: var(--ok) !important;
+}
+
+/*── اللوحة الرئيسية — بطاقات الخدمات (تعبئة لونية كاملة بروح MIG) ──*/
+.svc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 11px;
+  margin-top: 18px;
+}
+.svc-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 22px;
+  padding: 18px 16px;
+  border: none;
+  border-radius: 14px;
+  text-align: start;
+  position: relative;
+  overflow: hidden;
+  transition: 0.2s var(--ease);
+  color: #fff;
+}
+.svc-tile.parts {
+  background: linear-gradient(150deg, var(--acc-parts), color-mix(in srgb, var(--acc-parts) 78%, #000));
+}
+.svc-tile.booking {
+  background: linear-gradient(150deg, var(--acc-booking), color-mix(in srgb, var(--acc-booking) 78%, #000));
+}
+.svc-tile.tow {
+  background: linear-gradient(150deg, var(--acc-tow), color-mix(in srgb, var(--acc-tow) 78%, #000));
+}
+.svc-tile.support {
+  background: linear-gradient(150deg, var(--acc-support), color-mix(in srgb, var(--acc-support) 78%, #000));
+}
+.svc-tile:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px -10px #00000055;
+}
+.svc-tile:active:not(:disabled) {
+  transform: translateY(0);
+}
+.svc-tile:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+.svc-tile .ic {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  color: #fff;
+  background: #ffffff26;
+}
+.svc-tile .ic svg {
+  width: 22px;
+  height: 22px;
+}
+.svc-tile strong {
+  font-family: var(--font-disp);
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+}
+.svc-tile .d {
+  font-size: 11.5px;
+  color: #ffffffb8;
+  font-weight: 300;
+  margin-top: -14px;
+}
+.svc-tile .soon {
+  position: absolute;
+  top: 12px;
+  inset-inline-end: 12px;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: #fff;
+  font-family: var(--font-data);
+  background: #00000030;
+  padding: 3px 7px;
+  border-radius: 20px;
+}
+
+/*── الشريط السفلي ──*/
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  inset-inline: 0;
+  z-index: 20;
+  display: flex;
+  background: var(--sheet);
+  border-top: 1px solid var(--rule);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.bottom-nav button {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 0 8px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--text-3);
+  position: relative;
+}
+.bottom-nav button:disabled {
+  cursor: not-allowed;
+  color: var(--text-3);
+}
+.bottom-nav button:disabled .ic {
+  position: relative;
+  opacity: 0.75;
+}
+.bottom-nav .lock {
+  position: absolute;
+  top: -3px;
+  inset-inline-end: -4px;
+  width: 13px;
+  height: 13px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  color: var(--text-3);
+}
+.bottom-nav .lock svg {
+  width: 8px;
+  height: 8px;
+}
+.bottom-nav button.on {
+  color: var(--ink);
+}
+.bottom-nav .ic {
+  width: 22px;
+  height: 22px;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -64,6 +64,11 @@ export default function AdminOrdersPage() {
     refresh();
   }
 
+  function handleMarkPaid(order: LocalOrder) {
+    updateLocalOrder(order.id, { status: "paid", paidAt: new Date().toISOString() });
+    refresh();
+  }
+
   function handleRecordDelivery(order: LocalOrder) {
     if (!order.paidAt) return;
     const days = Math.max(1, Math.round((Date.now() - new Date(order.paidAt).getTime()) / 86400000));
@@ -104,7 +109,6 @@ export default function AdminOrdersPage() {
       <div className="mt-3.5 flex flex-col gap-2.5">
         {visibleOrders.map((order) => {
           const meta = STATUS_META[order.status];
-          const payUrl = typeof window !== "undefined" ? `${window.location.origin}/pay/${order.id}` : `/pay/${order.id}`;
           return (
             <Sheet key={order.id}>
               <div className="flex items-start justify-between gap-3">
@@ -144,9 +148,14 @@ export default function AdminOrdersPage() {
                   </>
                 )}
                 {order.status === "confirmed" && (
-                  <ActButton variant="secondary" onClick={() => copyText(order.id, payUrl)}>
-                    {copiedId === order.id ? "نُسخ الرابط" : "نسخ رابط الدفع"}
-                  </ActButton>
+                  <>
+                    <ActButton onClick={() => handleMarkPaid(order)}>تحديد كمدفوع</ActButton>
+                    {order.paymentLinkExpiresAt && (
+                      <span style={{ fontSize: 11.5, color: "var(--text-3)", alignSelf: "center" }}>
+                        موعد المتابعة: {new Date(order.paymentLinkExpiresAt).toLocaleString("ar-SA")}
+                      </span>
+                    )}
+                  </>
                 )}
                 {order.status === "paid" && order.actualDays === null && (
                   <ActButton variant="secondary" onClick={() => handleRecordDelivery(order)}>

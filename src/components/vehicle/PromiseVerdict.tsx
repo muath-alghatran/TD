@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { verifyPrice, type VerifiedPrice } from "@/app/actions/verify-price";
 import { ActButton } from "@/components/ui/ActButton";
 import { Sheet } from "@/components/ui/Sheet";
-import { dayWord, formatPrice, toArabicDigits } from "@/lib/format";
+import { dayWord, formatPrice } from "@/lib/format";
 import { createLocalOrder, type LocalOrder } from "@/lib/orders";
-import { capturePaymentMock } from "@/lib/payment";
 import { PRICING_SETTINGS } from "@/lib/pricing-settings";
 import type { PromiseMode } from "@/lib/promise-engine";
+import { buildPartsOrderMessage, buildWhatsAppLink } from "@/lib/whatsapp-checkout";
 import type { CatalogPart } from "@/lib/zone-catalog";
 
 const CIRCUMFERENCE = 216.8;
@@ -39,18 +39,25 @@ const LIT: Record<VerifiedPrice["status"], string> = {
   spec: "#9FB2BD",
 };
 
+export interface VerdictVehicle {
+  vin: string;
+  make: string;
+  model: string;
+  year: number;
+}
+
 export function PromiseVerdict({
   part,
   cityName,
   mode,
-  vehicleVin,
+  vehicle,
   onBack,
   onOutcome,
 }: {
   part: CatalogPart;
   cityName: string;
   mode: PromiseMode;
-  vehicleVin: string;
+  vehicle: VerdictVehicle;
   onBack: () => void;
   onOutcome: (order: LocalOrder) => void;
 }) {
@@ -96,13 +103,13 @@ export function PromiseVerdict({
     };
   }, [verified]);
 
-  async function handleAction() {
+  function handleAction() {
     if (!verified || submitting || requestedRef.current) return;
     requestedRef.current = true;
     setSubmitting(true);
 
-    const baseOrder = {
-      vehicleVin,
+    const order = createLocalOrder({
+      vehicleVin: vehicle.vin,
       partOem: verified.oem,
       partName: verified.partName,
       cityName,
@@ -110,16 +117,23 @@ export function PromiseVerdict({
       promisedDays: verified.days,
       confidenceAtOrder: verified.confidence,
       totalPrice: verified.total,
-    };
+      status: "requested",
+      paidAt: null,
+    });
 
-    if (verified.status === "ok") {
-      const payment = await capturePaymentMock(verified.total);
-      const order = createLocalOrder({ ...baseOrder, status: "paid", paidAt: payment.capturedAt });
-      onOutcome(order);
-    } else {
-      const order = createLocalOrder({ ...baseOrder, status: "requested", paidAt: null });
-      onOutcome(order);
-    }
+    const message = buildPartsOrderMessage({
+      vehicleLabel: `${vehicle.make} ${vehicle.model} ${vehicle.year}`,
+      partName: verified.partName,
+      partOem: verified.oem,
+      cityName,
+      mode,
+      days: verified.days,
+      confidence: verified.confidence,
+      total: verified.total,
+    });
+    window.open(buildWhatsAppLink(message), "_blank", "noopener,noreferrer");
+
+    onOutcome(order);
   }
 
   if (!verified) {
@@ -223,20 +237,11 @@ export function PromiseVerdict({
         </div>
 
         <ActButton style={{ marginTop: 20 }} onClick={handleAction} disabled={submitting}>
-          {submitting ? "جارٍ التنفيذ…" : verified.status === "ok" ? "إتمام الطلب والدفع" : "اطلب تأكيد التوفر"}
+          {submitting ? "جارٍ الفتح…" : "إتمام الطلب عبر واتساب"}
         </ActButton>
         <div className="memo">
-          {verified.status === "ok" ? (
-            <>
-              <b>هذا وعد ملزم.</b> إن تأخر الطلب عن {dayWord(verified.days)}، يُضاف إلى حسابك رصيد{" "}
-              {toArabicDigits(PRICING_SETTINGS.lateCredit)} ريال تلقائياً ودون مطالبة منك.
-            </>
-          ) : (
-            <>
-              <b>لا تدفع الآن — بلا بيانات بطاقة وبلا حجز.</b> نؤكد لك التوفر خلال ٢٤ ساعة عبر واتساب، وعندها يصلك
-              رابط دفع صالح ١٢ ساعة.
-            </>
-          )}
+          <b>لا دفع هنا.</b> سيُفتح واتساب برسالة طلبك جاهزة — راجعها وأرسلها، ونؤكد التوفر والسعر والدفع معك مباشرة
+          في المحادثة.
         </div>
       </Sheet>
     </section>
