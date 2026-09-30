@@ -69,7 +69,7 @@ export function VehicleIdentifyForm({ onIdentified }: { onIdentified: (result: V
                 height="26"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#4B565C"
+                stroke="currentColor"
                 strokeWidth="1.4"
                 strokeLinecap="round"
                 strokeLinejoin="round"

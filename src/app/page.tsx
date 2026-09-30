@@ -1,32 +1,28 @@
-"use client";
+import { ActiveOrder } from "@/components/home/ActiveOrder";
+import { GaragePeek } from "@/components/home/GaragePeek";
+import { HomeHero } from "@/components/home/HomeHero";
+import { IdentityStrip } from "@/components/home/IdentityStrip";
+import { PromisesRail } from "@/components/home/PromisesRail";
+import { ServicesBoard } from "@/components/home/ServicesBoard";
+import { TabBar } from "@/components/shell/TabBar";
 
-import { useState } from "react";
-import { BottomNav, type NavTarget } from "@/components/dashboard/BottomNav";
-import { Dashboard } from "@/components/dashboard/Dashboard";
-import { getGaragedVehicles, type GaragedVehicle } from "@/lib/garage";
-import { PartsOrderFlow } from "@/components/vehicle/PartsOrderFlow";
-
-function mostRecentVehicle(): GaragedVehicle | undefined {
-  const saved = getGaragedVehicles();
-  return saved.length > 0 ? saved[saved.length - 1] : undefined;
-}
-
-export default function Home() {
-  const [screen, setScreen] = useState<NavTarget>("home");
-  const [partsKey, setPartsKey] = useState(0);
-
-  function openParts() {
-    setPartsKey((k) => k + 1);
-    setScreen("parts");
-  }
-
+/**
+ * الرئيسية — تجمع الاتجاهات الثلاثة (docs/design/README.md):
+ * واجهة المركز (1c) · الطلب النشط على الطريق (1b) · لوح الخدمات الست (1a) ·
+ * كراجي باللوحة السعودية ووعودنا على الطريق (1b) · شريط الهوية (1a).
+ */
+export default function HomePage() {
   return (
     <>
-      {screen === "home" && <Dashboard onOpenParts={openParts} />}
-      {screen === "parts" && (
-        <PartsOrderFlow key={partsKey} initialVehicle={mostRecentVehicle()} onHome={() => setScreen("home")} />
-      )}
-      <BottomNav active={screen} onNavigate={(target) => (target === "parts" ? openParts() : setScreen("home"))} />
+      <main className="screen has-tabbar">
+        <HomeHero />
+        <ActiveOrder />
+        <ServicesBoard />
+        <GaragePeek />
+        <PromisesRail />
+        <IdentityStrip />
+      </main>
+      <TabBar />
     </>
   );
 }

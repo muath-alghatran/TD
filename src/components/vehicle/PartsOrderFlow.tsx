@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { PromiseVerdict } from "@/components/vehicle/PromiseVerdict";
 import { ReceivingStep } from "@/components/vehicle/ReceivingStep";
@@ -7,9 +8,10 @@ import { VehicleConfirmCard, type ConfirmRow } from "@/components/vehicle/Vehicl
 import { VehicleDiagramLevel1 } from "@/components/vehicle/VehicleDiagramLevel1";
 import { VehicleDiagramLevel2 } from "@/components/vehicle/VehicleDiagramLevel2";
 import { VehicleIdentifyForm, type VehicleIdentifyResult } from "@/components/vehicle/VehicleIdentifyForm";
+import { RegMarks } from "@/components/ui/Sheet";
 import { toArabicDigits } from "@/lib/format";
 import { saveVehicleToGarage, type GaragedVehicle } from "@/lib/garage";
-import { type LocalOrder } from "@/lib/orders";
+import { orderCode, type LocalOrder } from "@/lib/orders";
 import type { PromiseMode } from "@/lib/promise-engine";
 import { ZONES, type CatalogPart, type CatalogZone } from "@/lib/zone-catalog";
 
@@ -185,7 +187,7 @@ export function PartsOrderFlow({
       {step === "outcome" && finalOrder && (
         <section>
           <div className="lede">
-            <span className="t-eyebrow">تم إرسال طلبك</span>
+            <span className="t-eyebrow">تم إرسال طلبك · {orderCode(finalOrder.id)}</span>
             <h1>
               راجع رسالة واتساب
               <br />
@@ -196,15 +198,16 @@ export function PartsOrderFlow({
             </p>
           </div>
           <div className="sheet">
-            <div className="memo">
+            <RegMarks />
+            <div className="memo" style={{ marginTop: 0 }}>
               <b>لم يُخصم أي مبلغ.</b> فتحنا لك محادثة واتساب برسالة الطلب جاهزة — أرسلها ونؤكد التوفر والسعر
               والدفع معك مباشرة هناك.
             </div>
-            <button className="act" style={{ marginTop: 14 }} onClick={onHome}>
+            <Link className="act" style={{ marginTop: 14 }} href={`/orders/${finalOrder.id}`}>
+              تابع طلبك خطوة بخطوة
+            </Link>
+            <button className="act act-2" style={{ marginTop: 10 }} onClick={onHome}>
               الرئيسية
-            </button>
-            <button className="act act-2" style={{ marginTop: 10 }} onClick={resetToIdentify}>
-              تجربة من البداية
             </button>
           </div>
         </section>

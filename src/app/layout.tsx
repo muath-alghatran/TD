@@ -1,28 +1,53 @@
-import type { Metadata } from "next";
-import { Alexandria, IBM_Plex_Sans_Arabic, IBM_Plex_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Barlow, Barlow_Condensed, IBM_Plex_Sans_Arabic } from "next/font/google";
+import { CENTER } from "@/lib/center-info";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
-const alexandria = Alexandria({
-  variable: "--font-alexandria",
-  subsets: ["arabic", "latin"],
-  weight: ["200", "400", "500", "700", "800"],
+/* الخطوط حسب نظام Industry: Barlow Condensed للعناوين، Barlow للنص والأرقام اللاتينية،
+   وIBM Plex Sans Arabic لكل حرف عربي (يأتي بعدهما في كل مجموعة خطوط في globals.css). */
+const barlow = Barlow({
+  variable: "--font-barlow",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const barlowCondensed = Barlow_Condensed({
+  variable: "--font-barlow-condensed",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
   variable: "--font-ibm-plex-sans-arabic",
   subsets: ["arabic", "latin"],
-  weight: ["300", "400", "500", "600"],
-});
-
-const ibmPlexMono = IBM_Plex_Mono({
-  variable: "--font-ibm-plex-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "Trust Drive — منصة قطع الغيار",
-  description: "قطع غيار بوعد محسوب",
+  title: {
+    default: `${CENTER.nameAr} (TD) — ${CENTER.tagline}`,
+    template: `%s — ${CENTER.nameAr}`,
+  },
+  description: CENTER.summary,
+  applicationName: CENTER.nameAr,
+  openGraph: {
+    type: "website",
+    locale: "ar_SA",
+    siteName: `${CENTER.nameAr} · ${CENTER.nameEn}`,
+    title: `${CENTER.nameAr} (TD) — ${CENTER.headline}`,
+    description: CENTER.summary,
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f2f2f3" },
+    { media: "(prefers-color-scheme: dark)", color: "#1d2d3d" },
+  ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -30,9 +55,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="ar"
       dir="rtl"
-      className={`${alexandria.variable} ${ibmPlexSansArabic.variable} ${ibmPlexMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${barlow.variable} ${barlowCondensed.variable} ${ibmPlexSansArabic.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <head>
+        {/* يطبّق الوضع المحفوظ قبل أول رسم لتفادي وميض الوضع الخاطئ */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }

@@ -1,6 +1,13 @@
 import type { CatalogCity } from "./city-catalog";
 import { DEFAULT_PROMISE_SETTINGS } from "./default-promise-settings";
-import { calcPromise, type PromiseMode, type PromiseResult, type PromiseStatus } from "./promise-engine";
+import {
+  calcPromise,
+  promiseLegs,
+  type PromiseLegs,
+  type PromiseMode,
+  type PromiseResult,
+  type PromiseStatus,
+} from "./promise-engine";
 import type { CatalogPart, CatalogZone } from "./zone-catalog";
 
 /** يهيّئ بيانات الكتالوج (oem/n/g/stock/rel...) لشكل calcPromise (stockInternal/supplierReliability...). */
@@ -21,4 +28,14 @@ export function zoneStatus(zone: Pick<CatalogZone, "parts">, city: CatalogCity):
   if (bestConfidence >= DEFAULT_PROMISE_SETTINGS.hiConf) return "ok";
   if (bestConfidence >= DEFAULT_PROMISE_SETTINGS.midConf) return "wait";
   return "spec";
+}
+
+/** أجزاء مدة الوعد لقطعة من الكتالوج — لعرض «كيف حسبنا الموعد» في تتبع الطلب. */
+export function catalogPartLegs(part: CatalogPart, city: CatalogCity, mode: PromiseMode): PromiseLegs {
+  return promiseLegs(
+    { stockInternal: part.stock ?? 0, supplierReliability: part.rel ?? 0 },
+    { shipDaysMax: city.d, trustFactor: city.t },
+    mode,
+    DEFAULT_PROMISE_SETTINGS,
+  );
 }

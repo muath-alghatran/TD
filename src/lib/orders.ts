@@ -8,8 +8,9 @@
  * عبر واتساب (src/lib/whatsapp-checkout.ts) — التأكيد والدفع يحدثان بمحادثة
  * بشرية خارج التطبيق، ثم تُحدَّث الحالة يدوياً من /admin/orders.
  */
+import { notifyLocalChange } from "./local-events";
 
-const STORAGE_KEY = "td-orders-local";
+export const ORDERS_STORAGE_KEY = "td-orders-local";
 
 export type OrderStatus = "requested" | "confirmed" | "unavailable" | "paid";
 
@@ -30,12 +31,22 @@ export interface LocalOrder {
   paidAt: string | null;
   /** أيام التسليم الفعلية — لمقارنة الوعد مقابل الفعل، تُسجَّل يدوياً من لوحة التحكم */
   actualDays: number | null;
+
+  /* — تفصيل السعر لعرضه في «تتبع الطلب». اختيارية لأن الطلبات المحفوظة قبل
+       إضافتها لا تحملها. الأسماء تطابق OrderItem (unitPrice/laborCost/discount)
+       وCity.shipCost وPart (warrantyMonths/qualityTier) في prisma/schema.prisma. — */
+  unitPrice?: number;
+  laborCost?: number;
+  discount?: number;
+  shipCost?: number;
+  warrantyMonths?: number | null;
+  qualityTier?: string | null;
 }
 
 export function listLocalOrders(): LocalOrder[] {
   if (typeof window === "undefined") return [];
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(ORDERS_STORAGE_KEY);
     return raw ? (JSON.parse(raw) as LocalOrder[]) : [];
   } catch {
     return [];
@@ -58,7 +69,8 @@ export function createLocalOrder(
     actualDays: null,
   };
   const existing = listLocalOrders();
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify([...existing, record]));
+  window.localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify([...existing, record]));
+  notifyLocalChange();
   return record;
 }
 
@@ -71,7 +83,18 @@ export function updateLocalOrder(id: string, patch: Partial<LocalOrder>): LocalO
     return updated;
   });
   if (updated) {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    window.localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(next));
+    notifyLocalChange();
   }
   return updated;
+}
+
+/**
+ * رمز قصير ثابت للطلب مثل «TD-24817» — يُشتق من المعرّف ليسهل ذكره في
+ * محادثة واتساب. للعرض والمراسلة فقط، والمعرّف الكامل يبقى هو المرجع.
+ */
+export function orderCode(id: string): string {
+  let hash = 0;
+  for (const ch of id) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  return `TD-${(hash % 90000) + 10000}`;
 }

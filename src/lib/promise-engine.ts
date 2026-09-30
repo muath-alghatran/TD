@@ -48,12 +48,22 @@ export interface PromiseResult {
   status: PromiseStatus;
 }
 
-export function calcPromise(
+/** أجزاء المدة التي يتكوّن منها الوعد — تُعرض للعميل في «كيف حسبنا الموعد» */
+export interface PromiseLegs {
+  /** تجهيز القطعة: 0 من المخزون الداخلي، وإلا حسب موثوقية المورد */
+  prepDays: number;
+  /** الشحن إلى المدينة — صفر عند التركيب في المركز */
+  shipDays: number;
+  /** يوم التركيب في المركز — صفر عند التوصيل */
+  fitDays: number;
+}
+
+export function promiseLegs(
   part: PromisePart,
   city: PromiseCity,
   mode: PromiseMode,
   settings: PromiseSettings,
-): PromiseResult {
+): PromiseLegs {
   const prepDays =
     part.stockInternal > 0
       ? 0
@@ -61,8 +71,20 @@ export function calcPromise(
         ? settings.reliablePrepDays
         : settings.specialPrepDays;
 
-  const shipDays = mode === "fit" ? 0 : city.shipDaysMax;
-  const fitDays = mode === "fit" ? settings.fitDays : 0;
+  return {
+    prepDays,
+    shipDays: mode === "fit" ? 0 : city.shipDaysMax,
+    fitDays: mode === "fit" ? settings.fitDays : 0,
+  };
+}
+
+export function calcPromise(
+  part: PromisePart,
+  city: PromiseCity,
+  mode: PromiseMode,
+  settings: PromiseSettings,
+): PromiseResult {
+  const { prepDays, shipDays, fitDays } = promiseLegs(part, city, mode, settings);
   const days = Math.max(1, prepDays + shipDays + fitDays);
 
   const base =

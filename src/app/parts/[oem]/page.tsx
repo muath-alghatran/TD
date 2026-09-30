@@ -28,10 +28,10 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ oem: string }> }): Promise<Metadata> {
   const { oem } = await params;
   const found = findPart(oem);
-  if (!found) return { title: "قطعة غير موجودة — Trust Drive" };
+  if (!found) return { title: "قطعة غير موجودة" };
   const { part } = found;
   return {
-    title: `${part.n} · ${part.oem} — Trust Drive`,
+    title: `${part.n} · ${part.oem}`,
     description: `${part.n} (${part.oem}) — ${part.tier ?? ""} — قطع غيار بوعد محسوب من Trust Drive.`,
   };
 }
@@ -67,6 +67,9 @@ export default async function PartPage({ params }: { params: Promise<{ oem: stri
 
   return (
     <main className="stage">
+      <Link href="/parts" className="retreat">
+        ← قطع الغيار
+      </Link>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <div className="lede">
@@ -88,7 +91,7 @@ export default async function PartPage({ params }: { params: Promise<{ oem: stri
         <div className="t-disp mt-3" style={{ fontSize: 24, fontWeight: 700 }}>
           {formatPrice(part.price ?? 0)} ريال <small style={{ fontSize: 12, fontWeight: 300, color: "var(--text-3)" }}>شامل الضريبة</small>
         </div>
-        <Link className="act mt-5" href="/">
+        <Link className="act mt-5" href="/parts">
           ابدأ الطلب
         </Link>
         <div className="memo">
