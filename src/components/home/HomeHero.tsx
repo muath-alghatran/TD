@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Shield, Wordmark } from "@/components/brand/Brand";
 import { ThemeToggle } from "@/components/shell/ThemeToggle";
 import { Icon } from "@/components/ui/Icon";
-import { CENTER, FACADE_PHOTO } from "@/lib/center-info";
+import { CENTER, FACADE_FOCUS, FACADE_PHOTO } from "@/lib/center-info";
 
 /** الواجهة (1c): صورة المركز الحقيقية بصبغة فولاذية، وزوايا عدسة، وتعريف المركز */
 export function HomeHero() {
@@ -17,7 +17,7 @@ export function HomeHero() {
           sizes="(max-width: 720px) 100vw, 720px"
           loading="eager"
           fetchPriority="high"
-          style={{ objectFit: "cover", objectPosition: "50% 50%" }}
+          style={{ objectFit: "cover", objectPosition: FACADE_FOCUS }}
         />
       </div>
       <div className="hero-shade" />

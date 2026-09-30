@@ -5,7 +5,7 @@ import { Shield } from "@/components/brand/Brand";
 import { TabBar } from "@/components/shell/TabBar";
 import { Corners } from "@/components/ui/Corners";
 import { Icon } from "@/components/ui/Icon";
-import { CENTER, COMMITMENTS, FACADE_PHOTO, HOW_WE_WORK, TEAM, WORKSHOP_PHOTOS } from "@/lib/center-info";
+import { CENTER, COMMITMENTS, FACADE_FOCUS, FACADE_PHOTO, HOW_WE_WORK, TEAM, WORKSHOP_PHOTOS } from "@/lib/center-info";
 import { HELLO_MESSAGE, buildWhatsAppLink } from "@/lib/whatsapp-requests";
 
 export const metadata: Metadata = {
@@ -36,7 +36,7 @@ export default function AboutPage() {
               sizes="(max-width: 720px) 100vw, 720px"
               loading="eager"
               fetchPriority="high"
-              style={{ objectFit: "cover", objectPosition: "50% 58%" }}
+              style={{ objectFit: "cover", objectPosition: FACADE_FOCUS }}
             />
           </div>
           <div className="hero-shade" />
