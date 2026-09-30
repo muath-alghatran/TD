@@ -71,6 +71,12 @@ export const WORKSHOP_PHOTOS: WorkshopPhoto[] = [{ src: "/media/center-facade.jp
 export const FACADE_PHOTO = "/media/center-facade.jpg";
 
 /**
+ * نقطة التركيز في صورة الواجهة (object-position): الصورة أفقية، والشاشة الضيقة تقصّ جانبيها،
+ * فنُبقي اللوحة «TRUST DRIVE» والدرع والباب المفتوح داخل الإطار. غيّرها إن تغيّرت الصورة.
+ */
+export const FACADE_FOCUS = "12% 50%";
+
+/**
  * أوقات الحجز المقترحة — طلب الحجز يُرسل عبر واتساب ويؤكَّد بشرياً،
  * فهذه اقتراحات للعميل لا مواعيد مؤكدة. عدّلها لتطابق ساعات العمل الفعلية.
  */
