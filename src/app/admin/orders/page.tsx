@@ -8,7 +8,7 @@ import { Tag } from "@/components/ui/Tag";
 import { logDemandGap } from "@/lib/demand-gap";
 import { toArabicDigits } from "@/lib/format";
 import { getGaragedVehicles } from "@/lib/garage";
-import { listLocalOrders, updateLocalOrder, type LocalOrder, type OrderStatus } from "@/lib/orders";
+import { listLocalOrders, orderCode, updateLocalOrder, type LocalOrder, type OrderStatus } from "@/lib/orders";
 import { buildSupplierMessage } from "@/lib/whatsapp-message";
 
 const STATUS_META: Record<OrderStatus, { label: string; pill: "ok" | "wait" | "spec" }> = {
@@ -117,7 +117,7 @@ export default function AdminOrdersPage() {
                     {order.partName}
                   </div>
                   <div className="t-data" style={{ fontSize: 11.5, color: "var(--text-3)", marginTop: 2 }}>
-                    {order.partOem} · {vehicleLabelFor(order.vehicleVin)}
+                    {orderCode(order.id)} · {order.partOem} · {vehicleLabelFor(order.vehicleVin)}
                   </div>
                 </div>
                 <StatusPill status={meta.pill} label={meta.label} />

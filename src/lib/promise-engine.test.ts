@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_PROMISE_SETTINGS as SETTINGS } from "./default-promise-settings";
-import { calcPromise } from "./promise-engine";
+import { calcPromise, promiseLegs } from "./promise-engine";
 
 const HAIL = { shipDaysMax: 1, trustFactor: 1.0 };
 const ABHA = { shipDaysMax: 4, trustFactor: 0.85 };
@@ -62,5 +62,33 @@ describe("calcPromise — الحالات المرجعية من docs/build-plan.m
       SETTINGS,
     );
     expect(justBelowMid.status).toBe("spec");
+  });
+});
+
+describe("promiseLegs — أجزاء المدة المعروضة في «كيف حسبنا الموعد»", () => {
+  it("مجموع الأجزاء يساوي أيام الوعد في كل الحالات المرجعية", () => {
+    const cases = [
+      { part: { stockInternal: 2, supplierReliability: 0.88 }, city: HAIL },
+      { part: { stockInternal: 0, supplierReliability: 0.95 }, city: ABHA },
+      { part: { stockInternal: 0, supplierReliability: 0.4 }, city: ABHA },
+    ];
+    for (const { part, city } of cases) {
+      for (const mode of ["ship", "fit"] as const) {
+        const legs = promiseLegs(part, city, mode, SETTINGS);
+        const r = calcPromise(part, city, mode, SETTINGS);
+        expect(Math.max(1, legs.prepDays + legs.shipDays + legs.fitDays)).toBe(r.days);
+      }
+    }
+  });
+
+  it("مندوب موثوق → أبها: تجهيز 2 + شحن 4، والتركيب يستبدل الشحن بيوم واحد", () => {
+    const part = { stockInternal: 0, supplierReliability: 0.95 };
+    expect(promiseLegs(part, ABHA, "ship", SETTINGS)).toEqual({ prepDays: 2, shipDays: 4, fitDays: 0 });
+    expect(promiseLegs(part, ABHA, "fit", SETTINGS)).toEqual({ prepDays: 2, shipDays: 0, fitDays: 1 });
+  });
+
+  it("مخزون داخلي → لا أيام تجهيز", () => {
+    const legs = promiseLegs({ stockInternal: 3, supplierReliability: 0.2 }, HAIL, "ship", SETTINGS);
+    expect(legs.prepDays).toBe(0);
   });
 });

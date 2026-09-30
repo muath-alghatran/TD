@@ -119,6 +119,13 @@ export function PromiseVerdict({
       totalPrice: verified.total,
       status: "requested",
       paidAt: null,
+      // تفصيل السعر والضمان — يُعرض داخل مرحلة الموافقة في «تتبع الطلب»
+      unitPrice: verified.unitPrice,
+      laborCost: verified.laborCost,
+      discount: verified.discount,
+      shipCost: verified.shipCost,
+      warrantyMonths: part.war ?? null,
+      qualityTier: part.tier ?? null,
     });
 
     const message = buildPartsOrderMessage({
