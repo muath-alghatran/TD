@@ -1,172 +1,235 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { Sheet } from "@/components/ui/Sheet";
-import { extractVehicleForm, type VehicleFormExtraction } from "@/lib/ocr";
+import { useRef, useState, type FormEvent, type MouseEvent } from "react";
+import { Corners } from "@/components/ui/Corners";
+import { Icon } from "@/components/ui/Icon";
+import { SearchSelect } from "@/components/ui/SearchSelect";
+import { logDemandGap } from "@/lib/demand-gap";
+import { toArabicDigits } from "@/lib/format";
+import { FEATURE_FORM_OCR, extractVehicleForm } from "@/lib/ocr";
 import { VEHICLE_CATALOG } from "@/lib/vehicle-catalog";
+import { cleanVinInput, isCompleteVin } from "@/lib/vin";
+import { buildVehicleNotListedMessage, buildWhatsAppLink } from "@/lib/whatsapp-requests";
+import { VinField } from "./VinField";
 
-export type VehicleIdentifyResult =
-  | { source: "ocr"; extraction: VehicleFormExtraction }
-  | { source: "manual"; make: string; model: string; year: number };
+export interface VehicleIdentifyResult {
+  make: string;
+  model: string;
+  year: number;
+  /** فارغ حين لا يُدخله العميل */
+  vin: string;
+}
 
-const DOC_DEMO_ROWS: { label: string; value: string; vin?: boolean }[] = [
-  { label: "الصانع", value: "تويوتا" },
-  { label: "الطراز", value: "كامري" },
-  { label: "سنة الصنع", value: "٢٠٢١" },
-  { label: "اللون", value: "أبيض لؤلؤي" },
-  { label: "رقم الهيكل", value: "JTNBE46K173012345", vin: true },
-  { label: "رقم اللوحة", value: "ر ن ح ٤٧٢٩" },
-];
+const MAKES = Object.keys(VEHICLE_CATALOG);
 
+/** «حدّد سيارتك»: الماركة ← الموديل ← السنة، ثم رقم الهيكل اختيارياً */
 export function VehicleIdentifyForm({ onIdentified }: { onIdentified: (result: VehicleIdentifyResult) => void }) {
-  const [status, setStatus] = useState<"idle" | "reading" | "done">("idle");
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
+  const [vin, setVin] = useState("");
 
-  async function handleFile(file: File) {
-    setStatus("reading");
-    const extraction = await extractVehicleForm(file);
-    setStatus("done");
-    onIdentified({ source: "ocr", extraction });
-  }
+  const [notListedOpen, setNotListedOpen] = useState(false);
+  const [notListedText, setNotListedText] = useState("");
+  const [notListedSent, setNotListedSent] = useState(false);
+  const notListedRef = useRef<HTMLInputElement>(null);
+  const lastLoggedText = useRef<string | null>(null);
+
+  const [reading, setReading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const models = make ? Object.keys(VEHICLE_CATALOG[make]) : [];
   const years = make && model ? VEHICLE_CATALOG[make][model] : [];
-  const canContinueManually = Boolean(make && model && year);
+  const vinOk = vin === "" || isCompleteVin(vin);
+  const canContinue = Boolean(make && model && year) && vinOk;
+  const notListedValue = notListedText.trim();
+
+  function chooseMake(next: string) {
+    setMake(next);
+    setModel("");
+    setYear("");
+  }
+
+  function openNotListed(prefill: string) {
+    setNotListedOpen(true);
+    setNotListedText(prefill.trim());
+    requestAnimationFrame(() => notListedRef.current?.focus());
+  }
+
+  function notListedAction(query: string) {
+    return (
+      <button type="button" className="btn btn-ghost" onClick={() => openNotListed(query)}>
+        سيارتي غير موجودة في القائمة
+      </button>
+    );
+  }
+
+  function handleNotListedRequest(e: MouseEvent<HTMLAnchorElement>) {
+    if (!notListedValue) {
+      e.preventDefault();
+      return;
+    }
+    // يُسجَّل النص النهائي مرة واحدة — الضغط مرتين على النص نفسه لا يكرر السجل (قاعدة 8)
+    if (lastLoggedText.current !== notListedValue) {
+      lastLoggedText.current = notListedValue;
+      logDemandGap({
+        oemNumber: "",
+        partName: "",
+        make: "",
+        model: "",
+        year: 0,
+        cityName: "",
+        searchText: notListedValue,
+        reason: "سيارة غير موجودة في القائمة",
+      });
+    }
+    setNotListedSent(true);
+  }
+
+  async function fillFromForm(file: File) {
+    setReading(true);
+    const read = await extractVehicleForm(file);
+    setReading(false);
+    const readMake = read.make.value;
+    if (VEHICLE_CATALOG[readMake]) {
+      chooseMake(readMake);
+      const readModel = read.model.value;
+      if (VEHICLE_CATALOG[readMake][readModel]) {
+        setModel(readModel);
+        if (VEHICLE_CATALOG[readMake][readModel].includes(read.year.value)) setYear(String(read.year.value));
+      }
+    }
+    setVin(cleanVinInput(read.vin.value).value);
+  }
+
+  function submit(e: FormEvent) {
+    e.preventDefault();
+    if (!canContinue) return;
+    onIdentified({ make, model, year: Number(year), vin });
+  }
 
   return (
     <section>
       <div className="lede">
-        <span className="t-eyebrow">المرحلة الأولى — تعريف المركبة</span>
-        <h1>
-          صوّر الاستمارة
-          <br />
-          <em>ولا تكتب شيئاً</em>
-        </h1>
-        <p>نقرأ الماركة والموديل وسنة الصنع ورقم الهيكل من الصورة مباشرة — ثم نعرض عليك ما قرأناه لتؤكده.</p>
+        <h1>حدّد سيارتك</h1>
+        <p>الماركة والموديل والسنة تكفي لنبدأ. ورقم الهيكل — إن كان عندك — يزيد دقة القطع.</p>
       </div>
 
-      <Sheet>
-        {status === "idle" && (
-          <div
-            className="drop"
-            role="button"
-            tabIndex={0}
-            onClick={() => fileInputRef.current?.click()}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                fileInputRef.current?.click();
-              }
-            }}
+      {FEATURE_FORM_OCR && (
+        <>
+          <button
+            type="button"
+            className="btn btn-secondary btn-block"
+            disabled={reading}
+            onClick={() => fileRef.current?.click()}
           >
-            <div className="ic">
-              <svg
-                width="26"
-                height="26"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" />
-                <rect x="8" y="9.5" width="8" height="5" rx="1" />
-              </svg>
-            </div>
-            <strong>صوّر استمارة المركبة</strong>
-            <p>أو ارفع صورة من جهازك — JPG أو PNG</p>
-          </div>
-        )}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) void handleFile(file);
-          }}
-        />
+            <Icon name="camera" size={18} />
+            {reading ? "جارٍ قراءة الاستمارة…" : "املأ من صورة الاستمارة"}
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) void fillFromForm(file);
+            }}
+          />
+        </>
+      )}
 
-        {status !== "idle" && (
-          <div style={{ marginTop: 14 }}>
-            <div className={`doc ${status === "reading" ? "reading" : ""}`}>
-              {status === "reading" && <div className="scanline" />}
-              <div className="doc-hd">
-                <b>المملكة العربية السعودية — استمارة مركبة</b>
-                <span className="t-data">MOI · FORM</span>
-              </div>
-              {DOC_DEMO_ROWS.map((row) => (
-                <div key={row.label} className={`doc-row ${row.vin ? "vinrow" : ""}`}>
-                  <span>{row.label}</span>
-                  <span>{row.value}</span>
-                </div>
-              ))}
-            </div>
-            <p className="cap">{status === "reading" ? "جارٍ قراءة الاستمارة…" : "اكتملت القراءة — ٥ من ٦ حقول بثقة عالية"}</p>
-          </div>
-        )}
-
-        <div className="split">أو حدّد يدوياً</div>
-        <div className="grid2">
-          <select
+      <form noValidate onSubmit={submit}>
+        <div className="form-block">
+          <SearchSelect
+            label="الماركة"
+            placeholder="اكتب أو اختر — مثل: تويوتا"
+            options={MAKES.map((m) => ({ value: m, label: m }))}
             value={make}
-            onChange={(e) => {
-              setMake(e.target.value);
-              setModel("");
-              setYear("");
-            }}
-          >
-            <option value="">الماركة</option>
-            {Object.keys(VEHICLE_CATALOG).map((m) => (
-              <option key={m} value={m}>
-                {m}
-              </option>
-            ))}
-          </select>
-          <select
+            onChange={chooseMake}
+            renderEmpty={(q) => notListedAction(q)}
+          />
+        </div>
+        <div className="form-block">
+          <SearchSelect
+            label="الموديل"
+            placeholder={make ? "اكتب أو اختر الموديل" : "اختر الماركة أولاً"}
+            options={models.map((m) => ({ value: m, label: m }))}
             value={model}
-            onChange={(e) => {
-              setModel(e.target.value);
+            onChange={(next) => {
+              setModel(next);
               setYear("");
             }}
             disabled={!make}
-          >
-            <option value="">الموديل</option>
-            {models.map((m) => (
-              <option key={m} value={m}>
-                {m}
-              </option>
-            ))}
-          </select>
-          <select value={year} onChange={(e) => setYear(e.target.value)} disabled={!model}>
-            <option value="">السنة</option>
-            {years.map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
-          </select>
-          <button
-            className="act act-2"
-            disabled={!canContinueManually}
-            onClick={() => onIdentified({ source: "manual", make, model, year: Number(year) })}
-          >
-            متابعة يدوياً
-          </button>
+            renderEmpty={(q) => notListedAction(`${make} ${q}`)}
+          />
+        </div>
+        <div className="form-block">
+          <SearchSelect
+            label="سنة الصنع"
+            placeholder={model ? "اكتب أو اختر السنة" : "اختر الموديل أولاً"}
+            options={years.map((y) => ({ value: String(y), label: toArabicDigits(y) }))}
+            value={year}
+            onChange={setYear}
+            disabled={!model}
+            renderEmpty={(q) => notListedAction(`${make} ${model} ${q}`)}
+          />
         </div>
 
-        <div className="memo">
-          <b>لماذا لا نطلب منك رقم الهيكل؟</b> لأنه مكتوب في الاستمارة أصلاً. نقرأه ونحفظه بصمت — فهو ما يفرّق بين
-          فئتين من نفس الموديل، وسنحتاجه في الضمان وسجل التركيب.
+        <VinField value={vin} onChange={setVin} selectedMake={make} knownMakes={MAKES} onSwitchMake={chooseMake} />
+
+        <div className="form-block">
+          <button type="submit" className="btn btn-primary btn-lg btn-block blueprint" disabled={!canContinue}>
+            <Corners />
+            متابعة
+          </button>
+          {!vinOk && <p className="hint">أكمل رقم الهيكل (١٧ خانة) أو امسحه للمتابعة بدونه.</p>}
         </div>
-      </Sheet>
+      </form>
+
+      <div className="form-block not-listed">
+        {!notListedOpen ? (
+          <button type="button" className="btn btn-ghost" onClick={() => openNotListed("")}>
+            سيارتي غير موجودة في القائمة
+          </button>
+        ) : (
+          <>
+            <label className="label" htmlFor="not-listed-text">
+              اكتب سيارتك
+            </label>
+            <input
+              ref={notListedRef}
+              id="not-listed-text"
+              className="input"
+              value={notListedText}
+              onChange={(e) => {
+                setNotListedText(e.target.value);
+                setNotListedSent(false);
+              }}
+              placeholder="الماركة والموديل والسنة — مثل: كيا سورينتو ٢٠١٩"
+              autoComplete="off"
+            />
+            <p className="hint">نسجّلها لنضيفها للقائمة، وتكمل طلبك معنا على واتساب.</p>
+            <a
+              className="btn btn-secondary btn-block"
+              style={{ marginTop: 12 }}
+              href={notListedValue ? buildWhatsAppLink(buildVehicleNotListedMessage(notListedValue)) : undefined}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-disabled={!notListedValue}
+              onClick={handleNotListedRequest}
+            >
+              <Icon name="messageCircle" size={18} />
+              اطلب قطعتك عبر واتساب
+            </a>
+            {notListedSent && (
+              <div className="memo" role="status">
+                <b>فتحنا لك واتساب برسالة جاهزة.</b> اكتب فيها القطعة التي تحتاجها وأرسلها.
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </section>
   );
 }

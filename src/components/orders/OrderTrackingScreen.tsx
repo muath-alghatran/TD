@@ -16,7 +16,7 @@ import {
   remainingParts,
   toArabicDigits,
 } from "@/lib/format";
-import { vehicleLabel } from "@/lib/garage";
+import { findOrderVehicle, vehicleLabel } from "@/lib/garage";
 import { useGaragedVehicles, useHydrated, useLocalOrders, useNow } from "@/lib/local-store";
 import { orderProgress, type OrderStage } from "@/lib/order-progress";
 import { orderCode, type LocalOrder } from "@/lib/orders";
@@ -127,7 +127,7 @@ export function OrderTrackingScreen({ id }: { id: string }) {
   }
 
   const progress = orderProgress(order);
-  const vehicle = vehicles.find((v) => v.vin === order.vehicleVin);
+  const vehicle = findOrderVehicle(vehicles, order);
   const part = catalogPart(order.partOem);
   const tier = order.qualityTier ?? part?.tier ?? null;
   const warrantyMonths = order.warrantyMonths ?? part?.war ?? null;

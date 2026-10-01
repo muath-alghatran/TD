@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { PromiseVerdict } from "@/components/vehicle/PromiseVerdict";
 import { ReceivingStep } from "@/components/vehicle/ReceivingStep";
-import { VehicleConfirmCard, type ConfirmRow } from "@/components/vehicle/VehicleConfirmCard";
 import { VehicleDiagramLevel1 } from "@/components/vehicle/VehicleDiagramLevel1";
 import { VehicleDiagramLevel2 } from "@/components/vehicle/VehicleDiagramLevel2";
 import { VehicleIdentifyForm, type VehicleIdentifyResult } from "@/components/vehicle/VehicleIdentifyForm";
@@ -15,59 +14,17 @@ import { orderCode, type LocalOrder } from "@/lib/orders";
 import type { PromiseMode } from "@/lib/promise-engine";
 import { ZONES, type CatalogPart, type CatalogZone } from "@/lib/zone-catalog";
 
-type Step = "identify" | "confirm" | "diagram1" | "diagram2" | "receiving" | "verdict" | "outcome";
-
-interface PendingVehicle {
-  make: string;
-  model: string;
-  year: number;
-  trim: string;
-  vin: string;
-  plate: string;
-  trimConfirmed: boolean;
-}
+type Step = "identify" | "diagram1" | "diagram2" | "receiving" | "verdict" | "outcome";
 
 interface ReceivingChoice {
   cityName: string;
   mode: PromiseMode;
 }
 
-function fromIdentifyResult(result: VehicleIdentifyResult): PendingVehicle {
-  if (result.source === "ocr") {
-    const { extraction } = result;
-    return {
-      make: extraction.make.value,
-      model: extraction.model.value,
-      year: extraction.year.value,
-      trim: extraction.trim.value,
-      vin: extraction.vin.value,
-      plate: extraction.plate.value,
-      trimConfirmed: false,
-    };
-  }
-  return {
-    make: result.make,
-    model: result.model,
-    year: result.year,
-    trim: "الفئة غير محددة — قد تختلف بعض القطع",
-    vin: "",
-    plate: "",
-    trimConfirmed: false,
-  };
-}
+/** الفئة لا تُسأل في التحديد اليدوي — تُحدَّد عند التأكيد، ورقم الهيكل يساعد */
+const UNKNOWN_TRIM = "الفئة غير محددة — قد تختلف بعض القطع";
 
-function buildRows(car: PendingVehicle): ConfirmRow[] {
-  return [
-    { key: "make", label: "الصانع", value: car.make, ok: true },
-    { key: "model", label: "الطراز", value: car.model, ok: true },
-    { key: "year", label: "سنة الصنع", value: toArabicDigits(car.year), ok: true },
-    { key: "vin", label: "رقم الهيكل", value: car.vin || "لم يُقرأ", ok: car.vin.length > 0, monospace: true },
-    { key: "plate", label: "رقم اللوحة", value: car.plate || "—", ok: car.plate.length > 0 },
-    { key: "trim", label: "الفئة والمحرك", value: car.trim, ok: car.trimConfirmed },
-  ];
-}
-
-/** تدفق طلب قطع الغيار الكامل — مستخرَج من src/app/page.tsx (المرحلة 8) بلا تغيير في المنطق. */
+/** تدفق طلب قطع الغيار: تحديد السيارة ← المخطط ← القطعة ← الاستلام ← الوعد. */
 export function PartsOrderFlow({
   initialVehicle,
   onHome,
@@ -77,7 +34,6 @@ export function PartsOrderFlow({
   onHome: () => void;
 }) {
   const [step, setStep] = useState<Step>(initialVehicle ? "diagram1" : "identify");
-  const [pending, setPending] = useState<PendingVehicle | null>(null);
   const [saved, setSaved] = useState<GaragedVehicle | null>(initialVehicle ?? null);
   const [selectedZone, setSelectedZone] = useState<CatalogZone | null>(null);
   const [selectedPart, setSelectedPart] = useState<CatalogPart | null>(null);
@@ -85,30 +41,19 @@ export function PartsOrderFlow({
   const [finalOrder, setFinalOrder] = useState<LocalOrder | null>(null);
 
   function handleIdentified(result: VehicleIdentifyResult) {
-    setPending(fromIdentifyResult(result));
-    setStep("confirm");
-  }
-
-  function handleApplyTrimFix(trim: string) {
-    setPending((prev) => (prev ? { ...prev, trim, trimConfirmed: true } : prev));
-  }
-
-  function handleConfirm() {
-    if (!pending) return;
     const record = saveVehicleToGarage({
-      make: pending.make,
-      model: pending.model,
-      year: pending.year,
-      trim: pending.trim,
-      vin: pending.vin || "بلا رقم هيكل",
-      plate: pending.plate || "—",
+      make: result.make,
+      model: result.model,
+      year: result.year,
+      trim: UNKNOWN_TRIM,
+      vin: result.vin,
+      plate: "—",
     });
     setSaved(record);
     setStep("diagram1");
   }
 
   function resetToIdentify() {
-    setPending(null);
     setSaved(null);
     setSelectedZone(null);
     setSelectedPart(null);
@@ -120,18 +65,6 @@ export function PartsOrderFlow({
   return (
     <main className="stage">
       {step === "identify" && <VehicleIdentifyForm onIdentified={handleIdentified} />}
-
-      {step === "confirm" && pending && (
-        <VehicleConfirmCard
-          rows={buildRows(pending)}
-          onApplyTrimFix={handleApplyTrimFix}
-          onConfirm={handleConfirm}
-          onRetake={() => {
-            setPending(null);
-            setStep("identify");
-          }}
-        />
-      )}
 
       {step === "diagram1" && saved && (
         <VehicleDiagramLevel1
@@ -175,7 +108,7 @@ export function PartsOrderFlow({
           part={selectedPart}
           cityName={receivingChoice.cityName}
           mode={receivingChoice.mode}
-          vehicle={{ vin: saved.vin, make: saved.make, model: saved.model, year: saved.year }}
+          vehicle={{ id: saved.id, vin: saved.vin, make: saved.make, model: saved.model, year: saved.year }}
           onBack={() => setStep("receiving")}
           onOutcome={(order) => {
             setFinalOrder(order);

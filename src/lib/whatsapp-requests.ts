@@ -47,6 +47,17 @@ export function buildTowMessage(input: {
     .join("\n");
 }
 
+/** سيارة ليست في قائمة الموقع — يكمل العميل طلبه على واتساب ويكتب القطعة بنفسه */
+export function buildVehicleNotListedMessage(vehicleText: string): string {
+  return [
+    "طلب قطعة غيار — Trust Drive",
+    "",
+    `السيارة: ${vehicleText}`,
+    "(سيارتي غير موجودة في قائمة الموقع)",
+    "القطعة المطلوبة: ",
+  ].join("\n");
+}
+
 export function buildOrderFollowUpMessage(order: LocalOrder): string {
   return [`استفسار عن طلب ${orderCode(order.id)} — Trust Drive`, `القطعة: ${order.partName} (${order.partOem})`].join("\n");
 }

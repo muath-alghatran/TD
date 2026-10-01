@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Barlow, Barlow_Condensed, IBM_Plex_Sans_Arabic } from "next/font/google";
+import { LocalDataCleanup } from "@/components/shell/LocalDataCleanup";
 import { CENTER } from "@/lib/center-info";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
@@ -62,7 +63,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {/* يطبّق الوضع المحفوظ قبل أول رسم لتفادي وميض الوضع الخاطئ */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <LocalDataCleanup />
+        {children}
+      </body>
     </html>
   );
 }

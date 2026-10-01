@@ -15,6 +15,8 @@ export function buildWhatsAppLink(message: string): string {
 
 export interface PartsOrderMessageInput {
   vehicleLabel: string;
+  /** فارغ حين لم يُدخله العميل */
+  vin: string;
   partName: string;
   partOem: string;
   cityName: string;
@@ -31,11 +33,14 @@ export function buildPartsOrderMessage(input: PartsOrderMessageInput): string {
     "طلب قطعة غيار — Trust Drive",
     "",
     `السيارة: ${input.vehicleLabel}`,
+    input.vin ? `رقم الهيكل: ${input.vin}` : null,
     `القطعة: ${input.partName} (${input.partOem})`,
     `الاستلام: ${receiving}`,
     `الوعد: خلال ${toArabicDigits(input.days)} يوم — ${confidencePercent}٪ ثقة`,
     `الإجمالي: ${input.total.toFixed(2)} ريال`,
     "",
     "أرغب بتأكيد هذا الطلب.",
-  ].join("\n");
+  ]
+    .filter((line): line is string => line !== null)
+    .join("\n");
 }

@@ -4,6 +4,11 @@ export function toArabicDigits(value: number | string): string {
   return String(value).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[Number(d)]);
 }
 
+/** «٢٠٢٢» → «2022» — لما يكتبه العميل بلوحة مفاتيح عربية */
+export function toLatinDigits(value: string): string {
+  return value.replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660));
+}
+
 export function formatPrice(value: number): string {
   return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }

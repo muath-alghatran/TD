@@ -7,7 +7,7 @@ import { StatusPill } from "@/components/ui/StatusPill";
 import { Tag } from "@/components/ui/Tag";
 import { logDemandGap } from "@/lib/demand-gap";
 import { toArabicDigits } from "@/lib/format";
-import { getGaragedVehicles } from "@/lib/garage";
+import { findOrderVehicle, getGaragedVehicles } from "@/lib/garage";
 import { listLocalOrders, orderCode, updateLocalOrder, type LocalOrder, type OrderStatus } from "@/lib/orders";
 import { buildSupplierMessage } from "@/lib/whatsapp-message";
 
@@ -20,9 +20,9 @@ const STATUS_META: Record<OrderStatus, { label: string; pill: "ok" | "wait" | "s
 
 const FILTERS: (OrderStatus | "all")[] = ["all", "requested", "confirmed", "paid", "unavailable"];
 
-function vehicleLabelFor(vin: string): string {
-  const vehicle = getGaragedVehicles().find((v) => v.vin === vin);
-  return vehicle ? `${vehicle.make} ${vehicle.model}` : vin;
+function vehicleLabelFor(order: LocalOrder): string {
+  const vehicle = findOrderVehicle(getGaragedVehicles(), order);
+  return vehicle ? `${vehicle.make} ${vehicle.model}` : order.vehicleVin || "سيارة غير محددة";
 }
 
 export default function AdminOrdersPage() {
@@ -51,7 +51,7 @@ export default function AdminOrdersPage() {
 
   function handleUnavailable(order: LocalOrder) {
     updateLocalOrder(order.id, { status: "unavailable" });
-    const vehicle = getGaragedVehicles().find((v) => v.vin === order.vehicleVin);
+    const vehicle = findOrderVehicle(getGaragedVehicles(), order);
     logDemandGap({
       oemNumber: order.partOem,
       partName: order.partName,
@@ -117,7 +117,7 @@ export default function AdminOrdersPage() {
                     {order.partName}
                   </div>
                   <div className="t-data" style={{ fontSize: 11.5, color: "var(--text-3)", marginTop: 2 }}>
-                    {orderCode(order.id)} · {order.partOem} · {vehicleLabelFor(order.vehicleVin)}
+                    {orderCode(order.id)} · {order.partOem} · {vehicleLabelFor(order)}
                   </div>
                 </div>
                 <StatusPill status={meta.pill} label={meta.label} />

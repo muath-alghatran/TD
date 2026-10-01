@@ -16,6 +16,8 @@ export interface DemandGapEntry {
   model: string;
   year: number;
   cityName: string;
+  /** نص العميل كما كتبه — مثل سيارة غير موجودة في القائمة (DemandGap.searchText) */
+  searchText?: string;
   reason: string;
   createdAt: string;
 }
