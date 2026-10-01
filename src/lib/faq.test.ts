@@ -16,8 +16,11 @@ describe("أسئلة ممكن تخطر في بالك", () => {
     expect(visibleFaq({ packages: true, certificate: true })).toHaveLength(11);
   });
 
-  it("الافتراضي اليوم: لا باقات ولا شهادة بعد", () => {
-    expect(visibleFaq()).toHaveLength(9);
+  it("الافتراضي اليوم: الباقات مبنية (المرحلة 3) والشهادة لم تُبنَ", () => {
+    const shown = visibleFaq().map((f) => f.id);
+    expect(shown).toHaveLength(10);
+    expect(shown).toContain("facelift");
+    expect(shown).not.toContain("resale");
   });
 
   it("إجابة السطحة من مصدرها الواحد", () => {

@@ -17,7 +17,7 @@ export interface FaqItem {
 
 /** باقات الترهيم (المرحلة 3) · شهادة الإصلاح (المرحلة 9 وبعد تحديد سياسة الضمان) */
 export const BUILT_FEATURES: Record<FaqFeature, boolean> = {
-  packages: false,
+  packages: true,
   certificate: false,
 };
 

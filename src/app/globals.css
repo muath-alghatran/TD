@@ -2317,6 +2317,198 @@ html[data-motion="ok"] .journey-replay {
   }
 }
 
+/* باقات الترهيم: بطاقات مخطط بزوايا تسجيل — ٢×٢ على الجوال وصف من أربع على العريض */
+.pkg-sec {
+  scroll-margin-top: 20px;
+}
+.pkg-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+.pkg-grid > li {
+  display: flex;
+}
+.pkg-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 12px 12px 14px;
+  background: var(--bg);
+  color: var(--fg);
+}
+.pkg-card:hover {
+  border-color: var(--accent);
+}
+.pkg-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 8px;
+  color: var(--ink-accent);
+}
+.pkg-name {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.3;
+}
+.pkg-years {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.pkg-incl {
+  margin-top: auto;
+  padding-top: 10px;
+  padding-inline-end: 22px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+  text-wrap: balance;
+}
+.pkg-go {
+  position: absolute;
+  bottom: 13px;
+  inset-inline-end: 10px;
+  color: var(--accent);
+}
+@media (min-width: 700px) {
+  .pkg-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pkg-card {
+    transition: border-color 0.15s var(--ease);
+  }
+  .pkg-go {
+    transition: transform 0.15s var(--ease);
+  }
+  .pkg-card:hover .pkg-go {
+    transform: translateX(-3px);
+  }
+}
+
+/* سعر الباقة: الرقم بخط البيانات · «سعر شامل ثابت» أو «خصم» بترخيصه */
+.pkg-price {
+  margin-top: 10px;
+}
+.pkg-price-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+}
+.pkg-amount {
+  font-size: 13px;
+  color: var(--muted);
+}
+.pkg-amount b {
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--fg);
+}
+/* سطر الخصم محجوز مسبقاً حين تكتمل بياناته — يُملأ في المتصفح بلا إزاحة */
+.pkg-price-was {
+  min-height: calc(3 * 1.5em);
+  margin-top: 4px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.pkg-price-page .pkg-amount {
+  font-size: 15px;
+}
+.pkg-price-page .pkg-amount b {
+  font-size: 30px;
+}
+.pkg-price-page .pkg-price-was {
+  min-height: 1.5em;
+  font-size: 12.5px;
+}
+
+/* صفحة الباقة: الرأس حقل فولاذي فيه الرسم بخط المخطط */
+.pkg-hero {
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-block: 20px 24px;
+}
+.pkg-hero-art {
+  display: block;
+  width: 100%;
+  max-width: 440px;
+  height: auto;
+  margin: 12px auto 4px;
+  color: var(--ink-accent);
+}
+.pkg-hero-photo {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  margin-top: 14px;
+}
+.pkg-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: clamp(26px, 7vw, 32px);
+  line-height: 1.25;
+  margin-top: 8px;
+}
+.pkg-hero-sub {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.pkg-hero .pkg-price {
+  margin-top: 14px;
+}
+.pkg-target {
+  padding: 11px 14px;
+  border-top: 1px solid var(--divider);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 15px;
+}
+.pkg-ba {
+  margin-top: 12px;
+}
+.pkg-ba-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.pkg-ba-img {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--surface);
+}
+.pkg-ba-img .tag {
+  position: absolute;
+  top: 8px;
+  inset-inline-start: 8px;
+}
+
+/* الحجز من صفحة باقة: بطاقة «معاينة» في أعلى النموذج */
+.pkg-booking {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 20px;
+  padding: 12px 14px;
+  color: var(--fg);
+}
+.pkg-booking-name {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.35;
+}
+.pkg-booking-sub {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
 /* سطر ملاحظة بأيقونة */
 .note-line {
   display: flex;

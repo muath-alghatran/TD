@@ -1,3 +1,4 @@
+import { FaceliftPackages } from "@/components/home/FaceliftPackages";
 import { FaqSection } from "@/components/home/FaqSection";
 import { GaragePeek } from "@/components/home/GaragePeek";
 import { HomeHero } from "@/components/home/HomeHero";
@@ -10,7 +11,8 @@ import { TabBar } from "@/components/shell/TabBar";
 /**
  * الرئيسية — تجمع الاتجاهات الثلاثة (docs/design/README.md):
  * واجهة المركز (1c) · الطريق: رحلة الزائر أو طلبه النشط (1b) · لوح الخدمات الست (1a) ·
- * كراجي باللوحة السعودية ووعودنا على الطريق (1b) · أسئلة ممكن تخطر في بالك · شريط الهوية (1a).
+ * كراجي باللوحة السعودية · باقات الترهيم · وعودنا على الطريق (1b) · أسئلة ممكن تخطر في بالك ·
+ * شريط الهوية (1a).
  */
 export default function HomePage() {
   return (
@@ -20,6 +22,7 @@ export default function HomePage() {
         <HomeJourneySlot />
         <ServicesBoard />
         <GaragePeek />
+        <FaceliftPackages />
         <PromisesRail />
         <FaqSection className="page faq-sec" />
         <IdentityStrip />

@@ -13,6 +13,16 @@ export function formatPrice(value: number): string {
   return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+/** مبلغ صحيح بلا كسور: «10,000» — لأسعار الباقات */
+export function formatWholePrice(value: number): string {
+  return Math.round(value).toLocaleString("en-US", { maximumFractionDigits: 0 });
+}
+
+/** مدى سنوات الموديل سرداً بشرياً: «٢٠٠٨–٢٠١٥» */
+export function formatYearRange(from: number, to: number): string {
+  return toArabicDigits(`${from}–${to}`);
+}
+
 export function dayWord(days: number): string {
   if (days === 1) return "يوم واحد";
   if (days === 2) return "يومين";

@@ -1,20 +1,25 @@
 "use client";
 
+import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { ActionBar } from "@/components/shell/ActionBar";
 import { Corners } from "@/components/ui/Corners";
 import { Icon } from "@/components/ui/Icon";
 import { BOOKING_TIMES, CENTER } from "@/lib/center-info";
-import { formatDayDate, formatDayNumber, formatMonth, formatWeekday } from "@/lib/format";
+import { formatDayDate, formatDayNumber, formatMonth, formatWeekday, formatWholePrice } from "@/lib/format";
 import { useGaragedVehicles, useHydrated, useNow } from "@/lib/local-store";
-import { buildBookingMessage, buildWhatsAppLink } from "@/lib/whatsapp-requests";
+import type { FaceliftPackage } from "@/lib/packages";
+import { buildBookingMessage, buildWhatsAppLink, packageLabel } from "@/lib/whatsapp-requests";
 import { displayTime } from "./time";
 import { OTHER_VEHICLE, VehiclePicker, resolveVehicleText } from "./VehiclePicker";
 
 const DAYS_AHEAD = 8;
 
-/** حجز موعد فحص: السيارة · اليوم (لوح خلايا 1a) · الساعة — يُرسل طلباً على واتساب ويؤكَّد بشرياً */
-export function BookingForm({ vehicleId }: { vehicleId?: string }) {
+/**
+ * حجز موعد فحص: السيارة · اليوم (لوح خلايا 1a) · الساعة — يُرسل طلباً على واتساب ويؤكَّد بشرياً.
+ * من صفحة باقة ترهيم يصبح حجز معاينة لتلك الباقة، وتحمل الرسالة سطر «الخدمة».
+ */
+export function BookingForm({ vehicleId, pkg }: { vehicleId?: string; pkg?: FaceliftPackage }) {
   const hydrated = useHydrated();
   const vehicles = useGaragedVehicles();
   const now = useNow();
@@ -51,6 +56,7 @@ export function BookingForm({ vehicleId }: { vehicleId?: string }) {
       dayLabel: formatDayDate(day),
       time: `${t.time} ${t.period === "ص" ? "صباحاً" : "مساءً"}`,
       notes: notes.trim(),
+      service: pkg ? `معاينة باقة ${packageLabel(pkg)}` : undefined,
     });
     window.open(buildWhatsAppLink(message), "_blank", "noopener,noreferrer");
     setSent(true);
@@ -60,8 +66,20 @@ export function BookingForm({ vehicleId }: { vehicleId?: string }) {
     <>
       <main className="screen has-actionbar">
         <form id="booking-form" className="page" onSubmit={submit}>
-          <p className="lead-note" style={{ marginTop: 20 }}>
-            اختر اليوم والساعة المناسبة لك، ونؤكد الموعد معك على واتساب قبل اعتماده.
+          {pkg && (
+            <Link href={`/packages/${pkg.slug}`} className="blueprint pkg-booking">
+              <Corners />
+              <span className="t-code">FACELIFT</span>
+              <span className="pkg-booking-name">معاينة: {packageLabel(pkg)}</span>
+              <span className="pkg-booking-sub">
+                السعر المعلن <span className="t-data">{formatWholePrice(pkg.price)}</span> ر.س، ويُثبَّت عند التأكيد
+              </span>
+            </Link>
+          )}
+          <p className="lead-note" style={{ marginTop: pkg ? 14 : 20 }}>
+            {pkg
+              ? "اختر اليوم والساعة لمعاينة سيارتك في المركز، ونؤكد الموعد معك على واتساب قبل اعتماده."
+              : "اختر اليوم والساعة المناسبة لك، ونؤكد الموعد معك على واتساب قبل اعتماده."}
           </p>
 
           <div className="form-block">
@@ -142,7 +160,7 @@ export function BookingForm({ vehicleId }: { vehicleId?: string }) {
         <button type="submit" form="booking-form" className="btn btn-primary btn-lg blueprint" disabled={!valid}>
           <Corners />
           <Icon name="messageCircle" size={20} />
-          أرسل طلب الحجز
+          {pkg ? "أرسل طلب المعاينة" : "أرسل طلب الحجز"}
         </button>
         <a href={`tel:${CENTER.phoneTel}`} className="btn btn-secondary btn-icon" aria-label="اتصال مباشر">
           <Icon name="phone" size={20} />

@@ -2,20 +2,30 @@
  * رسائل واتساب لطلبات الحجز والسطحة والمتابعة — نفس نهج whatsapp-checkout.ts:
  * رابط wa.me مُعبّأ مسبقاً يراجعه العميل ويرسله بنفسه، ثم يؤكَّد الطلب بشرياً.
  */
+import { formatWholePrice, formatYearRange } from "./format";
 import { orderCode, type LocalOrder } from "./orders";
+import type { FaceliftPackage } from "./packages";
 import { buildWhatsAppLink } from "./whatsapp-checkout";
 
 export { buildWhatsAppLink };
+
+/** «ترهيم لاندكروزر ٢٠٠٨–٢٠١٥» — اسم الباقة بسنواتها للرسائل والحجز */
+export function packageLabel(pkg: FaceliftPackage): string {
+  return `${pkg.title} ${formatYearRange(pkg.yearFrom, pkg.yearTo)}`;
+}
 
 export function buildBookingMessage(input: {
   vehicle: string;
   dayLabel: string;
   time: string;
   notes: string;
+  /** مثل «معاينة باقة ترهيم لاندكروزر ٢٠٠٨–٢٠١٥» — حين يأتي الحجز من صفحة باقة */
+  service?: string;
 }): string {
   return [
-    "طلب حجز موعد فحص — Trust Drive",
+    input.service ? "طلب حجز معاينة — Trust Drive" : "طلب حجز موعد فحص — Trust Drive",
     "",
+    input.service ? `الخدمة: ${input.service}` : null,
     `السيارة: ${input.vehicle || "—"}`,
     `اليوم: ${input.dayLabel}`,
     `الساعة المقترحة: ${input.time}`,
@@ -25,6 +35,17 @@ export function buildBookingMessage(input: {
   ]
     .filter((line): line is string => line !== null)
     .join("\n");
+}
+
+/** «اسأل على واتساب» من صفحة الباقة: اسمها وسعرها، ويكمل العميل سنة سيارته */
+export function buildPackageQuestionMessage(pkg: FaceliftPackage): string {
+  return [
+    "استفسار عن باقة ترهيم — Trust Drive",
+    "",
+    `الباقة: ${packageLabel(pkg)}`,
+    `السعر المعلن: ${formatWholePrice(pkg.price)} ر.س`,
+    "سنة سيارتي: ",
+  ].join("\n");
 }
 
 export function buildTowMessage(input: {
