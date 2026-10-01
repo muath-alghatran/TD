@@ -39,7 +39,7 @@ export interface FaceliftPackage {
 const INCLUDES = ["قطع الترهيم كاملة حتى الجنوط", "الرش", "التركيب"];
 
 /** سطر البطاقة المختصر لما تشمله كل باقة */
-export const PACKAGE_INCLUDES_LINE = "قطع كاملة حتى الجنوط + رش + تركيب";
+export const PACKAGE_INCLUDES_LINE = "قطع كاملة حتى الجنوط + رش + تركيب";
 
 function pkg(base: Pick<FaceliftPackage, "slug" | "title" | "make" | "model" | "yearFrom" | "yearTo" | "body" | "price">): FaceliftPackage {
   return {

@@ -13,7 +13,7 @@ export function BodyDrawing({ body, className }: { body: FaceliftPackage["body"]
       className={className}
       fill="none"
       stroke="currentColor"
-      strokeWidth={1.6}
+      strokeWidth={1.5}
       strokeLinejoin="round"
       strokeLinecap="round"
       aria-hidden="true"

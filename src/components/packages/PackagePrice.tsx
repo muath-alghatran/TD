@@ -27,15 +27,18 @@ export function PackagePrice({ pkg, size = "card" }: { pkg: FaceliftPackage; siz
           <span className="tag tag-outline">سعر شامل ثابت</span>
         )}
       </div>
-      {hasDiscountTerms(pkg) && (
+      {/* قبل معرفة الوقت يُحجز السطر، وبعد انتهاء العرض يختفي فلا تبقى فجوة */}
+      {hasDiscountTerms(pkg) && (now === 0 || discount) && (
         <div className="pkg-price-was">
           {discount && (
             <>
-              <s>
+              <s className="whitespace-nowrap">
                 <span className="t-data">{formatWholePrice(discount.regularPrice)}</span> ر.س
-              </s>
-              {" · "}حتى {formatShortDate(discount.endsAt)}
-              {" · "}ترخيص رقم <span className="t-data">{discount.permitNo}</span>
+              </s>{" "}
+              <span className="whitespace-nowrap">حتى {formatShortDate(discount.endsAt)}</span>
+              <span className="pkg-permit">
+                ترخيص رقم <span className="t-data">{discount.permitNo}</span>
+              </span>
             </>
           )}
         </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { ActionBar } from "@/components/shell/ActionBar";
 import { Corners } from "@/components/ui/Corners";
@@ -67,14 +66,14 @@ export function BookingForm({ vehicleId, pkg }: { vehicleId?: string; pkg?: Face
       <main className="screen has-actionbar">
         <form id="booking-form" className="page" onSubmit={submit}>
           {pkg && (
-            <Link href={`/packages/${pkg.slug}`} className="blueprint pkg-booking">
+            <div className="blueprint pkg-booking">
               <Corners />
               <span className="t-code">FACELIFT</span>
               <span className="pkg-booking-name">معاينة: {packageLabel(pkg)}</span>
               <span className="pkg-booking-sub">
-                السعر المعلن <span className="t-data">{formatWholePrice(pkg.price)}</span> ر.س، ويُثبَّت عند التأكيد
+                السعر الشامل الثابت <span className="t-data">{formatWholePrice(pkg.price)}</span> ر.س
               </span>
-            </Link>
+            </div>
           )}
           <p className="lead-note" style={{ marginTop: pkg ? 14 : 20 }}>
             {pkg

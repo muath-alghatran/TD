@@ -2341,6 +2341,11 @@ html[data-motion="ok"] .journey-replay {
 .pkg-card:hover {
   border-color: var(--accent);
 }
+/* خط المخطط شعري ثابت مهما كبر الرسم (1.5px في البطاقة و2px في الرأس) */
+.pkg-art :is(path, circle),
+.pkg-hero-art :is(path, circle) {
+  vector-effect: non-scaling-stroke;
+}
 .pkg-art {
   display: block;
   width: 100%;
@@ -2418,6 +2423,9 @@ html[data-motion="ok"] .journey-replay {
   line-height: 1.5;
   color: var(--muted);
 }
+.pkg-permit {
+  display: block;
+}
 .pkg-price-page .pkg-amount {
   font-size: 15px;
 }
@@ -2436,6 +2444,7 @@ html[data-motion="ok"] .journey-replay {
   padding-block: 20px 24px;
 }
 .pkg-hero-art {
+  stroke-width: 2px;
   display: block;
   width: 100%;
   max-width: 440px;

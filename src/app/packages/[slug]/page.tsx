@@ -151,7 +151,7 @@ export default async function PackagePage({ params }: PageProps<"/packages/[slug
             </ol>
           </div>
 
-          {/* قبل وبعد — بالصور الحقيقية فقط */}
+          {/* قبل وبعد — بالصور الحقيقية فقط، وبلا صبغة فولاذية (duotone) عمداً: لون الرش هنا هو الدليل */}
           {pkg.gallery.length > 0 && (
             <section style={{ marginTop: 34 }} aria-labelledby="gallery-title">
               <h2 id="gallery-title" className="sec-title">
