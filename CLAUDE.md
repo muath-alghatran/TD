@@ -16,6 +16,7 @@
 - `docs/auth-spec.md` · `docs/payment-spec.md`
 - `docs/data/*.csv` — بيانات البذر
 - `docs/data/parts-glossary-seed.csv` — قاموس أنواع القطع بمصطلحات السوق (مشتق من ملف كيا، بلا أسعار)
+- `docs/data/parts-price-list.csv` — قائمة أسعار استرشادية لكل نوع قطعة وجودة، من ملف المركز كما هي (تُكتب «سعر استرشادي — يُثبَّت عند التأكيد»)
 - `.agents/product-marketing.md` — سياق التسويق: الجمهور والرسائل والكلمات المستخدمة والممنوعة. كل نص تسويقي يلتزم به
 - `docs/prompts/` — برومتات مراحل التطوير (الأحدث: `2026-10-site-upgrade.md`)
 
