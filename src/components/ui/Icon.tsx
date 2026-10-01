@@ -25,6 +25,7 @@ const PATHS = {
     </>
   ),
   chevronLeft: <path d="m15 18-6-6 6-6" />,
+  chevronDown: <path d="m6 9 6 6 6-6" />,
   chevronRight: <path d="m9 18 6-6-6-6" />,
   camera: (
     <>
@@ -145,6 +146,12 @@ const PATHS = {
     <>
       <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
       <path d="M12 22V12m-8.7-5 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7M7.5 4.27l9 5.15" />
+    </>
+  ),
+  rotateCcw: (
+    <>
+      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+      <path d="M3 3v5h5" />
     </>
   ),
 } satisfies Record<string, ReactElement>;

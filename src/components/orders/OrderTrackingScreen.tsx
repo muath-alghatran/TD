@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { ActionBar } from "@/components/shell/ActionBar";
 import { AppBar } from "@/components/shell/AppBar";
 import { Corners } from "@/components/ui/Corners";
@@ -21,11 +22,24 @@ import { useGaragedVehicles, useHydrated, useLocalOrders, useNow } from "@/lib/l
 import { orderProgress, type OrderStage } from "@/lib/order-progress";
 import { orderCode, type LocalOrder } from "@/lib/orders";
 import { PRICING_SETTINGS } from "@/lib/pricing-settings";
+import { useRunWhenVisible } from "@/lib/use-run-when-visible";
 import { buildOrderFollowUpMessage, buildWhatsAppLink } from "@/lib/whatsapp-requests";
 import { ZONES } from "@/lib/zone-catalog";
 
 function catalogPart(oem: string) {
   return ZONES.flatMap((z) => z.parts).find((p) => p.oem === oem);
+}
+
+/** مراحل الطلب عمودياً: حين تظهر تمتلئ المنجزة متتالية من الأعلى حتى الحالية (CSS فقط) */
+function MotionTimeline({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLOListElement>(null);
+  const [running, setRunning] = useState(false);
+  useRunWhenVisible(ref, "motion", () => setRunning(true));
+  return (
+    <ol ref={ref} className={`timeline${running ? " is-running" : ""}`}>
+      {children}
+    </ol>
+  );
 }
 
 /** عرض السعر المفصّل — يبقى داخل المرحلة التي وافقت فيها (1a) */
@@ -254,12 +268,16 @@ export function OrderTrackingScreen({ id }: { id: string }) {
           <h2 className="sec-title" style={{ marginTop: 28 }}>
             مراحل الطلب
           </h2>
-          <ol className="timeline">
+          <MotionTimeline>
             {progress.stages.map((stage, i) => {
               const nextStage = progress.stages[i + 1];
               const lineSolid = nextStage && nextStage.state !== "next";
               return (
-                <li key={stage.key} className={`tl-row ${stage.state === "next" ? "is-next" : ""}`}>
+                <li
+                  key={stage.key}
+                  className={`tl-row ${stage.state === "next" ? "is-next" : ""}`}
+                  style={{ "--i": i } as CSSProperties}
+                >
                   <div className="tl-rail">
                     <span className={`tl-node ${stage.state}`}>
                       {stage.state === "done" && <Icon name="check" size={13} strokeWidth={2.2} />}
@@ -287,7 +305,7 @@ export function OrderTrackingScreen({ id }: { id: string }) {
                 </li>
               );
             })}
-          </ol>
+          </MotionTimeline>
 
           {warrantyMonths && !progress.failed ? (
             <div className="blueprint warranty">

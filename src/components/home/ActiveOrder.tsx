@@ -1,24 +1,38 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { RoadTrack } from "@/components/orders/RoadTrack";
 import { Icon } from "@/components/ui/Icon";
 import { formatDayNumber, formatMonth, formatRemaining, formatWeekday, toArabicDigits } from "@/lib/format";
 import { useGaragedVehicles, useLocalOrders, useNow } from "@/lib/local-store";
+import { markJourneyPlayed } from "@/lib/motion";
 import { activeOrders, orderProgress } from "@/lib/order-progress";
 import { findOrderVehicle } from "@/lib/garage";
 import { orderCode } from "@/lib/orders";
+import { useRunWhenVisible } from "@/lib/use-run-when-visible";
 
 /**
  * الطلب النشط على الطريق (1b) — حقل فولاذي يكمل واجهة الرئيسية ويحمل ما يحدث الآن.
- * لا يظهر إن لم يكن على هذا الجهاز طلب قائم.
+ * لا يظهر إن لم يكن على هذا الجهاز طلب قائم. يأخذ حركة رحلة الزائر نفسها مرة في الجلسة:
+ * المنجزات تمتلئ متتالية، والدرع يتوقف عند مرحلته بنبضة واحدة.
  */
 export function ActiveOrder() {
   const orders = useLocalOrders();
   const vehicles = useGaragedVehicles();
   const now = useNow();
+  const ref = useRef<HTMLElement>(null);
+  const [running, setRunning] = useState(false);
 
   const active = activeOrders(orders);
+
+  useRunWhenVisible(ref, "journey", () => setRunning(true), active.length > 0);
+
+  // بعد أن يُرسم .is-running لا قبله — وإلا ظهر إطار بالحالة النهائية بين التغييرين
+  useEffect(() => {
+    if (running) markJourneyPlayed();
+  }, [running]);
+
   if (active.length === 0) return null;
 
   const order = active[0];
@@ -27,7 +41,7 @@ export function ActiveOrder() {
   const others = active.length - 1;
 
   return (
-    <section className="steel" aria-label="طلبك النشط">
+    <section ref={ref} className="steel" aria-label="طلبك النشط">
       <div className="page run">
         <div className="flex items-center justify-between gap-3" style={{ fontSize: 13, color: "var(--muted)" }}>
           <span>
@@ -69,7 +83,13 @@ export function ActiveOrder() {
           </>
         )}
 
-        <RoadTrack stages={progress.stages} currentIndex={progress.currentIndex} delivered={progress.delivered} />
+        <RoadTrack
+          stages={progress.stages}
+          currentIndex={progress.currentIndex}
+          delivered={progress.delivered}
+          motion="progress"
+          running={running}
+        />
 
         <div className="run-foot">
           <span style={{ color: "var(--muted)" }}>

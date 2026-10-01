@@ -1915,6 +1915,31 @@ select:disabled {
   text-wrap: balance;
   max-width: 20ch;
 }
+/* «زرنا في المركز» على صورة الواجهة — يفتح الموقع على خرائط Google */
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  margin-top: 14px;
+}
+.hero-map {
+  justify-content: flex-start;
+  gap: 10px;
+  padding-block: 8px;
+  text-align: start;
+}
+.hero-map-say {
+  display: block;
+  font-size: 15px;
+}
+.hero-map-sub {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  font-weight: 500;
+  opacity: 0.85;
+}
 .lens {
   position: absolute;
   z-index: 2;
@@ -2047,6 +2072,8 @@ select:disabled {
   inset-inline-start: 0;
   height: 2px;
   background: var(--accent);
+  /* بداية الطريق في العربية يميناً — منها يمتد المقطوع عند الحركة */
+  transform-origin: right center;
 }
 .road-stop {
   position: absolute;
@@ -2072,6 +2099,12 @@ select:disabled {
   margin-inline-start: -16px;
   filter: drop-shadow(0 2px 4px #0006);
 }
+/* الدرع داخل طبقة بعرض الطريق، فإزاحتها بنسبة من عرضها = نسبة من الطريق */
+.road-car {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
 .road-labels {
   display: grid;
   margin-top: 8px;
@@ -2079,9 +2112,164 @@ select:disabled {
   text-align: center;
   color: var(--muted);
 }
-.road-labels .on {
+/* الاسم العادي والعريض مكدّسان في خلية واحدة — يتلاشيان بدل تحريك font-weight */
+.road-label {
+  display: grid;
+}
+.road-label > span {
+  grid-area: 1 / 1;
+}
+.road-label .lbl-on {
+  opacity: 0;
   color: var(--fg);
   font-weight: 600;
+}
+.road-label.on .lbl-on {
+  opacity: 1;
+}
+.road-label.on .lbl-off {
+  opacity: 0;
+}
+
+/*── رحلة الطريق تحت الواجهة: زائر بلا طلب، أو الطلب النشط في الخانة نفسها ──*/
+.journey-slot {
+  display: grid;
+}
+.journey-layer {
+  grid-area: 1 / 1;
+  display: grid;
+}
+.journey-slot.has-order > .journey-layer:first-child {
+  opacity: 0;
+  visibility: hidden;
+}
+/* الخانة بارتفاع الطريق المحجوز — الطلب النشط يتوسطها بدل فراغ أسفله */
+.journey-layer-in > section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.journey-in {
+  padding-top: 22px;
+  padding-bottom: 22px;
+}
+.journey-hd {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.journey-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 19px;
+  line-height: 1.35;
+}
+/* «أعد الرحلة» يظهر حين تُسمح الحركة فقط (لا بلا JavaScript ولا مع تقليل الحركة) */
+.journey-replay {
+  display: none;
+}
+html[data-motion="ok"] .journey-replay {
+  display: grid;
+}
+/* سطر الوعود: الأسطر الستة مكدّسة في خلية واحدة، فارتفاعه ثابت أثناء التبدل */
+.journey-say {
+  display: none;
+  margin-top: 14px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.journey-say > span {
+  grid-area: 1 / 1;
+}
+.journey-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 16px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.journey-list li {
+  display: flex;
+  gap: 10px;
+}
+.journey-list b {
+  flex: none;
+  min-width: 52px;
+  color: var(--fg);
+  font-weight: 600;
+}
+/* عمودان يُقرآن بالترتيب: المحطات ١–٣ في عمود البداية، و٤–٦ في الثاني */
+@media (min-width: 560px) {
+  .journey-list {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3, auto);
+    grid-auto-flow: column;
+    column-gap: 24px;
+  }
+}
+.journey-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+.journey-cta .btn {
+  flex: 1 1 140px;
+}
+
+/*── أسئلة ممكن تخطر في بالك ──*/
+.faq-sec {
+  margin-top: 32px;
+}
+.faq {
+  margin-top: 8px;
+}
+.faq-item {
+  border-bottom: 1px solid var(--divider);
+}
+.faq-item > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  cursor: pointer;
+  list-style: none;
+}
+.faq-item > summary::-webkit-details-marker {
+  display: none;
+}
+.faq-q {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 1.45;
+}
+.faq-chev {
+  flex: none;
+  color: var(--muted);
+}
+.faq-item[open] .faq-chev {
+  transform: rotate(180deg);
+}
+.faq-a {
+  margin-top: -4px;
+  padding-bottom: 18px;
+  max-width: 62ch;
+  font-size: 15px;
+  line-height: 1.85;
+  color: var(--text-2);
+}
+.faq-more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--muted);
 }
 
 /* لوح الخدمات الست (1a): خلايا متساوية مرقّمة بخطوط شعرية */
@@ -2454,6 +2642,7 @@ select:disabled {
   width: 1px;
   min-height: 12px;
   background: var(--accent);
+  transform-origin: top;
 }
 .tl-line.dashed {
   width: 0;
@@ -2937,6 +3126,319 @@ select:disabled {
   color: var(--muted);
   margin: 6px auto 18px;
   max-width: 36ch;
+}
+
+/*══ الحركة — transform وopacity فقط، وكلها داخل no-preference: مع تقليل الحركة
+     لا يبقى شيء عالقاً في حالة البداية. سمات <html> يضعها MOTION_INIT_SCRIPT قبل
+     أول رسم (src/lib/motion.ts)، و.is-running يضيفه الظهور في مجال الرؤية. ══*/
+@media (prefers-reduced-motion: no-preference) {
+  /* وضع العرض: سطر الوعود بدل القائمة — والقائمة تبقى لقارئ الشاشة */
+  html[data-journey="play"] .journey .journey-say,
+  .journey.is-running .journey-say {
+    display: grid;
+  }
+  html[data-journey="play"] .journey .journey-list,
+  .journey.is-running .journey-list {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* حالة البداية قبل أن يظهر الطريق: الدرع عند «الطلب» والمحطات فارغة */
+  html[data-journey="play"] .road[data-motion]:not(.is-running) .road-done {
+    transform: scaleX(var(--from-scale));
+  }
+  html[data-journey="play"] .road[data-motion]:not(.is-running) .road-stop.fill {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  html[data-journey="play"] .road[data-motion]:not(.is-running) .road-car {
+    transform: translateX(var(--from));
+  }
+  html[data-journey="play"] .journey:not(.is-running) .road-label .lbl-on,
+  html[data-journey="play"] .journey:not(.is-running) .journey-say > span {
+    opacity: 0;
+  }
+  html[data-journey="play"] .journey:not(.is-running) .road-label .lbl-off {
+    opacity: 1;
+  }
+  html[data-journey="play"] .journey:not(.is-running) .journey-cta {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  /* رحلة الزائر: ست محطات، ٠٫٥٦ث لكل محطة (٠٫٢ توقف + ٠٫٣٦ سير)، ونحو ٣ ثوانٍ كاملة */
+  .road[data-motion="journey"] {
+    --road-step: 0.56s;
+  }
+  .road[data-motion="progress"] {
+    --road-step: 0.4s;
+  }
+  .road.is-running[data-motion="journey"] .road-done {
+    animation: road-line-journey 2.8s ease-in-out both;
+  }
+  .road.is-running[data-motion="journey"] .road-car {
+    animation: road-car-journey 2.8s ease-in-out both;
+  }
+  .road.is-running[data-motion="journey"] .road-mark {
+    animation: road-tilt 0.56s ease-out 6 both;
+  }
+  .road.is-running[data-motion] .road-stop.fill {
+    animation: road-stop-in 0.36s var(--ease) both;
+    animation-delay: calc(var(--i) * var(--road-step));
+  }
+  .journey.is-running .road-label .lbl-on,
+  .journey.is-running .journey-say > span {
+    animation: journey-window 0.56s linear both;
+    animation-delay: calc(var(--i) * 0.56s);
+  }
+  .journey.is-running .road-label .lbl-off {
+    animation: journey-window-out 0.56s linear both;
+    animation-delay: calc(var(--i) * 0.56s);
+  }
+  .journey.is-running .road-label:last-child .lbl-on,
+  .journey.is-running .journey-say > span:last-child {
+    animation-name: journey-arrive;
+  }
+  .journey.is-running .road-label:last-child .lbl-off {
+    animation-name: journey-leave;
+  }
+  .journey.is-running .journey-cta {
+    animation: journey-cta 0.35s var(--ease) 2.95s both;
+  }
+
+  /* الطلب النشط: المنجزات تمتلئ متتالية، والدرع يسير إلى مرحلته وينبض مرة */
+  .road.is-running[data-motion="progress"] .road-done {
+    animation: road-line-progress calc(var(--c) * 0.4s) ease-in-out both;
+  }
+  .road.is-running[data-motion="progress"] .road-car {
+    animation: road-car-progress calc(var(--c) * 0.4s) ease-in-out both;
+  }
+  .road.is-running[data-motion="progress"] .road-mark {
+    animation: road-pulse 0.5s var(--ease) both;
+    animation-delay: calc(var(--c) * 0.4s);
+  }
+
+  /* سهم السؤال يدور عند الفتح */
+  .faq-chev {
+    transition: transform 0.2s var(--ease);
+  }
+
+  /* التبديل إلى الطلب النشط في الخانة نفسها: تلاشٍ لا قفزة */
+  .journey-slot.has-order > .journey-layer:first-child {
+    transition:
+      opacity 0.3s var(--ease),
+      visibility 0s linear 0.3s;
+  }
+  .journey-layer-in {
+    animation: journey-fade 0.3s var(--ease) both;
+  }
+
+  /* تتبع الطلب: المنجزة تمتلئ متتالية من الأعلى حتى الحالية */
+  html[data-motion="ok"] .timeline:not(.is-running) :is(.tl-node.done, .tl-node.current, .tl-node.failed) {
+    opacity: 0.25;
+    transform: scale(0.6);
+  }
+  html[data-motion="ok"] .timeline:not(.is-running) .tl-line:not(.dashed) {
+    transform: scaleY(0);
+  }
+  .timeline.is-running :is(.tl-node.done, .tl-node.current, .tl-node.failed) {
+    animation: tl-fill 0.3s var(--ease) both;
+    animation-delay: calc(var(--i) * 0.15s);
+  }
+  .timeline.is-running .tl-line:not(.dashed) {
+    animation: tl-line 0.15s linear both;
+    animation-delay: calc(var(--i) * 0.15s + 0.1s);
+  }
+}
+
+/* مواضع الدرع والمقطوع عند المحطات الست — تطابق at(i) في RoadTrack.tsx */
+@keyframes road-line-journey {
+  0%,
+  7.14% {
+    transform: scaleX(0.0909);
+  }
+  20%,
+  27.14% {
+    transform: scaleX(0.2727);
+  }
+  40%,
+  47.14% {
+    transform: scaleX(0.4545);
+  }
+  60%,
+  67.14% {
+    transform: scaleX(0.6364);
+  }
+  80%,
+  87.14% {
+    transform: scaleX(0.8182);
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes road-car-journey {
+  0%,
+  7.14% {
+    transform: translateX(83.333%);
+  }
+  20%,
+  27.14% {
+    transform: translateX(66.667%);
+  }
+  40%,
+  47.14% {
+    transform: translateX(50%);
+  }
+  60%,
+  67.14% {
+    transform: translateX(33.333%);
+  }
+  80%,
+  87.14% {
+    transform: translateX(16.667%);
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes road-line-progress {
+  from {
+    transform: scaleX(var(--from-scale));
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes road-car-progress {
+  from {
+    transform: translateX(var(--from));
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes road-stop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.35);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes road-tilt {
+  0% {
+    transform: none;
+  }
+  14% {
+    transform: rotate(-7deg);
+  }
+  36%,
+  100% {
+    transform: none;
+  }
+}
+@keyframes road-pulse {
+  0%,
+  100% {
+    transform: none;
+  }
+  45% {
+    transform: scale(1.18);
+  }
+}
+@keyframes journey-window {
+  0% {
+    opacity: 0;
+  }
+  8%,
+  92% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes journey-window-out {
+  0% {
+    opacity: 1;
+  }
+  8%,
+  92% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes journey-arrive {
+  0% {
+    opacity: 0;
+  }
+  8%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes journey-leave {
+  0% {
+    opacity: 1;
+  }
+  8%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes journey-cta {
+  from {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+}
+@keyframes journey-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes tl-fill {
+  from {
+    opacity: 0.25;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes tl-line {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -86,7 +86,7 @@ export default function AboutPage() {
           </section>
 
           {/* كيف نعمل (1b): محطات على الطريق، والسطحة تحويلة جانبية */}
-          <h2 className="sec-title" style={{ marginTop: 34 }}>
+          <h2 id="how" className="sec-title" style={{ marginTop: 34, scrollMarginTop: 20 }}>
             كيف نعمل
           </h2>
           <div className="route">

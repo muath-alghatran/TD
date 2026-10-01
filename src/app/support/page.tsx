@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { FaqSection } from "@/components/home/FaqSection";
 import { ActionBar } from "@/components/shell/ActionBar";
 import { AppBar } from "@/components/shell/AppBar";
 import { Corners } from "@/components/ui/Corners";
@@ -102,6 +103,8 @@ export default function SupportPage() {
               </Link>
             ))}
           </nav>
+
+          <FaqSection className="faq-sec" />
         </div>
       </main>
       <ActionBar>
