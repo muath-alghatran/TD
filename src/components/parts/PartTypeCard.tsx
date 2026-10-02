@@ -96,7 +96,7 @@ export function PartTypeCard({
 
       <StatusPill
         status={status}
-        label={status === "ok" ? "في مخزون المركز · دفع فوري" : `توريد ${SUPPLY} · بعد تأكيد المركز`}
+        label={status === "ok" ? "في مخزون المركز" : `توريد ${SUPPLY} · بعد تأكيد المركز`}
       />
 
       {modifiers.includes("side") && (
@@ -197,7 +197,9 @@ export function PartTypeCard({
             <Icon name="receipt" size={18} />
             <span>
               <b>الدفع</b>{" "}
-              {fromStock ? "دفع فوري — نرسل لك رابط الدفع مع تأكيد الطلب" : "بعد أن يؤكد المركز التوفر والسعر، برابط صالح ١٢ ساعة"}
+              {fromStock
+                ? "فوري مع تأكيد الطلب — والشحن لأبعد المدن بعد تأكيد المركز"
+                : "بعد أن يؤكد المركز التوفر والسعر، برابط صالح ١٢ ساعة"}
             </span>
           </li>
         </ul>

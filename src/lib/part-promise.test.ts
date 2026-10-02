@@ -93,6 +93,12 @@ describe("الوعد لخيار ومدينة", () => {
     expect([riyadh.days, riyadh.status]).toEqual([2, "ok"]);
   });
 
+  it("المخزون المشحون لأبعد المدن يتبع المحرك: الثقة دون الأخضر فكهرماني (قاعدة 11)", () => {
+    expect(offerPromise(stockOption, ABHA, "ship").status).toBe("wait");
+    expect(offerPromise(stockOption, city("جازان"), "ship").status).toBe("wait");
+    expect(offerPromise(stockOption, ABHA, "fit").status).toBe("ok");
+  });
+
   it("أجزاء الوعد تساوي حدّيه", () => {
     for (const option of [listOption, stockOption, null]) {
       for (const c of [HAIL, RIYADH, ABHA]) {

@@ -96,6 +96,7 @@ export function PartOrderStep({
       partKey: v.partKey,
       promisedDaysMin: v.promise.daysMin,
       promiseStatus: v.promise.status,
+      fromStock: stock,
       promiseLegs: v.promise.legs,
       priceIndicative: v.pricing.indicative,
       pricePending: v.pricing.unitPrice === null,
@@ -114,6 +115,7 @@ export function PartOrderStep({
       oemNumber: stock ? (v.option?.oemNumber ?? null) : null,
       tier: v.option ? tierLabel(v.option.tier) : null,
       fromStock: stock,
+      immediatePay: v.promise.status === "ok",
       cityName: v.cityName,
       mode: v.mode,
       daysMin: v.promise.daysMin,
@@ -196,7 +198,12 @@ export function PartOrderStep({
       <div className="blueprint order-sum">
         <Corners />
         <div className="order-promise">
-          <StatusPill status={promise.status} label={fromStock ? "في مخزون المركز" : "متوقع — يؤكده المركز"} />
+          <StatusPill
+            status={promise.status}
+            label={
+              promise.status === "ok" ? "في مخزون المركز · دفع فوري" : fromStock ? "من مخزون المركز · يؤكده المركز" : "متوقع — يؤكده المركز"
+            }
+          />
           <div className="order-days">
             خلال <b>{dayRangeWord(promise.daysMin, promise.days)}</b> من الدفع
           </div>
@@ -229,7 +236,7 @@ export function PartOrderStep({
               </div>
               {pricing.discount > 0 && (
                 <div className="ledger-row credit-line">
-                  <span>خصم «اطلب وركّب» على أجرة اليد ١٠٪</span>
+                  <span>خصم «اطلب وركّب» على أجرة اليد {toArabicDigits(Math.round(PRICING_SETTINGS.fitDiscount * 100))}٪</span>
                   <span>−{formatPrice(pricing.discount)}</span>
                 </div>
               )}
@@ -248,9 +255,14 @@ export function PartOrderStep({
       </div>
 
       <div className="memo" style={{ marginTop: 14 }}>
-        {fromStock ? (
+        {promise.status === "ok" ? (
           <>
             <b>القطعة في مخزون المركز.</b> نرسل لك رابط الدفع مع تأكيد الطلب، ويبدأ عدّاد الوعد من لحظة الدفع.
+          </>
+        ) : fromStock ? (
+          <>
+            <b>لا دفع الآن.</b> القطعة في مخزون المركز، ونؤكد لك الشحن إلى {city.n} على واتساب، ثم يصلك رابط دفع صالح
+            ١٢ ساعة.
           </>
         ) : (
           <>

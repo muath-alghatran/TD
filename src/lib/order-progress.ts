@@ -82,13 +82,17 @@ export function orderProgress(order: LocalOrder): OrderProgress {
   const confirmedDone = order.confirmedAt !== null && !failed;
   const paidAt = toDate(order.paidAt);
   const fit = order.mode === "fit";
-  // المرحلة 6: مخزون المركز = دفع فوري (قاعدة 11)، والتوريد بالمدى = بلا دفع حتى التأكيد ثم رابط ١٢ ساعة
-  const fromStock = order.promiseStatus === "ok";
-  const pendingNote = fromStock
-    ? "القطعة في مخزون المركز — نرسل لك رابط الدفع مباشرة على واتساب."
-    : order.promiseStatus === "wait"
-      ? "نتأكد من التوفر والسعر، ثم يصلك رابط دفع صالح ١٢ ساعة."
-      : "نتأكد من المورد، ونرسل لك السعر المفصّل على واتساب.";
+  // المرحلة 6: الدفع تحكمه الحالة (قاعدة 11) — أخضر فوري، وكهرماني بلا دفع حتى التأكيد ثم رابط ١٢ ساعة —
+  // ومصدر القطعة مستقل عنها: مخزون المركز المشحون لأبعد المدن كهرماني
+  const fromStock = order.fromStock === true;
+  const pendingNote =
+    order.promiseStatus === "ok"
+      ? "القطعة في مخزون المركز — نرسل لك رابط الدفع مباشرة على واتساب."
+      : order.promiseStatus === "wait"
+        ? fromStock
+          ? "القطعة في مخزون المركز — نؤكد الشحن إلى مدينتك، ثم يصلك رابط دفع صالح ١٢ ساعة."
+          : "نتأكد من التوفر والسعر، ثم يصلك رابط دفع صالح ١٢ ساعة."
+        : "نتأكد من المورد، ونرسل لك السعر المفصّل على واتساب.";
 
   const stages: OrderStage[] = [
     {

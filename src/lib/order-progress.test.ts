@@ -64,5 +64,7 @@ describe("تقدم طلبات المرحلة 6", () => {
     expect(confirmNote(rangeOrder)).toContain("رابط دفع صالح ١٢ ساعة");
     expect(confirmNote({ ...rangeOrder, promiseStatus: "ok" })).toContain("نرسل لك رابط الدفع مباشرة");
     expect(confirmNote(base)).toContain("نتأكد من المورد");
+    // مخزون المركز المشحون لأبعد المدن: المصدر مخزون، والدفع بعد التأكيد
+    expect(confirmNote({ ...rangeOrder, fromStock: true })).toContain("نؤكد الشحن إلى مدينتك");
   });
 });

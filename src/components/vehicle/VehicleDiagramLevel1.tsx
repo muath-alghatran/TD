@@ -154,7 +154,7 @@ export function VehicleDiagramLevel1({
 
       <div className="key">
         <span>
-          <i style={{ background: "var(--ok-lit)" }} /> في مخزون المركز · دفع فوري
+          <i style={{ background: "var(--ok-lit)" }} /> في مخزون المركز
         </span>
         <span>
           <i style={{ background: "var(--wait-lit)" }} /> توريد {SUPPLY} · بعد تأكيد المركز

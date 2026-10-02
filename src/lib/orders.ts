@@ -50,8 +50,10 @@ export interface LocalOrder {
    */
   partKey?: string;
   promisedDaysMin?: number;
-  /** ok مخزون المركز (دفع فوري) · wait توريد بالمدى (بلا دفع حتى التأكيد) — قاعدة 11 */
+  /** حالة الوعد عند الطلب — تحكم الدفع (قاعدة 11): ok فوري · wait بلا دفع حتى تأكيد المركز */
   promiseStatus?: PromiseStatus;
+  /** مصدر القطعة: مخزون المركز — مستقل عن الحالة (الشحن لأبعد المدن قد يجعل المخزون كهرمانياً) */
+  fromStock?: boolean;
   /** أجزاء الوعد كما حُسبت عند الطلب — «كيف حسبنا الموعد» */
   promiseLegs?: { label: string; daysMin: number; daysMax: number }[];
   /** سعر القائمة الاسترشادي — يُثبَّت عند التأكيد (قاعدة 15) */

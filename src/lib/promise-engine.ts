@@ -138,9 +138,11 @@ export function supplyRangeLegs(city: PromiseCity, mode: PromiseMode, settings: 
 
 export function calcSupplyRangePromise(city: PromiseCity, mode: PromiseMode, settings: PromiseSettings): PromiseRangeResult {
   const legs = supplyRangeLegs(city, mode, settings);
+  // يوم واحد على الأقل كـcalcPromise، والأعلى لا ينزل عن الأدنى حتى لو أُخطئ في الإعدادات
+  const daysMin = Math.max(1, legs.supplyMinDays + legs.shipDays);
   return {
-    daysMin: legs.supplyMinDays + legs.shipDays,
-    days: legs.supplyMaxDays + legs.shipDays,
+    daysMin,
+    days: Math.max(daysMin, legs.supplyMaxDays + legs.shipDays),
     // معامل ثقة المدينة للشحن كالوعد الحالي، والتركيب داخل المركز يلغيه
     confidence: settings.supplyConfidence * (mode === "fit" ? 1 : city.trustFactor),
     // كهرماني دائماً (البرومت): لا أخضر ولا دفع فوري قبل تأكيد المركز (قاعدة 11)

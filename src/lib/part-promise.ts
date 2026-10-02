@@ -17,6 +17,7 @@ import { PRICING_SETTINGS } from "./pricing-settings";
 import {
   calcPromise,
   calcSupplyRangePromise,
+  promiseLegs,
   supplyRangeLegs,
   type PromiseMode,
   type PromiseRangeResult,
@@ -127,14 +128,18 @@ export function offerPromise(
   settings: PromiseSettings = DEFAULT_PROMISE_SETTINGS,
 ): OfferPromise {
   if (option?.kind === "stock") {
-    const r = calcPromise({ stockInternal: option.stockQty, supplierReliability: 0 }, { shipDaysMax: city.d, trustFactor: city.t }, mode, settings);
-    const handover = mode === "fit" ? { label: "التركيب في المركز", days: settings.fitDays } : { label: `الشحن إلى ${city.n}`, days: city.d };
+    // مخزون المركز: calcPromise الحالي نفسه — والحالة منه: الشحن لأبعد المدن قد ينزل بالثقة عن الأخضر
+    const part = { stockInternal: option.stockQty, supplierReliability: 0 };
+    const promiseCity = { shipDaysMax: city.d, trustFactor: city.t };
+    const r = calcPromise(part, promiseCity, mode, settings);
+    const legs = promiseLegs(part, promiseCity, mode, settings);
     return {
       ...r,
       daysMin: r.days,
       legs: [
-        { label: "من مخزون المركز", daysMin: 0, daysMax: 0 },
-        { label: handover.label, daysMin: handover.days, daysMax: handover.days },
+        { label: "من مخزون المركز", daysMin: legs.prepDays, daysMax: legs.prepDays },
+        ...(legs.shipDays > 0 ? [{ label: `الشحن إلى ${city.n}`, daysMin: legs.shipDays, daysMax: legs.shipDays }] : []),
+        ...(legs.fitDays > 0 ? [{ label: "التركيب في المركز", daysMin: legs.fitDays, daysMax: legs.fitDays }] : []),
       ],
     };
   }

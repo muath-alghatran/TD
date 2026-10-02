@@ -13,7 +13,7 @@ export function PartOrderOutcome({ order, onAnother }: { order: LocalOrder; onAn
   useEffect(() => {
     titleRef.current?.focus({ preventScroll: true });
   }, []);
-  const fromStock = order.promiseStatus === "ok";
+  const immediate = order.promiseStatus === "ok";
 
   return (
     <section aria-labelledby="outcome-title">
@@ -26,9 +26,11 @@ export function PartOrderOutcome({ order, onAnother }: { order: LocalOrder; onAn
         </h1>
         <p>
           أرسلها كما هي — فيها رقم الطلب وكل التفاصيل.{" "}
-          {fromStock
+          {immediate
             ? "القطعة في مخزون المركز، فنرسل لك رابط الدفع مع التأكيد."
-            : "نؤكد لك التوفر والسعر، ثم يصلك رابط دفع صالح ١٢ ساعة."}{" "}
+            : order.fromStock
+              ? "القطعة في مخزون المركز، ونؤكد لك الشحن ثم يصلك رابط دفع صالح ١٢ ساعة."
+              : "نؤكد لك التوفر والسعر، ثم يصلك رابط دفع صالح ١٢ ساعة."}{" "}
           الوعد خلال {orderDaysLabel(order)} من الدفع.
         </p>
       </div>

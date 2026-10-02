@@ -10,6 +10,7 @@ const base: PartsOrderMessageInput = {
   oemNumber: null,
   tier: "كوري",
   fromStock: false,
+  immediatePay: false,
   cityName: "الرياض",
   mode: "ship",
   daysMin: 5,
@@ -48,6 +49,7 @@ describe("رسالة طلب القطعة", () => {
       oemNumber: "45022-TVA-A01",
       tier: "وكالة",
       fromStock: true,
+      immediatePay: true,
       mode: "fit",
       daysMin: 1,
       daysMax: 1,
@@ -61,6 +63,13 @@ describe("رسالة طلب القطعة", () => {
     expect(msg).toContain("الوعد: خلال يوم واحد من الدفع");
     expect(msg).toContain("الإجمالي: 402.00 ريال");
     expect(msg).toContain("أرسلوا لي رابط الدفع");
+  });
+
+  it("مخزون مشحون لأبعد المدن (كهرماني): من المخزون، والدفع بعد تأكيد الشحن", () => {
+    const msg = buildPartsOrderMessage({ ...base, tier: "وكالة", fromStock: true, immediatePay: false, cityName: "أبها" });
+    expect(msg).toContain("الجودة: وكالة — من مخزون المركز");
+    expect(msg).toContain("أرجو تأكيد الشحن إلى مدينتي، ثم إرسال رابط الدفع.");
+    expect(msg).not.toContain("أرسلوا لي رابط الدفع");
   });
 
   it("بلا سعر ولا جودة: «عند التأكيد»، والملاحظات تصل كما كتبها العميل", () => {

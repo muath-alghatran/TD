@@ -131,7 +131,8 @@ export default function AdminOrdersPage() {
                 <Tag>
                   {order.pricePending ? "السعر عند التأكيد" : `${toArabicDigits(order.totalPrice.toFixed(2))} ريال${order.priceIndicative ? " · استرشادي" : ""}`}
                 </Tag>
-                {order.promiseStatus === "ok" && <Tag>من المخزون · دفع فوري</Tag>}
+                {order.fromStock && <Tag>من المخزون</Tag>}
+                {order.promiseStatus === "ok" && <Tag>دفع فوري</Tag>}
                 <Tag>{toArabicDigits(Math.round(order.confidenceAtOrder * 100))}% ثقة</Tag>
                 {order.actualDays !== null && (
                   <Tag>

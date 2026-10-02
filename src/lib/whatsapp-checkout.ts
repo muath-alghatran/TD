@@ -37,8 +37,10 @@ export interface PartsOrderMessageInput {
   oemNumber: string | null;
   /** اسم الجودة للعرض، أو null حين لم تُختر */
   tier: string | null;
-  /** من مخزون المركز = دفع فوري (قاعدة 11) */
+  /** مصدر القطعة: مخزون المركز */
   fromStock: boolean;
+  /** دفع فوري (حالة خضراء، قاعدة 11) — وإلا بلا دفع حتى يؤكد المركز */
+  immediatePay: boolean;
   cityName: string;
   mode: PromiseMode;
   daysMin: number;
@@ -75,7 +77,11 @@ export function buildPartsOrderMessage(input: PartsOrderMessageInput): string {
     price,
     input.notes ? `ملاحظات: ${input.notes}` : null,
     "",
-    input.fromStock ? "القطعة في مخزون المركز — أرسلوا لي رابط الدفع." : "أرجو تأكيد التوفر والسعر، ثم إرسال رابط الدفع.",
+    input.immediatePay
+      ? "القطعة في مخزون المركز — أرسلوا لي رابط الدفع."
+      : input.fromStock
+        ? "أرجو تأكيد الشحن إلى مدينتي، ثم إرسال رابط الدفع."
+        : "أرجو تأكيد التوفر والسعر، ثم إرسال رابط الدفع.",
   ]
     .filter((line): line is string => line !== null)
     .join("\n");
