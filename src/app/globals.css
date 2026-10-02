@@ -109,37 +109,39 @@
   color-scheme: light;
 }
 
-/* — الوضع الداكن: اختيار صريح من المستخدم، أو إعداد الجهاز إن لم يختر — */
-:root[data-theme="dark"] {
-  --bg: var(--a-900);
-  --surface: var(--a-800);
-  --fg: var(--n-100);
-  --accent: var(--a-400);
-  --accent-hover: var(--a-300);
-  --accent-press: var(--a-200);
-  --ink-accent: var(--a-300);
-  --on-accent: var(--a-900);
-  --muted: color-mix(in srgb, var(--n-100) 70%, transparent);
-  --faint: color-mix(in srgb, var(--n-100) 50%, transparent);
-  --divider: color-mix(in srgb, var(--n-100) 17%, transparent);
-  --hair: color-mix(in srgb, var(--n-100) 9%, transparent);
-  --dash: color-mix(in srgb, var(--n-100) 40%, transparent);
-  --tint: color-mix(in srgb, var(--n-100) 6%, transparent);
-  --tag-accent-bg: color-mix(in srgb, var(--a-400) 20%, transparent);
-  --tag-accent-fg: var(--a-200);
-  /* في الداكن يصبح الحقل الفولاذي أفتح بدرجة ليبقى منفصلًا عن الخلفية */
-  --steel-bg: #283e53;
-  --ok: #3fd9a0;
-  --ok-film: #3fd9a020;
-  --wait: #f2b33c;
-  --wait-film: #f2b33c20;
-  --spec: #9fb2bd;
-  --spec-film: #9fb2bd20;
-  --stroke: #4a6886;
-  --frame: #152230;
-  color-scheme: dark;
+/* — الوضع الداكن: اختيار صريح من المستخدم، أو إعداد الجهاز إن لم يختر — للشاشة فقط، فالطباعة فاتحة دائماً — */
+@media screen {
+  :root[data-theme="dark"] {
+    --bg: var(--a-900);
+    --surface: var(--a-800);
+    --fg: var(--n-100);
+    --accent: var(--a-400);
+    --accent-hover: var(--a-300);
+    --accent-press: var(--a-200);
+    --ink-accent: var(--a-300);
+    --on-accent: var(--a-900);
+    --muted: color-mix(in srgb, var(--n-100) 70%, transparent);
+    --faint: color-mix(in srgb, var(--n-100) 50%, transparent);
+    --divider: color-mix(in srgb, var(--n-100) 17%, transparent);
+    --hair: color-mix(in srgb, var(--n-100) 9%, transparent);
+    --dash: color-mix(in srgb, var(--n-100) 40%, transparent);
+    --tint: color-mix(in srgb, var(--n-100) 6%, transparent);
+    --tag-accent-bg: color-mix(in srgb, var(--a-400) 20%, transparent);
+    --tag-accent-fg: var(--a-200);
+    /* في الداكن يصبح الحقل الفولاذي أفتح بدرجة ليبقى منفصلًا عن الخلفية */
+    --steel-bg: #283e53;
+    --ok: #3fd9a0;
+    --ok-film: #3fd9a020;
+    --wait: #f2b33c;
+    --wait-film: #f2b33c20;
+    --spec: #9fb2bd;
+    --spec-film: #9fb2bd20;
+    --stroke: #4a6886;
+    --frame: #152230;
+    color-scheme: dark;
+  }
 }
-@media (prefers-color-scheme: dark) {
+@media screen and (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: var(--a-900);
     --surface: var(--a-800);
@@ -4264,7 +4266,6 @@ html[data-motion="ok"] .journey-replay {
 ═══════════════════════════════════════════════════════════════*/
 .cert {
   position: relative;
-  overflow: hidden;
   max-width: 794px;
   margin-inline: auto;
   padding: 18px 16px 20px;
@@ -4278,11 +4279,19 @@ html[data-motion="ok"] .journey-replay {
     padding: 34px 38px 28px;
     aspect-ratio: 210 / 297;
   }
+  .cert-sec {
+    margin-top: 14px;
+  }
+  .cert-foot {
+    margin-top: 14px;
+  }
 }
+/* العلامة تُقصّ داخل حدود الشهادة، والشهادة نفسها تطول مع محتواها */
 .cert-watermark {
   position: absolute;
   inset: 0;
   z-index: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -4331,13 +4340,15 @@ html[data-motion="ok"] .journey-replay {
 .cert-wm-dark {
   display: none;
 }
-:root[data-theme="dark"] .cert-wm-light {
-  display: none;
+@media screen {
+  :root[data-theme="dark"] .cert-wm-light {
+    display: none;
+  }
+  :root[data-theme="dark"] .cert-wm-dark {
+    display: flex;
+  }
 }
-:root[data-theme="dark"] .cert-wm-dark {
-  display: flex;
-}
-@media (prefers-color-scheme: dark) {
+@media screen and (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .cert-wm-light {
     display: none;
   }
@@ -4490,15 +4501,15 @@ html[data-motion="ok"] .journey-replay {
   position: absolute;
   bottom: 4px;
   inset-inline-start: 6px;
-  font-size: 10px;
-  color: var(--muted);
+  font-size: 11px;
+  color: var(--text-2);
 }
 .cert-ba {
   position: absolute;
   top: 6px;
   inset-inline-start: 6px;
   padding: 1px 8px;
-  background: var(--accent);
+  background: var(--ink-accent);
   color: var(--on-accent);
   font-family: var(--font-heading);
   font-size: 12px;
@@ -4536,12 +4547,29 @@ html[data-motion="ok"] .journey-replay {
   }
 }
 
-/* الطباعة إلى PDF: A4 فاتح، والعلامة المائية على كل صفحة، ولا تنقسم الكتل بين صفحتين */
-@page {
+/* الطباعة إلى PDF: A4 فاتح، والعلامة المائية على كل صفحة، ولا تنقسم الكتل بين صفحتين.
+   صفحة مسمّاة: مقاس A4 وهوامشه للشهادة وحدها لا لطباعة بقية الموقع */
+.cert-print,
+.cert-page {
+  page: cert;
+}
+@page cert {
   size: A4;
   margin: 12mm;
 }
 @media print {
+  /* طباعة صفحة النموذج نفسها (Ctrl+P): الشهادة وحدها، بلا الأشرطة ولا المقدمة */
+  .appbar,
+  .actionbar,
+  .cert-page > .lead-note {
+    display: none !important;
+  }
+  .has-actionbar {
+    padding-bottom: 0 !important;
+  }
+  .cert-page {
+    padding: 0;
+  }
   /* الورق نفسه خلفية الصفحة — هوامش @page لا تُطلى، فلو لُوّن الجسم ظهر مستطيلاً رمادياً داخل ورقة بيضاء */
   html,
   body {

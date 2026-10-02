@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildPartsOrderMessage, type PartsOrderMessageInput } from "./whatsapp-checkout";
+import { buildPartsOrderMessage, buildWhatsAppLink, buildWhatsAppShareLink, type PartsOrderMessageInput } from "./whatsapp-checkout";
 
 const base: PartsOrderMessageInput = {
   orderCode: "TD-30742",
@@ -77,5 +77,14 @@ describe("رسالة طلب القطعة", () => {
     expect(msg).toContain("السعر: عند التأكيد");
     expect(msg).toContain("الجودة: أرجو عرض الخيارات");
     expect(msg).toContain("ملاحظات: الصوت من اليمين");
+  });
+});
+
+describe("روابط واتساب", () => {
+  it("الطلب يذهب إلى رقم المركز، والمشاركة بلا رقم فيختار العميل لمن يرسل", () => {
+    expect(buildWhatsAppLink("مرحبا").startsWith("https://wa.me/966")).toBe(true);
+    const share = buildWhatsAppShareLink("نموذج الشهادة");
+    expect(share.startsWith("https://wa.me/?text=")).toBe(true);
+    expect(decodeURIComponent(share.split("text=")[1])).toBe("نموذج الشهادة");
   });
 });

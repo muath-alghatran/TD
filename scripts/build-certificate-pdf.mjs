@@ -83,6 +83,8 @@ try {
     });
 
   await send("Page.enable");
+  // الشهادة تُطبع فاتحة دائماً — مهما كان وضع الجهاز
+  await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: "light" }] });
   const loaded = new Promise((resolve) => {
     const onLoad = (msg) => {
       if (msg.method === "Page.loadEventFired") {

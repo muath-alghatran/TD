@@ -26,7 +26,7 @@ export const SAMPLE_CERTIFICATE: CertificateData = {
     {
       date: "2026-09-14",
       kind: "parts",
-      title: "قطع وتركيب",
+      title: "قماش ومساعدات أمامية وفلتر زيت",
       parts: [
         { name: "قماش أمامي", number: "XXXXX-XXXXX", tier: "وكالة", origin: "اليابان", qty: 1 },
         { name: "مساعدات أمامية", number: "XXXXX-XXXXX", tier: "أصلي", origin: "اليابان", qty: 2 },
