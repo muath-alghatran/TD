@@ -7,7 +7,7 @@
  *    بمدى «3–4 أيام» كهرماني — بلا دفع حتى يؤكد المركز (قواعد 11 و14 و15).
  */
 import { CENTER } from "./center-info";
-import type { CatalogCity } from "./city-catalog";
+import { CITIES, type CatalogCity } from "./city-catalog";
 import { DEFAULT_PROMISE_SETTINGS } from "./default-promise-settings";
 import { HONDA_INVENTORY } from "./honda-inventory";
 import type { StockItem } from "./inventory-schema";
@@ -154,6 +154,12 @@ export function offerPromise(
       ...(legs.shipDays > 0 ? [{ label: `الشحن إلى ${city.n}`, daysMin: legs.shipDays, daysMax: legs.shipDays }] : []),
     ],
   };
+}
+
+/** وعد التركيب في المركز لقطعة من مخزونه — يكمّل «في مخزون المركز» بمدته (لا حالة بلا أيام) */
+export function stockFitDays(settings: PromiseSettings = DEFAULT_PROMISE_SETTINGS): number {
+  const center = CITIES.find(isCenterCity) ?? CITIES[0];
+  return offerPromise({ kind: "stock", stockQty: 1 }, center, "fit", settings).days;
 }
 
 export interface OfferPricing {

@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { Ruler } from "@/components/ui/Ruler";
-import { dayRangeWord, toArabicDigits, typesWord } from "@/lib/format";
+import { dayRangeWord, dayWord, toArabicDigits, typesWord } from "@/lib/format";
 import { DEFAULT_PROMISE_SETTINGS } from "@/lib/default-promise-settings";
 import { DIAGRAM_LAYERS, DIAGRAM_ZONES, partsInZone, type DiagramZone } from "@/lib/diagram-zones";
-import { partStatus, type PartVehicle } from "@/lib/part-promise";
+import { partStatus, stockFitDays, type PartVehicle } from "@/lib/part-promise";
 import type { PromiseStatus } from "@/lib/promise-engine";
 
 const LIT: Record<PromiseStatus, string> = {
@@ -15,6 +15,7 @@ const LIT: Record<PromiseStatus, string> = {
 };
 
 const SUPPLY = dayRangeWord(DEFAULT_PROMISE_SETTINGS.supplyMinDays, DEFAULT_PROMISE_SETTINGS.supplyMaxDays);
+const STOCK_FIT = dayWord(stockFitDays());
 
 interface ZoneState {
   zone: DiagramZone;
@@ -31,7 +32,7 @@ function zoneState(zone: DiagramZone, vehicle: PartVehicle): ZoneState {
 }
 
 function statusText(state: ZoneState): string {
-  return state.status === "ok" ? `${toArabicDigits(state.inStock)} في مخزون المركز` : `توريد ${SUPPLY}`;
+  return state.status === "ok" ? `${toArabicDigits(state.inStock)} في مخزون المركز · تركيب خلال ${STOCK_FIT}` : `توريد ${SUPPLY}`;
 }
 
 /**
@@ -103,7 +104,8 @@ export function VehicleDiagramLevel1({
                     key={zone.id}
                     className={`node ${off ? "off" : ""}`}
                     style={{ animationDelay: `${1200 + i * 55}ms` }}
-                    tabIndex={0}
+                    tabIndex={off ? -1 : 0}
+                    aria-hidden={off || undefined}
                     role="button"
                     aria-pressed={selectedZone === zone.id}
                     aria-label={`${zone.name} — ${typesWord(state.types)} — ${statusText(state)}`}
@@ -154,10 +156,10 @@ export function VehicleDiagramLevel1({
 
       <div className="key">
         <span>
-          <i style={{ background: "var(--ok-lit)" }} /> في مخزون المركز
+          <i style={{ background: "var(--ok)" }} /> في مخزون المركز · تركيب خلال {STOCK_FIT}
         </span>
         <span>
-          <i style={{ background: "var(--wait-lit)" }} /> توريد {SUPPLY} · بعد تأكيد المركز
+          <i style={{ background: "var(--wait)" }} /> توريد {SUPPLY} · بعد تأكيد المركز
         </span>
       </div>
     </section>

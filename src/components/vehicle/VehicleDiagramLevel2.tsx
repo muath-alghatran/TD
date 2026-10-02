@@ -3,8 +3,8 @@
 import { Icon } from "@/components/ui/Icon";
 import { DEFAULT_PROMISE_SETTINGS } from "@/lib/default-promise-settings";
 import { DIAGRAM_ZONES, partsInZone } from "@/lib/diagram-zones";
-import { dayRangeWord, formatListPrice, toArabicDigits } from "@/lib/format";
-import { partStatus, stockFor, type PartVehicle } from "@/lib/part-promise";
+import { dayRangeWord, dayWord, formatListPrice, toArabicDigits } from "@/lib/format";
+import { partStatus, stockFitDays, stockFor, type PartVehicle } from "@/lib/part-promise";
 import { findPartType, fromPrice } from "@/lib/parts-offer";
 
 const SUPPLY = dayRangeWord(DEFAULT_PROMISE_SETTINGS.supplyMinDays, DEFAULT_PROMISE_SETTINGS.supplyMaxDays);
@@ -43,7 +43,7 @@ export function VehicleDiagramLevel2({ zoneId, vehicle, onPick }: { zoneId: stri
                 <span className="pcat-type-name">
                   {type.name}
                   <span className="zone-say">
-                    {status === "ok" ? `في مخزون المركز: ${toArabicDigits(stock.reduce((n, s) => n + s.stockQty, 0))}` : `توريد ${SUPPLY}`}
+                    {status === "ok" ? `في مخزون المركز: ${toArabicDigits(stock.reduce((n, s) => n + s.stockQty, 0))} — تركيب خلال ${dayWord(stockFitDays())}` : `توريد ${SUPPLY}`}
                   </span>
                 </span>
                 <span className="pcat-type-price">

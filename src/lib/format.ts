@@ -103,6 +103,14 @@ export function formatClock(date: Date): { time: string; period: "ص" | "م" } {
   return { time, period: h24 < 12 ? "ص" : "م" };
 }
 
+const HOURS = new Intl.NumberFormat("ar-SA-u-nu-arab", { maximumFractionDigits: 2 });
+
+/** ساعات العمل سرداً: «ساعة» · «ساعتان» · «١٫٥ ساعة» — الفاصلة العشرية عربية مع الأرقام العربية */
+export function formatHours(hours: number): string {
+  if (Number.isInteger(hours)) return hourWord(hours);
+  return `${HOURS.format(hours)} ساعة`;
+}
+
 function hourWord(hours: number): string {
   if (hours === 1) return "ساعة";
   if (hours === 2) return "ساعتان";

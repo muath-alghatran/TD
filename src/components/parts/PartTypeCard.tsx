@@ -5,9 +5,9 @@ import { Corners } from "@/components/ui/Corners";
 import { Icon } from "@/components/ui/Icon";
 import { StatusPill } from "@/components/ui/StatusPill";
 import { DEFAULT_PROMISE_SETTINGS } from "@/lib/default-promise-settings";
-import { dayRangeWord, formatListPrice, monthsWord, toArabicDigits } from "@/lib/format";
+import { dayRangeWord, dayWord, formatListPrice, monthsWord, toArabicDigits } from "@/lib/format";
 import { POSITION_OPTIONS, SIDE_OPTIONS, partModifiers } from "@/lib/part-modifiers";
-import { partOptions, partStatus, type PartOption } from "@/lib/part-promise";
+import { partOptions, partStatus, stockFitDays, type PartOption } from "@/lib/part-promise";
 import { VISIBLE_TIERS, categoryName, tierLabel, type PartType } from "@/lib/parts-offer";
 import { PRICING_SETTINGS } from "@/lib/pricing-settings";
 import type { SearchVehicle } from "./PartSearch";
@@ -96,7 +96,7 @@ export function PartTypeCard({
 
       <StatusPill
         status={status}
-        label={status === "ok" ? "في مخزون المركز" : `توريد ${SUPPLY} · بعد تأكيد المركز`}
+        label={status === "ok" ? `في مخزون المركز · تركيب خلال ${dayWord(stockFitDays())}` : `توريد ${SUPPLY} · بعد تأكيد المركز`}
       />
 
       {modifiers.includes("side") && (
@@ -133,7 +133,7 @@ export function PartTypeCard({
                 <button
                   key={o.id}
                   type="button"
-                  className={`tier-cell${o.kind === "stock" ? " is-stock" : ""}`}
+                  className="tier-cell"
                   aria-pressed={optionId === o.id}
                   onClick={() => setOptionId(optionId === o.id ? null : o.id)}
                 >

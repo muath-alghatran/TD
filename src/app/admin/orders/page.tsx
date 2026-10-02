@@ -6,18 +6,39 @@ import { Sheet } from "@/components/ui/Sheet";
 import { StatusPill } from "@/components/ui/StatusPill";
 import { Tag } from "@/components/ui/Tag";
 import { logDemandGap } from "@/lib/demand-gap";
-import { toArabicDigits } from "@/lib/format";
+import { DEFAULT_PROMISE_SETTINGS } from "@/lib/default-promise-settings";
+import { formatClock, formatPrice, formatShortDate, toArabicDigits } from "@/lib/format";
 import { orderDaysLabel } from "@/lib/order-progress";
 import { findOrderVehicle, getGaragedVehicles } from "@/lib/garage";
 import { listLocalOrders, orderCode, updateLocalOrder, type LocalOrder, type OrderStatus } from "@/lib/orders";
+import type { PromiseStatus } from "@/lib/promise-engine";
 import { buildSupplierMessage } from "@/lib/whatsapp-message";
 
-const STATUS_META: Record<OrderStatus, { label: string; pill: "ok" | "wait" | "spec" }> = {
-  requested: { label: "بانتظار تأكيد المورد", pill: "wait" },
-  confirmed: { label: "مؤكدة — بانتظار الدفع", pill: "wait" },
-  unavailable: { label: "غير متوفرة", pill: "spec" },
-  paid: { label: "مدفوعة", pill: "ok" },
+const STATUS_LABEL: Record<OrderStatus, string> = {
+  requested: "بانتظار التأكيد",
+  confirmed: "مؤكدة — بانتظار الدفع",
+  unavailable: "غير متوفرة",
+  paid: "مدفوعة",
 };
+
+const PROMISE_PILL: Record<PromiseStatus, string> = {
+  ok: "من المخزون · دفع فوري",
+  wait: "يحتاج تأكيد",
+  spec: "طلب خاص",
+};
+
+/** اللون للتوفر وحده (قاعدة 1): حالة الوعد عند الطلب، أو من ثقته للطلبات الأقدم من المرحلة 6 */
+function promiseStatusOf(order: LocalOrder): PromiseStatus {
+  if (order.promiseStatus) return order.promiseStatus;
+  const { hiConf, midConf } = DEFAULT_PROMISE_SETTINGS;
+  return order.confidenceAtOrder >= hiConf ? "ok" : order.confidenceAtOrder >= midConf ? "wait" : "spec";
+}
+
+function followUpLabel(iso: string): string {
+  const date = new Date(iso);
+  const { time, period } = formatClock(date);
+  return `${formatShortDate(date)} · ${time} ${period}`;
+}
 
 const FILTERS: (OrderStatus | "all")[] = ["all", "requested", "confirmed", "paid", "unavailable"];
 
@@ -96,7 +117,7 @@ export default function AdminOrdersPage() {
       <div className="layers">
         {FILTERS.map((f) => (
           <button key={f} className="lay" aria-pressed={filter === f} onClick={() => setFilter(f)}>
-            {f === "all" ? "الكل" : STATUS_META[f].label}
+            {f === "all" ? "الكل" : STATUS_LABEL[f]}
           </button>
         ))}
       </div>
@@ -109,7 +130,7 @@ export default function AdminOrdersPage() {
 
       <div className="mt-3.5 flex flex-col gap-2.5">
         {visibleOrders.map((order) => {
-          const meta = STATUS_META[order.status];
+          const promise = promiseStatusOf(order);
           return (
             <Sheet key={order.id}>
               <div className="flex items-start justify-between gap-3">
@@ -122,18 +143,24 @@ export default function AdminOrdersPage() {
                     {order.partOem ? ` · ${order.partOem}` : ""} · {vehicleLabelFor(order)}
                   </div>
                 </div>
-                <StatusPill status={meta.pill} label={meta.label} />
+                <StatusPill status={promise} label={PROMISE_PILL[promise]} />
               </div>
 
               <div className="mt-2.5 flex flex-wrap gap-2">
+                <Tag>{STATUS_LABEL[order.status]}</Tag>
                 <Tag>{order.cityName}</Tag>
                 <Tag>{order.mode === "fit" ? "تركيب" : "توصيل"}</Tag>
                 <Tag>
-                  {order.pricePending ? "السعر عند التأكيد" : `${toArabicDigits(order.totalPrice.toFixed(2))} ريال${order.priceIndicative ? " · استرشادي" : ""}`}
+                  {order.pricePending ? (
+                    "السعر عند التأكيد"
+                  ) : (
+                    <>
+                      <span className="t-data">{formatPrice(order.totalPrice)}</span> ر.س{order.priceIndicative ? " (استرشادي)" : ""}
+                    </>
+                  )}
                 </Tag>
                 {order.fromStock && <Tag>من المخزون</Tag>}
-                {order.promiseStatus === "ok" && <Tag>دفع فوري</Tag>}
-                <Tag>{toArabicDigits(Math.round(order.confidenceAtOrder * 100))}% ثقة</Tag>
+                <Tag>ثقة {toArabicDigits(Math.round(order.confidenceAtOrder * 100))}٪</Tag>
                 {order.actualDays !== null && (
                   <Tag>
                     الوعد {orderDaysLabel(order)} · الفعلي {toArabicDigits(order.actualDays)}
@@ -158,7 +185,7 @@ export default function AdminOrdersPage() {
                     <ActButton onClick={() => handleMarkPaid(order)}>تحديد كمدفوع</ActButton>
                     {order.paymentLinkExpiresAt && (
                       <span style={{ fontSize: 11.5, color: "var(--text-3)", alignSelf: "center" }}>
-                        موعد المتابعة: {new Date(order.paymentLinkExpiresAt).toLocaleString("ar-SA")}
+                        موعد المتابعة: {followUpLabel(order.paymentLinkExpiresAt)}
                       </span>
                     )}
                   </>

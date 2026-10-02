@@ -2,14 +2,13 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { PartOrderOutcome } from "@/components/parts/PartOrderOutcome";
+import { PartOrderOutcome, type PlacedOrder } from "@/components/parts/PartOrderOutcome";
 import { PartOrderStep } from "@/components/parts/PartOrderStep";
 import { PartTypeCard, type PartChoice } from "@/components/parts/PartTypeCard";
 import { PartsBrowser } from "@/components/parts/PartsBrowser";
 import type { SearchVehicle } from "@/components/parts/PartSearch";
 import { VehicleIdentifyForm, type VehicleIdentifyResult } from "@/components/vehicle/VehicleIdentifyForm";
 import { saveVehicleToGarage, vehicleLabel, type GaragedVehicle } from "@/lib/garage";
-import type { LocalOrder } from "@/lib/orders";
 import { findPartType } from "@/lib/parts-offer";
 
 /** الفئة لا تُسأل في التحديد اليدوي — تُحدَّد عند التأكيد، ورقم الهيكل يساعد */
@@ -47,7 +46,7 @@ export function PartsOrderFlow({ initialVehicle, initialQuery = "" }: { initialV
   // اختيار البطاقة (الجودة والطرف) يبقى عند الرجوع من نموذج الطلب، والنموذج مربوط بقطعته
   const [draft, setDraft] = useState<{ key: string; choice: PartChoice } | null>(null);
   const [orderFor, setOrderFor] = useState<string | null>(null);
-  const [placed, setPlaced] = useState<LocalOrder | null>(null);
+  const [placed, setPlaced] = useState<PlacedOrder | null>(null);
 
   const partKey = searchParams.get("part");
   const type = partKey ? findPartType(partKey) : undefined;
@@ -166,7 +165,7 @@ export function PartsOrderFlow({ initialVehicle, initialQuery = "" }: { initialV
         />
       )}
 
-      {step === "done" && placed && <PartOrderOutcome order={placed} onAnother={another} />}
+      {step === "done" && placed && <PartOrderOutcome placed={placed} onAnother={another} />}
     </main>
   );
 }

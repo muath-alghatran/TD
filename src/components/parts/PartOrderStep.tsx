@@ -1,19 +1,20 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { verifyPartOffer } from "@/app/actions/verify-price";
 import { Corners } from "@/components/ui/Corners";
 import { Icon } from "@/components/ui/Icon";
 import { StatusPill } from "@/components/ui/StatusPill";
 import { CENTER } from "@/lib/center-info";
 import { CITIES } from "@/lib/city-catalog";
-import { dayRangeWord, formatPrice, toArabicDigits } from "@/lib/format";
-import { orderCode, createLocalOrder, type LocalOrder } from "@/lib/orders";
+import { dayRangeWord, formatHours, formatListPrice, formatPrice, toArabicDigits } from "@/lib/format";
+import { orderCode, createLocalOrder } from "@/lib/orders";
 import { offerPricing, offerPromise } from "@/lib/part-promise";
 import { tierLabel, type PartType } from "@/lib/parts-offer";
 import { PRICING_SETTINGS } from "@/lib/pricing-settings";
 import type { PromiseMode } from "@/lib/promise-engine";
 import { buildPartsOrderMessage, buildWhatsAppLink } from "@/lib/whatsapp-checkout";
+import type { PlacedOrder } from "./PartOrderOutcome";
 import type { PartChoice } from "./PartTypeCard";
 import type { SearchVehicle } from "./PartSearch";
 
@@ -37,7 +38,7 @@ export function PartOrderStep({
   vehicleId: string;
   choice: PartChoice;
   onBack: () => void;
-  onPlaced: (order: LocalOrder) => void;
+  onPlaced: (placed: PlacedOrder) => void;
 }) {
   const [cityName, setCityName] = useState(CENTER_CITY.n);
   const [mode, setMode] = useState<PromiseMode>("fit");
@@ -46,6 +47,10 @@ export function PartOrderStep({
   const [failed, setFailed] = useState(false);
   const cityId = useId();
   const notesId = useId();
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    titleRef.current?.focus({ preventScroll: true });
+  }, []);
 
   const city = CITIES.find((c) => c.n === cityName) ?? CENTER_CITY;
   const option = choice.option;
@@ -125,8 +130,11 @@ export function PartOrderStep({
       laborPending: v.mode === "fit" && v.pricing.laborCost === null,
       notes: notes.trim(),
     });
-    window.open(buildWhatsAppLink(message), "_blank", "noopener,noreferrer");
-    onPlaced(order);
+    // يُفتح بعد التحقق الخادمي، فقد يمنعه مانع النوافذ (سفاري خاصة) — شاشة النتيجة تعرض الرابط حينها
+    const whatsappLink = buildWhatsAppLink(message);
+    const win = window.open(whatsappLink, "_blank");
+    if (win) win.opener = null;
+    onPlaced({ order, whatsappLink, opened: win !== null });
   }
 
   return (
@@ -138,7 +146,9 @@ export function PartOrderStep({
 
       <div className="lede" style={{ marginTop: 14 }}>
         <span className="t-eyebrow">طلب القطعة</span>
-        <h1 id="order-title">أين تريدها؟</h1>
+        <h1 id="order-title" ref={titleRef} tabIndex={-1}>
+          أين تريدها؟
+        </h1>
         <p>
           {type.name}
           {details ? ` — ${details}` : ""} · {option ? tierLabel(option.tier) : "الجودة تُعرض عليك عند التأكيد"} · {vehicle.label}
@@ -175,7 +185,13 @@ export function PartOrderStep({
             <span className="gen-name">{city.n === CENTER.city ? `استلام أو توصيل في ${city.n}` : `توصيل إلى ${city.n}`}</span>
             <span className="gen-sub">
               خلال {dayRangeWord(shipPromise.daysMin, shipPromise.days)} من الدفع · الشحن{" "}
-              {city.c === 0 ? "مجاني" : `${toArabicDigits(city.c)} ريال`}
+              {city.c === 0 ? (
+                "مجاني"
+              ) : (
+                <>
+                  <span className="t-data">{formatListPrice(city.c)}</span> ر.س
+                </>
+              )}
             </span>
           </span>
         </button>
@@ -230,7 +246,12 @@ export function PartOrderStep({
               <div className="ledger-row">
                 <span>
                   أجرة التركيب
-                  {option?.laborHours ? ` (${toArabicDigits(option.laborHours)} ساعة × ${PRICING_SETTINGS.hourRate})` : ""}
+                  {option?.laborHours ? (
+                    <>
+                      {" "}
+                      ({formatHours(option.laborHours)} × <span className="t-data">{PRICING_SETTINGS.hourRate}</span> ر.س)
+                    </>
+                  ) : null}
                 </span>
                 <span>{pricing.laborCost === null ? "تُحدَّد عند التأكيد" : formatPrice(pricing.laborCost)}</span>
               </div>
@@ -273,7 +294,7 @@ export function PartOrderStep({
       </div>
 
       <div className="form-block">
-        <button type="button" className="btn btn-primary btn-lg btn-block blueprint" disabled={submitting} onClick={submit}>
+        <button type="button" className="btn btn-primary btn-lg btn-block blueprint" aria-disabled={submitting} onClick={submit}>
           <Corners />
           <Icon name="messageCircle" size={20} />
           {submitting ? "جارٍ التحقق من السعر…" : "أرسل الطلب عبر واتساب"}

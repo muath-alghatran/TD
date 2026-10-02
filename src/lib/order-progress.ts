@@ -85,6 +85,7 @@ export function orderProgress(order: LocalOrder): OrderProgress {
   // المرحلة 6: الدفع تحكمه الحالة (قاعدة 11) — أخضر فوري، وكهرماني بلا دفع حتى التأكيد ثم رابط ١٢ ساعة —
   // ومصدر القطعة مستقل عنها: مخزون المركز المشحون لأبعد المدن كهرماني
   const fromStock = order.fromStock === true;
+  const immediate = order.promiseStatus === "ok";
   const pendingNote =
     order.promiseStatus === "ok"
       ? "القطعة في مخزون المركز — نرسل لك رابط الدفع مباشرة على واتساب."
@@ -105,7 +106,7 @@ export function orderProgress(order: LocalOrder): OrderProgress {
     },
     {
       key: "confirmed",
-      label: failed ? "لم تتوفر القطعة" : "تأكيد التوفر والسعر",
+      label: failed ? "لم تتوفر القطعة" : immediate ? "تأكيد الطلب ورابط الدفع" : "تأكيد التوفر والسعر",
       short: "التأكيد",
       note: failed
         ? "سجّلناها في قائمة الطلب المفقود، ونبلغك فور توفرها."
@@ -163,7 +164,9 @@ export function orderProgress(order: LocalOrder): OrderProgress {
         ? "قيد التجهيز"
         : order.status === "confirmed"
           ? "بانتظار موافقتك"
-          : "بانتظار تأكيد التوفر";
+          : immediate
+            ? "بانتظار رابط الدفع"
+            : "بانتظار تأكيد التوفر";
 
   return {
     stages,

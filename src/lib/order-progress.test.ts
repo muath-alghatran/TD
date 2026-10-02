@@ -67,4 +67,11 @@ describe("تقدم طلبات المرحلة 6", () => {
     // مخزون المركز المشحون لأبعد المدن: المصدر مخزون، والدفع بعد التأكيد
     expect(confirmNote({ ...rangeOrder, fromStock: true })).toContain("نؤكد الشحن إلى مدينتك");
   });
+
+  it("الأخضر بدفع فوري لا يقول «بانتظار تأكيد التوفر»", () => {
+    const stock = orderProgress({ ...rangeOrder, promiseStatus: "ok", fromStock: true });
+    expect(stock.statusLabel).toBe("بانتظار رابط الدفع");
+    expect(stock.stages.find((s) => s.key === "confirmed")?.label).toBe("تأكيد الطلب ورابط الدفع");
+    expect(orderProgress(rangeOrder).statusLabel).toBe("بانتظار تأكيد التوفر");
+  });
 });

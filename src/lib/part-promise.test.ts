@@ -4,7 +4,7 @@ import { CITIES } from "./city-catalog";
 import { DIAGRAM_ZONES, partsInZone, zoneOfPart } from "./diagram-zones";
 import { HONDA_INVENTORY } from "./honda-inventory";
 import type { StockItem } from "./inventory-schema";
-import { offerPricing, offerPromise, partOptions, partStatus, stockFor } from "./part-promise";
+import { offerPricing, offerPromise, partOptions, partStatus, stockFitDays, stockFor } from "./part-promise";
 import { PART_TYPES } from "./parts-dictionary";
 import { CATALOG_MAKES } from "./vehicle-catalog";
 
@@ -91,6 +91,10 @@ describe("الوعد لخيار ومدينة", () => {
     expect([fit.daysMin, fit.days, fit.status]).toEqual([1, 1, "ok"]);
     const riyadh = offerPromise(stockOption, RIYADH, "ship");
     expect([riyadh.days, riyadh.status]).toEqual([2, "ok"]);
+  });
+
+  it("«في مخزون المركز» يُعرض بوعد التركيب في المركز نفسه", () => {
+    expect(stockFitDays()).toBe(offerPromise(stockOption, HAIL, "fit").days);
   });
 
   it("المخزون المشحون لأبعد المدن يتبع المحرك: الثقة دون الأخضر فكهرماني (قاعدة 11)", () => {

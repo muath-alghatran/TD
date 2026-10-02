@@ -7,7 +7,7 @@ import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
 /* الخطوط حسب نظام Industry: Barlow Condensed للعناوين، Barlow للنص والأرقام اللاتينية،
-   وIBM Plex Sans Arabic لكل حرف عربي (يأتي بعدهما في كل مجموعة خطوط في globals.css). */
+   وIBM Plex Sans Arabic لكل حرف عربي — ترتيبها في مجموعات الخطوط في globals.css (قاعدة 2). */
 const barlow = Barlow({
   variable: "--font-barlow",
   subsets: ["latin"],

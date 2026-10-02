@@ -11,6 +11,7 @@ import {
   dayRangeWord,
   dayWord,
   formatClock,
+  formatHours,
   formatPrice,
   formatShortDate,
   formatWeekday,
@@ -64,13 +65,18 @@ function PriceLedger({ order }: { order: LocalOrder }) {
               <div className="ledger-row">
                 <span>
                   أجرة التركيب
-                  {hours ? ` (${hours === 1 ? "ساعة واحدة" : `${toArabicDigits(hours)} ساعة`} × ${PRICING_SETTINGS.hourRate})` : ""}
+                  {hours ? (
+                    <>
+                      {" "}
+                      ({hours === 1 ? "ساعة واحدة" : formatHours(hours)} × <span className="t-data">{PRICING_SETTINGS.hourRate}</span> ر.س)
+                    </>
+                  ) : null}
                 </span>
                 <span>{order.laborPending ? "تُحدَّد عند التأكيد" : formatPrice(order.laborCost ?? 0)}</span>
               </div>
               {(order.discount ?? 0) > 0 && (
                 <div className="ledger-row credit-line">
-                  <span>خصم «اطلب وركّب» على أجرة اليد ١٠٪</span>
+                  <span>خصم «اطلب وركّب» على أجرة اليد {toArabicDigits(Math.round(PRICING_SETTINGS.fitDiscount * 100))}٪</span>
                   <span>−{formatPrice(order.discount ?? 0)}</span>
                 </div>
               )}
@@ -84,7 +90,13 @@ function PriceLedger({ order }: { order: LocalOrder }) {
         </>
       )}
       <div className="ledger-sum">
-        <span>{order.status === "requested" ? "الإجمالي التقديري" : "الإجمالي المعتمد"}</span>
+        <span>
+          {order.status !== "requested"
+            ? "الإجمالي المعتمد"
+            : order.fromStock && !order.priceIndicative
+              ? "الإجمالي"
+              : "الإجمالي التقديري"}
+        </span>
         <span>{order.pricePending ? "يُحدَّد عند التأكيد" : `${formatPrice(order.totalPrice)} ر.س`}</span>
       </div>
       {order.status === "requested" && order.priceIndicative && (

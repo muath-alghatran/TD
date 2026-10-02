@@ -59,12 +59,13 @@
   --steel-bg: var(--a-900);
 
   /* — حالة التوفر: المعنى الوحيد للون المشبع — */
-  --ok: #12764f;
+  /* أغمق قليلاً من النموذج ليبلغ نص الحالة ٤٫٥:١ على الصفحة وداخل الخلية الملوّنة (تدقيق المرحلة 6) */
+  --ok: #106c48;
   --ok-lit: #3fd9a0;
-  --ok-film: #12764f16;
-  --wait: #96660a;
+  --ok-film: #106c4816;
+  --wait: #805708;
   --wait-lit: #f2b33c;
-  --wait-film: #96660a16;
+  --wait-film: #80570816;
   --spec: #68767f;
   --spec-lit: #9fb2bd;
   --spec-film: #68767f16;
@@ -88,11 +89,16 @@
   --steel: var(--ink-accent);
   --steel-2: var(--accent);
 
-  /* — الخطوط (المتغيرات الأولى تضعها next/font في layout.tsx) — */
-  --font-heading: var(--font-barlow-condensed), var(--font-ibm-plex-sans-arabic), system-ui, sans-serif;
-  --font-body: var(--font-barlow), var(--font-ibm-plex-sans-arabic), system-ui, sans-serif;
+  /* — الخطوط (قاعدة 2؛ next/font يحمّلها في layout.tsx) —
+     متغير next/font لخطّي Barlow يحمل معه وجهاً بديلاً («Barlow Fallback» = Arial المحلي) يغطي كل
+     الحروف، فلو جاء أولاً رسم العربي بـArial قبل أن يصل إلى IBM Plex. لذلك يأتي اسم Barlow وحده أولاً
+     (وجوهه لاتينية فقط)، ثم IBM Plex Sans Arabic للعربي، ثم متغير Barlow كاملاً احتياطاً.
+     Turbopack يُبقي أسماء الخطوط كما هي، ولا يحترم adjustFontFallback: false. */
+  --font-heading:
+    "Barlow Condensed", var(--font-ibm-plex-sans-arabic), var(--font-barlow-condensed), system-ui, sans-serif;
+  --font-body: "Barlow", var(--font-ibm-plex-sans-arabic), var(--font-barlow), system-ui, sans-serif;
   --font-disp: var(--font-heading);
-  --font-data: var(--font-barlow), var(--font-ibm-plex-sans-arabic), ui-monospace, monospace;
+  --font-data: "Barlow", var(--font-ibm-plex-sans-arabic), var(--font-barlow), ui-monospace, monospace;
 
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --shadow-lg: 0 12px 32px color-mix(in srgb, #2b2b2d 22%, transparent);
@@ -1165,6 +1171,14 @@ select:disabled {
 }
 .node:hover .ring {
   opacity: 1;
+}
+/* المنطقة المختارة تبقى مضاءة */
+.node[aria-pressed="true"] .ring {
+  opacity: 1;
+  stroke-width: 2.4;
+}
+.node[aria-pressed="true"] .aura {
+  opacity: 0.3;
 }
 .node.off {
   opacity: 0.14;
@@ -3992,10 +4006,10 @@ html[data-motion="ok"] .journey-replay {
   flex: none;
 }
 .zone-dot.ok {
-  background: var(--ok-lit);
+  background: var(--ok);
 }
 .zone-dot.wait {
-  background: var(--wait-lit);
+  background: var(--wait);
 }
 .zone-say {
   display: block;
@@ -4003,10 +4017,7 @@ html[data-motion="ok"] .journey-replay {
   color: var(--muted);
 }
 
-/* خيار من مخزون المركز في بطاقة القطعة */
-.tier-cell.is-stock {
-  border-color: var(--ok);
-}
+/* خيار من مخزون المركز في بطاقة القطعة — التوفر في شارته الخضراء، والإطار للاختيار وحده */
 .tier-stock {
   align-self: flex-start;
   padding: 2px 7px;
@@ -4041,4 +4052,14 @@ html[data-motion="ok"] .journey-replay {
 }
 .order-sum .ledger {
   margin-top: 14px;
+}
+/* حالة المنطقة داخل القراءة الفولاذية: ألوان الحقل المضاءة (التباين على الفولاذي) */
+.field .stat.ok {
+  color: var(--ok-lit);
+}
+.field .stat.wait {
+  color: var(--wait-lit);
+}
+.field .stat.spec {
+  color: var(--spec-lit);
 }
