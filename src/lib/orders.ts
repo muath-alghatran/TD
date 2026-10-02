@@ -16,6 +16,8 @@ export type OrderStatus = "requested" | "confirmed" | "unavailable" | "paid";
 
 export interface LocalOrder {
   id: string;
+  /** معرّف السيارة في كراجي (Order.vehicleId). اختياري لأن الطلبات الأقدم لا تحمله */
+  vehicleId?: string;
   vehicleVin: string;
   partOem: string;
   partName: string;

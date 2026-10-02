@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Corners } from "@/components/ui/Corners";
 import { Icon } from "@/components/ui/Icon";
 import { dayWord, formatDayDate, formatPrice } from "@/lib/format";
-import { vehicleLabel } from "@/lib/garage";
+import { findOrderVehicle, vehicleLabel } from "@/lib/garage";
 import { useGaragedVehicles, useHydrated, useLocalOrders } from "@/lib/local-store";
 import { orderProgress } from "@/lib/order-progress";
 import { orderCode } from "@/lib/orders";
@@ -44,7 +44,7 @@ export function OrdersScreen() {
       <Corners />
       {sorted.map((order) => {
         const progress = orderProgress(order);
-        const vehicle = vehicles.find((v) => v.vin === order.vehicleVin);
+        const vehicle = findOrderVehicle(vehicles, order);
         const tagClass = progress.failed ? "tag tag-dashed" : progress.delivered ? "tag tag-neutral" : "tag tag-accent";
         return (
           <Link key={order.id} href={`/orders/${order.id}`} className="order-row">

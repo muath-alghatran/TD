@@ -10,7 +10,7 @@ export default function GaragePage() {
     <>
       <main className="screen has-tabbar">
         <TabHead title="كراجي" code="MY GARAGE">
-          مركباتك المحفوظة من الاستمارة — لا نسألك عنها مرة ثانية.
+          مركباتك المحفوظة — تحددها مرة واحدة، ولا نسألك عنها مرة ثانية.
         </TabHead>
         <div className="page">
           <GarageScreen />

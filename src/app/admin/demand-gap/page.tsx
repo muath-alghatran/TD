@@ -3,12 +3,16 @@
 import { useEffect, useState } from "react";
 import { Sheet } from "@/components/ui/Sheet";
 import { Tag } from "@/components/ui/Tag";
+import { normalizeArabic } from "@/lib/arabic-text";
 import { toArabicDigits } from "@/lib/format";
 import { listDemandGaps, type DemandGapEntry } from "@/lib/demand-gap";
 
 interface GroupedGap {
+  key: string;
+  /** اسم القطعة، أو نص العميل حين لا قطعة (سيارة غير موجودة في القائمة) */
+  title: string;
   oemNumber: string;
-  partName: string;
+  isVehicle: boolean;
   count: number;
   cities: Set<string>;
   latest: string;
@@ -17,18 +21,21 @@ interface GroupedGap {
 function groupByOem(entries: DemandGapEntry[]): GroupedGap[] {
   const map = new Map<string, GroupedGap>();
   for (const entry of entries) {
-    const key = entry.oemNumber || entry.partName;
+    const isVehicle = !entry.oemNumber && !entry.partName && Boolean(entry.searchText);
+    const key = entry.oemNumber || entry.partName || `vehicle:${normalizeArabic(entry.searchText ?? "")}`;
     const existing = map.get(key);
     if (existing) {
       existing.count++;
-      existing.cities.add(entry.cityName);
+      if (entry.cityName) existing.cities.add(entry.cityName);
       if (entry.createdAt > existing.latest) existing.latest = entry.createdAt;
     } else {
       map.set(key, {
+        key,
+        title: entry.partName || entry.searchText || "—",
         oemNumber: entry.oemNumber,
-        partName: entry.partName,
+        isVehicle,
         count: 1,
-        cities: new Set([entry.cityName]),
+        cities: new Set(entry.cityName ? [entry.cityName] : []),
         latest: entry.createdAt,
       });
     }
@@ -62,11 +69,11 @@ export default function AdminDemandGapPage() {
       ) : (
         <div className="flex flex-col gap-2.5">
           {grouped.map((g) => (
-            <Sheet key={g.oemNumber || g.partName}>
+            <Sheet key={g.key}>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="t-disp" style={{ fontWeight: 500, fontSize: 15.5 }}>
-                    {g.partName}
+                    {g.title}
                   </div>
                   {g.oemNumber && (
                     <div className="t-data" style={{ fontSize: 11.5, color: "var(--text-3)", marginTop: 2 }}>
@@ -79,6 +86,7 @@ export default function AdminDemandGapPage() {
                 </div>
               </div>
               <div className="mt-2.5 flex flex-wrap gap-2">
+                {g.isVehicle && <Tag>سيارة غير موجودة في القائمة</Tag>}
                 {[...g.cities].map((city) => (
                   <Tag key={city}>{city}</Tag>
                 ))}

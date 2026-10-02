@@ -6,6 +6,7 @@ import { Icon } from "@/components/ui/Icon";
 import { formatDayNumber, formatMonth, formatRemaining, formatWeekday, toArabicDigits } from "@/lib/format";
 import { useGaragedVehicles, useLocalOrders, useNow } from "@/lib/local-store";
 import { activeOrders, orderProgress } from "@/lib/order-progress";
+import { findOrderVehicle } from "@/lib/garage";
 import { orderCode } from "@/lib/orders";
 
 /**
@@ -22,7 +23,7 @@ export function ActiveOrder() {
 
   const order = active[0];
   const progress = orderProgress(order);
-  const vehicle = vehicles.find((v) => v.vin === order.vehicleVin);
+  const vehicle = findOrderVehicle(vehicles, order);
   const others = active.length - 1;
 
   return (

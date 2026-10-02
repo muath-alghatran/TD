@@ -5,6 +5,7 @@ import { verifyPrice, type VerifiedPrice } from "@/app/actions/verify-price";
 import { ActButton } from "@/components/ui/ActButton";
 import { Sheet } from "@/components/ui/Sheet";
 import { dayWord, formatPrice } from "@/lib/format";
+import { vehicleLabel } from "@/lib/garage";
 import { createLocalOrder, type LocalOrder } from "@/lib/orders";
 import { PRICING_SETTINGS } from "@/lib/pricing-settings";
 import type { PromiseMode } from "@/lib/promise-engine";
@@ -40,6 +41,8 @@ const LIT: Record<VerifiedPrice["status"], string> = {
 };
 
 export interface VerdictVehicle {
+  /** معرّف السيارة في كراجي — يربط الطلب بها حتى بلا رقم هيكل */
+  id: string;
   vin: string;
   make: string;
   model: string;
@@ -109,6 +112,7 @@ export function PromiseVerdict({
     setSubmitting(true);
 
     const order = createLocalOrder({
+      vehicleId: vehicle.id,
       vehicleVin: vehicle.vin,
       partOem: verified.oem,
       partName: verified.partName,
@@ -129,7 +133,8 @@ export function PromiseVerdict({
     });
 
     const message = buildPartsOrderMessage({
-      vehicleLabel: `${vehicle.make} ${vehicle.model} ${vehicle.year}`,
+      vehicleLabel: vehicleLabel(vehicle),
+      vin: vehicle.vin,
       partName: verified.partName,
       partOem: verified.oem,
       cityName,

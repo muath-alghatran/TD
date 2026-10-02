@@ -6,6 +6,7 @@ import { STATUS_LABEL } from "@/components/ui/StatusPill";
 import { CITIES } from "@/lib/city-catalog";
 import { zoneStatus } from "@/lib/catalog-promise";
 import { toArabicDigits } from "@/lib/format";
+import { groupVin } from "@/lib/vin";
 import { LAYERS, ZONES, type CatalogZone } from "@/lib/zone-catalog";
 
 const LIT: Record<string, string> = {
@@ -53,7 +54,7 @@ export function VehicleDiagramLevel1({
         <div>
           <strong>{vehicleLabel}</strong>
           <small>{vehicleTrim}</small>
-          <div className="t-data">{vehicleVin}</div>
+          {vehicleVin && <div className="t-data">{groupVin(vehicleVin)}</div>}
         </div>
         <button className="chg" onClick={onChangeVehicle}>
           تغيير

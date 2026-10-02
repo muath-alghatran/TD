@@ -4,8 +4,9 @@ import Link from "next/link";
 import { Corners } from "@/components/ui/Corners";
 import { Icon } from "@/components/ui/Icon";
 import { toArabicDigits } from "@/lib/format";
-import { displayTrim, vehicleLabel } from "@/lib/garage";
+import { displayTrim, findOrderVehicle, vehicleLabel } from "@/lib/garage";
 import { useGaragedVehicles, useHydrated, useLocalOrders } from "@/lib/local-store";
+import { groupVin, isCompleteVin } from "@/lib/vin";
 import { KsaPlate } from "./KsaPlate";
 
 function ordersWord(n: number): string {
@@ -34,7 +35,7 @@ export function GarageScreen() {
         <div className="t-disp" style={{ fontSize: 19 }}>
           لا مركبات بعد
         </div>
-        <p>صوّر استمارة سيارتك مرة واحدة، ونحفظها هنا لكل طلب وحجز بعدها.</p>
+        <p>حدّد سيارتك مرة واحدة — الماركة والموديل والسنة — ونحفظها هنا لكل طلب وحجز بعدها.</p>
         <Link href="/parts?new=1" className="btn btn-primary">
           <Icon name="plus" size={18} />
           أضف مركبتك
@@ -50,8 +51,8 @@ export function GarageScreen() {
       <div className="blueprint" style={{ marginTop: 20 }}>
         <Corners />
         {newestFirst.map((v) => {
-          const count = orders.filter((o) => o.vehicleVin === v.vin).length;
-          const hasVin = /[A-Z0-9]{8,}/i.test(v.vin);
+          const count = orders.filter((o) => findOrderVehicle(vehicles, o)?.id === v.id).length;
+          const hasVin = isCompleteVin(v.vin);
           return (
             <article key={v.id} className="garage-item">
               <div className="flex items-center gap-3">
@@ -63,7 +64,7 @@ export function GarageScreen() {
                 <KsaPlate plate={v.plate} />
               </div>
               <div className="garage-meta">
-                {hasVin ? <span className="t-data">VIN {v.vin}</span> : <span>بلا رقم هيكل</span>}
+                {hasVin ? <span className="t-data">VIN {groupVin(v.vin)}</span> : <span>بلا رقم هيكل</span>}
                 <span>{ordersWord(count)}</span>
               </div>
               <div className="garage-actions">

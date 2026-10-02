@@ -2,13 +2,18 @@
  * قراءة استمارة المركبة — واجهة نظيفة خلف تنفيذ Mock حالياً.
  *
  * TODO(OCR حقيقي): استبدل تنفيذ extractVehicleForm بمزوّد حقيقي (Google Cloud
- * Vision، Azure AI Document Intelligence، أو غيره) حين يتوفر حساب ومفتاح API.
- * الشكل الناتج (VehicleFormExtraction) لن يتغير، فالمكوّنات المستهلكة
- * (VehicleIdentifyForm/VehicleConfirmCard) لن تحتاج تعديلاً.
+ * Vision، Azure AI Document Intelligence، أو غيره) حين يتوفر حساب ومفتاح API،
+ * ثم اقلب FEATURE_FORM_OCR. الشكل الناتج (VehicleFormExtraction) لن يتغير.
  *
- * لا اتصال شبكة هنا الآن — تأخير اصطناعي فقط لمحاكاة زمن معالجة حقيقي،
- * مطابق لسلوك docs/prototype-parts.html (startScan → renderConf).
+ * لا اتصال شبكة هنا الآن — تأخير اصطناعي فقط لمحاكاة زمن معالجة حقيقي.
  */
+
+/**
+ * معطّل بقرار المالك (أكتوبر ٢٠٢٦): القراءة التجريبية تحفظ كامري وهمية لأي صورة.
+ * حين يُفعَّل يظهر في «حدّد سيارتك» زر «املأ من صورة الاستمارة» يعبّئ الحقول
+ * نفسها التي يراجعها العميل قبل الحفظ.
+ */
+export const FEATURE_FORM_OCR = false;
 
 export type FieldConfidence = "high" | "low";
 
