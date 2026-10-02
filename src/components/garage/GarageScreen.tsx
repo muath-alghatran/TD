@@ -59,7 +59,15 @@ export function GarageScreen() {
                 <Icon name="car" size={28} className="car-ic" />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <h2 className="car-name">{vehicleLabel(v)}</h2>
-                  <div className="car-sub">{displayTrim(v.trim)}</div>
+                  <div className="car-sub">
+                    {v.generationCode && (
+                      <>
+                        <span className="t-data gen-code">{v.generationCode}</span>
+                        {" · "}
+                      </>
+                    )}
+                    {displayTrim(v.trim)}
+                  </div>
                 </div>
                 <KsaPlate plate={v.plate} />
               </div>

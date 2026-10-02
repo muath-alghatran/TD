@@ -84,3 +84,14 @@ describe("findOrderVehicle", () => {
     expect(findOrderVehicle(garage, { vehicleId: "gone", vehicleVin: REAL_VIN })).toBe(withVin);
   });
 });
+
+describe("رمز الجيل في كراجي (المرحلة 4)", () => {
+  it("السجلات الأقدم بلا جيل تبقى صالحة ويحفظ التنظيف الجيل كما هو", () => {
+    const legacy = car("old", "");
+    const withGeneration = car("new", "", { generationCode: "CV" });
+    const { vehicles, changed } = cleanupGarage([legacy, withGeneration]);
+    expect(changed).toBe(false);
+    expect(vehicles[0].generationCode).toBeUndefined();
+    expect(vehicles[1].generationCode).toBe("CV");
+  });
+});

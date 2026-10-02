@@ -1,0 +1,264 @@
+﻿make_ar,make_en,model_ar,model_en,aliases_ar,generation_code,year_from,year_to,body,source,status
+تويوتا,Toyota,كامري,Camry,كامري|كامرى,XV40,2008,2011,sedan,https://en.wikipedia.org/wiki/Toyota_Camry_(XV40),verified
+تويوتا,Toyota,كامري,Camry,كامري|كامرى,XV50,2011,2017,sedan,https://en.wikipedia.org/wiki/Toyota_Camry_(XV50),verified
+تويوتا,Toyota,كامري,Camry,كامري|كامرى,XV70,2017,2024,sedan,https://en.wikipedia.org/wiki/Toyota_Camry_(XV70),verified
+تويوتا,Toyota,كامري,Camry,كامري|كامرى,XV80,2024,2027,sedan,https://en.wikipedia.org/wiki/Toyota_Camry_(XV80),provisional
+تويوتا,Toyota,كورولا,Corolla,كرولا|كورلا,E150,2008,2013,sedan,https://en.wikipedia.org/wiki/Toyota_Corolla_(E140),verified
+تويوتا,Toyota,كورولا,Corolla,كرولا|كورلا,E170,2013,2019,sedan,https://en.wikipedia.org/wiki/Toyota_Corolla_(E170),verified
+تويوتا,Toyota,كورولا,Corolla,كرولا|كورلا,E210,2019,2027,sedan,https://en.wikipedia.org/wiki/Toyota_Corolla_(E210),provisional
+تويوتا,Toyota,يارس,Yaris,ياريس,XP90,2008,2013,sedan,https://en.wikipedia.org/wiki/Toyota_Yaris_(XP90),verified
+تويوتا,Toyota,يارس,Yaris,ياريس,XP150,2013,2022,sedan,https://en.wikipedia.org/wiki/Toyota_Yaris_(XP150),verify
+تويوتا,Toyota,يارس,Yaris,ياريس,AC100,2022,2027,sedan,https://en.wikipedia.org/wiki/Toyota_Yaris,verify
+تويوتا,Toyota,أفالون,Avalon,افالون|افلون,XX30,2008,2012,sedan,https://en.wikipedia.org/wiki/Toyota_Avalon,verified
+تويوتا,Toyota,أفالون,Avalon,افالون|افلون,XX40,2012,2018,sedan,https://en.wikipedia.org/wiki/Toyota_Avalon,verified
+تويوتا,Toyota,أفالون,Avalon,افالون|افلون,XX50,2018,2022,sedan,https://en.wikipedia.org/wiki/Toyota_Avalon,verified
+تويوتا,Toyota,كراون,Crown,كراون تويوتا,S200,2008,2012,sedan,https://en.wikipedia.org/wiki/Toyota_Crown,verify
+تويوتا,Toyota,كراون,Crown,كراون تويوتا,S210,2012,2018,sedan,https://en.wikipedia.org/wiki/Toyota_Crown,verify
+تويوتا,Toyota,كراون,Crown,كراون تويوتا,S235,2023,2027,sedan,https://en.wikipedia.org/wiki/Toyota_Crown,provisional
+تويوتا,Toyota,لاندكروزر,Land Cruiser,لاند كروزر|جيب لاندكروزر|لاندكروزر ستيشن,J200,2008,2021,suv,https://en.wikipedia.org/wiki/Toyota_Land_Cruiser_(J200),verified
+تويوتا,Toyota,لاندكروزر,Land Cruiser,لاند كروزر|جيب لاندكروزر|لاندكروزر ستيشن,J300,2021,2027,suv,https://en.wikipedia.org/wiki/Toyota_Land_Cruiser_(J300),provisional
+تويوتا,Toyota,لاندكروزر 70,Land Cruiser 70,شاص|ربع|لاندكروزر بيك اب|لاند كروزر بيك اب|لاندكروزر هاردتوب|شاص لاندكروزر|ربع لاندكروزر|لاندكروزر 79|لاندكروزر 76,J70,2008,2027,pickup,https://en.wikipedia.org/wiki/Toyota_Land_Cruiser_(J70),provisional
+تويوتا,Toyota,برادو,Land Cruiser Prado,لاندكروزر برادو|لاند كروزر برادو,J120,2008,2009,suv,https://en.wikipedia.org/wiki/Toyota_Land_Cruiser_Prado,verified
+تويوتا,Toyota,برادو,Land Cruiser Prado,لاندكروزر برادو|لاند كروزر برادو,J150,2009,2024,suv,https://en.wikipedia.org/wiki/Toyota_Land_Cruiser_Prado,verified
+تويوتا,Toyota,برادو,Land Cruiser Prado,لاندكروزر برادو|لاند كروزر برادو,J250,2024,2027,suv,https://en.wikipedia.org/wiki/Toyota_Land_Cruiser_Prado,provisional
+تويوتا,Toyota,إف جي كروزر,FJ Cruiser,اف جي|اف جي كروزر|إف جي|FJ,XJ10,2008,2022,suv,https://en.wikipedia.org/wiki/Toyota_FJ_Cruiser,verified
+تويوتا,Toyota,فورتشنر,Fortuner,فورتشينر|فورجنر|فورتنر,AN50,2008,2015,suv,https://en.wikipedia.org/wiki/Toyota_Fortuner,verified
+تويوتا,Toyota,فورتشنر,Fortuner,فورتشينر|فورجنر|فورتنر,AN150,2015,2027,suv,https://en.wikipedia.org/wiki/Toyota_Fortuner,provisional
+تويوتا,Toyota,هايلكس,Hilux,هايلوكس|هيلكس|هيلوكس,AN10,2008,2015,pickup,https://en.wikipedia.org/wiki/Toyota_Hilux,verified
+تويوتا,Toyota,هايلكس,Hilux,هايلوكس|هيلكس|هيلوكس,AN110,2015,2025,pickup,https://en.wikipedia.org/wiki/Toyota_Hilux,verified
+تويوتا,Toyota,هايلكس,Hilux,هايلوكس|هيلكس|هيلوكس,AN220,2025,2027,pickup,https://en.wikipedia.org/wiki/Toyota_Hilux,verify
+تويوتا,Toyota,سيكويا,Sequoia,سكويا,XK60,2008,2022,suv,https://en.wikipedia.org/wiki/Toyota_Sequoia,verified
+تويوتا,Toyota,سيكويا,Sequoia,سكويا,XK80,2022,2027,suv,https://en.wikipedia.org/wiki/Toyota_Sequoia,provisional
+تويوتا,Toyota,تندرا,Tundra,توندرا,XK50,2008,2021,pickup,https://en.wikipedia.org/wiki/Toyota_Tundra,verified
+تويوتا,Toyota,تندرا,Tundra,توندرا,XK70,2021,2027,pickup,https://en.wikipedia.org/wiki/Toyota_Tundra,provisional
+تويوتا,Toyota,هايلاندر,Highlander,هايلندر,XU40,2008,2013,suv,https://en.wikipedia.org/wiki/Toyota_Highlander,verified
+تويوتا,Toyota,هايلاندر,Highlander,هايلندر,XU50,2013,2019,suv,https://en.wikipedia.org/wiki/Toyota_Highlander,verified
+تويوتا,Toyota,هايلاندر,Highlander,هايلندر,XU70,2019,2026,suv,https://en.wikipedia.org/wiki/Toyota_Highlander,verified
+تويوتا,Toyota,هايلاندر,Highlander,هايلندر,,2026,2027,suv,https://en.wikipedia.org/wiki/Toyota_Highlander,verify
+تويوتا,Toyota,راف فور,RAV4,راف4|راف 4|راف,XA30,2008,2012,suv,https://en.wikipedia.org/wiki/Toyota_RAV4,verified
+تويوتا,Toyota,راف فور,RAV4,راف4|راف 4|راف,XA40,2012,2018,suv,https://en.wikipedia.org/wiki/Toyota_RAV4,verified
+تويوتا,Toyota,راف فور,RAV4,راف4|راف 4|راف,XA50,2018,2025,suv,https://en.wikipedia.org/wiki/Toyota_RAV4,verified
+تويوتا,Toyota,راف فور,RAV4,راف4|راف 4|راف,XA60,2025,2027,suv,https://en.wikipedia.org/wiki/Toyota_RAV4,provisional
+تويوتا,Toyota,سي إتش آر,C-HR,سي اتش ار|CHR,AX10,2017,2023,suv,https://en.wikipedia.org/wiki/Toyota_C-HR,verify
+تويوتا,Toyota,رش,Rush,راش,,2008,2017,suv,https://en.wikipedia.org/wiki/Daihatsu_Terios,verify
+تويوتا,Toyota,رش,Rush,راش,F800,2017,2027,suv,https://en.wikipedia.org/wiki/Daihatsu_Terios,verify
+تويوتا,Toyota,رايز,Raize,رايز تويوتا,A200,2022,2027,suv,https://en.wikipedia.org/wiki/Daihatsu_Rocky_(A200),verify
+تويوتا,Toyota,فيلوز,Veloz,فيلوز تويوتا,,2022,2027,mpv,https://en.wikipedia.org/wiki/Toyota_Avanza,verify
+تويوتا,Toyota,أفانزا,Avanza,افانزا|افنزا,F600,2008,2011,mpv,https://en.wikipedia.org/wiki/Toyota_Avanza,verify
+تويوتا,Toyota,أفانزا,Avanza,افانزا|افنزا,F650,2011,2022,mpv,https://en.wikipedia.org/wiki/Toyota_Avanza,verify
+تويوتا,Toyota,أفانزا,Avanza,افانزا|افنزا,,2022,2027,mpv,https://en.wikipedia.org/wiki/Toyota_Avanza,verify
+تويوتا,Toyota,إنوفا,Innova,انوفا|اينوفا,AN40,2008,2016,mpv,https://en.wikipedia.org/wiki/Toyota_Innova,verified
+تويوتا,Toyota,إنوفا,Innova,انوفا|اينوفا,AN140,2016,2023,mpv,https://en.wikipedia.org/wiki/Toyota_Innova,verified
+تويوتا,Toyota,إنوفا,Innova,انوفا|اينوفا,AG10,2023,2027,mpv,https://en.wikipedia.org/wiki/Toyota_Innova,verify
+تويوتا,Toyota,هايس,HiAce,هاي اس|هايس فان|هايس باص,H200,2008,2019,van,https://en.wikipedia.org/wiki/Toyota_HiAce,verified
+تويوتا,Toyota,هايس,HiAce,هاي اس|هايس فان|هايس باص,H300,2019,2027,van,https://en.wikipedia.org/wiki/Toyota_HiAce,provisional
+تويوتا,Toyota,كوستر,Coaster,باص كوستر,B50,2008,2017,van,https://en.wikipedia.org/wiki/Toyota_Coaster,verified
+تويوتا,Toyota,كوستر,Coaster,باص كوستر,B70,2017,2027,van,https://en.wikipedia.org/wiki/Toyota_Coaster,provisional
+تويوتا,Toyota,بريفيا,Previa,بريفيا تويوتا,XR50,2008,2019,mpv,https://en.wikipedia.org/wiki/Toyota_Previa,verified
+تويوتا,Toyota,جرانفيا,Granvia,غرانفيا|قرانفيا,H300,2019,2027,mpv,https://en.wikipedia.org/wiki/Toyota_Granvia,provisional
+تويوتا,Toyota,أوريون,Aurion,اوريون|اورين,XV40,2008,2012,sedan,https://en.wikipedia.org/wiki/Toyota_Aurion,verified
+تويوتا,Toyota,أوريون,Aurion,اوريون|اورين,XV50,2012,2017,sedan,https://en.wikipedia.org/wiki/Toyota_Aurion,verified
+تويوتا,Toyota,كورولا كروس,Corolla Cross,كرولا كروس,XG10,2021,2027,suv,https://en.wikipedia.org/wiki/Toyota_Corolla_Cross,provisional
+تويوتا,Toyota,86,86,جي تي 86|GT86|GR86|تويوتا 86|جي ار 86,ZN6,2012,2021,coupe,https://en.wikipedia.org/wiki/Toyota_86,verified
+تويوتا,Toyota,86,86,جي تي 86|GT86|GR86|تويوتا 86|جي ار 86,ZN8,2021,2027,coupe,https://en.wikipedia.org/wiki/Toyota_86,provisional
+تويوتا,Toyota,سوبرا,Supra,سبرا|جي ار سوبرا,DB,2019,2027,coupe,https://en.wikipedia.org/wiki/Toyota_Supra_(J29/DB),provisional
+تويوتا,Toyota,bZ4X,bZ4X,بي زد فور اكس|بي زد 4 اكس,EA10,2023,2027,suv,https://en.wikipedia.org/wiki/Toyota_bZ4X,verify
+نيسان,Nissan,باترول,Patrol,بترول|نيسان باترول,Y61,2008,2010,suv,https://en.wikipedia.org/wiki/Nissan_Patrol_(Y61),verified
+نيسان,Nissan,باترول,Patrol,بترول|نيسان باترول,Y62,2010,2024,suv,https://en.wikipedia.org/wiki/Nissan_Patrol_(Y62),verified
+نيسان,Nissan,باترول,Patrol,بترول|نيسان باترول,Y63,2024,2027,suv,https://en.wikipedia.org/wiki/Nissan_Patrol,provisional
+نيسان,Nissan,باترول سفاري,Patrol Safari,سفاري|باترول بيك اب|بيك اب باترول|سفاري بيك اب,Y61,2008,2024,pickup,https://en.wikipedia.org/wiki/Nissan_Patrol_(Y61),verified
+نيسان,Nissan,صني,Sunny,سني|صنى,N16,2008,2011,sedan,https://en.wikipedia.org/wiki/Nissan_Sunny,verified
+نيسان,Nissan,صني,Sunny,سني|صنى,N17,2011,2020,sedan,https://en.wikipedia.org/wiki/Nissan_Almera,verified
+نيسان,Nissan,صني,Sunny,سني|صنى,N18,2020,2027,sedan,https://en.wikipedia.org/wiki/Nissan_Almera,provisional
+نيسان,Nissan,التيما,Altima,ألتيما|التيمه,L32,2008,2012,sedan,https://en.wikipedia.org/wiki/Nissan_Altima,verified
+نيسان,Nissan,التيما,Altima,ألتيما|التيمه,L33,2012,2018,sedan,https://en.wikipedia.org/wiki/Nissan_Altima,verified
+نيسان,Nissan,التيما,Altima,ألتيما|التيمه,L34,2018,2027,sedan,https://en.wikipedia.org/wiki/Nissan_Altima,provisional
+نيسان,Nissan,ماكسيما,Maxima,مكسيما,A34,2008,2008,sedan,https://en.wikipedia.org/wiki/Nissan_Maxima,verified
+نيسان,Nissan,ماكسيما,Maxima,مكسيما,A35,2008,2015,sedan,https://en.wikipedia.org/wiki/Nissan_Maxima,verified
+نيسان,Nissan,ماكسيما,Maxima,مكسيما,A36,2015,2023,sedan,https://en.wikipedia.org/wiki/Nissan_Maxima,verified
+نيسان,Nissan,سنترا,Sentra,سينترا|سنتره,B16,2008,2012,sedan,https://en.wikipedia.org/wiki/Nissan_Sentra,verified
+نيسان,Nissan,سنترا,Sentra,سينترا|سنتره,B17,2012,2019,sedan,https://en.wikipedia.org/wiki/Nissan_Sentra,verified
+نيسان,Nissan,سنترا,Sentra,سينترا|سنتره,B18,2019,2025,sedan,https://en.wikipedia.org/wiki/Nissan_Sentra,verified
+نيسان,Nissan,سنترا,Sentra,سينترا|سنتره,B19,2025,2027,sedan,https://en.wikipedia.org/wiki/Nissan_Sentra,verify
+نيسان,Nissan,تيدا,Tiida,تيده|تييدا,C11,2008,2012,hatchback,https://en.wikipedia.org/wiki/Nissan_Tiida,verified
+نيسان,Nissan,تيدا,Tiida,تيده|تييدا,C12,2012,2018,hatchback,https://en.wikipedia.org/wiki/Nissan_Tiida,verify
+نيسان,Nissan,ميكرا,Micra,مكرا,K12,2008,2010,hatchback,https://en.wikipedia.org/wiki/Nissan_Micra,verify
+نيسان,Nissan,ميكرا,Micra,مكرا,K13,2010,2019,hatchback,https://en.wikipedia.org/wiki/Nissan_Micra,verified
+نيسان,Nissan,باثفايندر,Pathfinder,باثفندر|باث فايندر|باثفيندر,R51,2008,2012,suv,https://en.wikipedia.org/wiki/Nissan_Pathfinder,verified
+نيسان,Nissan,باثفايندر,Pathfinder,باثفندر|باث فايندر|باثفيندر,R52,2012,2021,suv,https://en.wikipedia.org/wiki/Nissan_Pathfinder,verified
+نيسان,Nissan,باثفايندر,Pathfinder,باثفندر|باث فايندر|باثفيندر,R53,2021,2027,suv,https://en.wikipedia.org/wiki/Nissan_Pathfinder,provisional
+نيسان,Nissan,إكس تريل,X-Trail,اكس تريل|اكستريل|XTrail,T31,2008,2014,suv,https://en.wikipedia.org/wiki/Nissan_X-Trail,verified
+نيسان,Nissan,إكس تريل,X-Trail,اكس تريل|اكستريل|XTrail,T32,2014,2022,suv,https://en.wikipedia.org/wiki/Nissan_X-Trail,verified
+نيسان,Nissan,إكس تريل,X-Trail,اكس تريل|اكستريل|XTrail,T33,2022,2027,suv,https://en.wikipedia.org/wiki/Nissan_X-Trail,provisional
+نيسان,Nissan,كيكس,Kicks,ككس,P15,2017,2025,suv,https://en.wikipedia.org/wiki/Nissan_Kicks,verified
+نيسان,Nissan,كيكس,Kicks,ككس,P16,2025,2027,suv,https://en.wikipedia.org/wiki/Nissan_Kicks,verify
+نيسان,Nissan,جوك,Juke,جوكي,F15,2010,2019,suv,https://en.wikipedia.org/wiki/Nissan_Juke,verify
+نيسان,Nissan,نافارا,Navara,نفارا|نافاره,D40,2008,2015,pickup,https://en.wikipedia.org/wiki/Nissan_Navara,verified
+نيسان,Nissan,نافارا,Navara,نفارا|نافاره,D23,2015,2025,pickup,https://en.wikipedia.org/wiki/Nissan_Navara,verified
+نيسان,Nissan,نافارا,Navara,نفارا|نافاره,D27,2025,2027,pickup,https://en.wikipedia.org/wiki/Nissan_Navara,verify
+نيسان,Nissan,أورفان,Urvan,اورفان|اورفن|يورفان,E25,2008,2012,van,https://en.wikipedia.org/wiki/Nissan_Caravan,verified
+نيسان,Nissan,أورفان,Urvan,اورفان|اورفن|يورفان,E26,2012,2027,van,https://en.wikipedia.org/wiki/Nissan_Caravan,provisional
+نيسان,Nissan,أرمادا,Armada,ارمادا|ارماده,TA60,2008,2015,suv,https://en.wikipedia.org/wiki/Nissan_Armada,verify
+نيسان,Nissan,مورانو,Murano,مورانو نيسان,Z51,2008,2014,suv,https://en.wikipedia.org/wiki/Nissan_Murano,verified
+نيسان,Nissan,مورانو,Murano,مورانو نيسان,Z52,2014,2024,suv,https://en.wikipedia.org/wiki/Nissan_Murano,verified
+نيسان,Nissan,مورانو,Murano,مورانو نيسان,Z53,2024,2027,suv,https://en.wikipedia.org/wiki/Nissan_Murano,verify
+نيسان,Nissan,قشقاي,Qashqai,كشكاي|قاشقاي,J10,2008,2013,suv,https://en.wikipedia.org/wiki/Nissan_Qashqai,verified
+نيسان,Nissan,قشقاي,Qashqai,كشكاي|قاشقاي,J11,2013,2021,suv,https://en.wikipedia.org/wiki/Nissan_Qashqai,verified
+نيسان,Nissan,قشقاي,Qashqai,كشكاي|قاشقاي,J12,2021,2027,suv,https://en.wikipedia.org/wiki/Nissan_Qashqai,verify
+نيسان,Nissan,إكستيرا,Xterra,اكستيرا|اكس تيرا|اكسترا,N50,2008,2015,suv,https://en.wikipedia.org/wiki/Nissan_Xterra,verify
+نيسان,Nissan,إكستيرا,Xterra,اكستيرا|اكس تيرا|اكسترا,,2020,2027,suv,https://en.wikipedia.org/wiki/Nissan_Terra,verify
+نيسان,Nissan,370Z,370Z,370 زد|نيسان 370,Z34,2008,2020,coupe,https://en.wikipedia.org/wiki/Nissan_370Z,verified
+نيسان,Nissan,Z,Z,زد|نيسان زد|فيرليدي,RZ34,2022,2027,coupe,https://en.wikipedia.org/wiki/Nissan_Z_(RZ34),provisional
+نيسان,Nissan,GT-R,GT-R,جي تي ار|جي تي آر|GTR,R35,2008,2025,coupe,https://en.wikipedia.org/wiki/Nissan_GT-R,verified
+هيونداي,Hyundai,أكسنت,Accent,اكسنت|اكسينت,MC,2008,2010,sedan,https://en.wikipedia.org/wiki/Hyundai_Accent,verified
+هيونداي,Hyundai,أكسنت,Accent,اكسنت|اكسينت,RB,2010,2017,sedan,https://en.wikipedia.org/wiki/Hyundai_Accent,verified
+هيونداي,Hyundai,أكسنت,Accent,اكسنت|اكسينت,HC,2017,2023,sedan,https://en.wikipedia.org/wiki/Hyundai_Accent,verified
+هيونداي,Hyundai,أكسنت,Accent,اكسنت|اكسينت,BN7,2023,2027,sedan,https://en.wikipedia.org/wiki/Hyundai_Accent,provisional
+هيونداي,Hyundai,إلنترا,Elantra,النترا|الانترا|النتره|افانتي,HD,2008,2010,sedan,https://en.wikipedia.org/wiki/Hyundai_Elantra,verified
+هيونداي,Hyundai,إلنترا,Elantra,النترا|الانترا|النتره|افانتي,MD,2010,2015,sedan,https://en.wikipedia.org/wiki/Hyundai_Elantra,verified
+هيونداي,Hyundai,إلنترا,Elantra,النترا|الانترا|النتره|افانتي,AD,2015,2020,sedan,https://en.wikipedia.org/wiki/Hyundai_Elantra,verified
+هيونداي,Hyundai,إلنترا,Elantra,النترا|الانترا|النتره|افانتي,CN7,2020,2027,sedan,https://en.wikipedia.org/wiki/Hyundai_Elantra,provisional
+هيونداي,Hyundai,سوناتا,Sonata,سوناته,NF,2008,2009,sedan,https://en.wikipedia.org/wiki/Hyundai_Sonata,verified
+هيونداي,Hyundai,سوناتا,Sonata,سوناته,YF,2009,2014,sedan,https://en.wikipedia.org/wiki/Hyundai_Sonata,verified
+هيونداي,Hyundai,سوناتا,Sonata,سوناته,LF,2014,2019,sedan,https://en.wikipedia.org/wiki/Hyundai_Sonata,verified
+هيونداي,Hyundai,سوناتا,Sonata,سوناته,DN8,2019,2027,sedan,https://en.wikipedia.org/wiki/Hyundai_Sonata,provisional
+هيونداي,Hyundai,أزيرا,Azera,ازيرا|جراندير|جرانديور|غرانديور,TG,2008,2011,sedan,https://en.wikipedia.org/wiki/Hyundai_Grandeur,verified
+هيونداي,Hyundai,أزيرا,Azera,ازيرا|جراندير|جرانديور|غرانديور,HG,2011,2016,sedan,https://en.wikipedia.org/wiki/Hyundai_Grandeur,verified
+هيونداي,Hyundai,أزيرا,Azera,ازيرا|جراندير|جرانديور|غرانديور,IG,2016,2022,sedan,https://en.wikipedia.org/wiki/Hyundai_Grandeur,verified
+هيونداي,Hyundai,أزيرا,Azera,ازيرا|جراندير|جرانديور|غرانديور,GN7,2022,2027,sedan,https://en.wikipedia.org/wiki/Hyundai_Grandeur,provisional
+هيونداي,Hyundai,توسان,Tucson,توكسون|تكسن|توسون,JM,2008,2009,suv,https://en.wikipedia.org/wiki/Hyundai_Tucson,verified
+هيونداي,Hyundai,توسان,Tucson,توكسون|تكسن|توسون,LM,2009,2015,suv,https://en.wikipedia.org/wiki/Hyundai_Tucson,verified
+هيونداي,Hyundai,توسان,Tucson,توكسون|تكسن|توسون,TL,2015,2020,suv,https://en.wikipedia.org/wiki/Hyundai_Tucson,verified
+هيونداي,Hyundai,توسان,Tucson,توكسون|تكسن|توسون,NX4,2020,2027,suv,https://en.wikipedia.org/wiki/Hyundai_Tucson,provisional
+هيونداي,Hyundai,سانتافي,Santa Fe,سنتافي|سانتا في|سنتافيه,CM,2008,2012,suv,https://en.wikipedia.org/wiki/Hyundai_Santa_Fe,verified
+هيونداي,Hyundai,سانتافي,Santa Fe,سنتافي|سانتا في|سنتافيه,DM,2012,2018,suv,https://en.wikipedia.org/wiki/Hyundai_Santa_Fe,verified
+هيونداي,Hyundai,سانتافي,Santa Fe,سنتافي|سانتا في|سنتافيه,TM,2018,2023,suv,https://en.wikipedia.org/wiki/Hyundai_Santa_Fe,verified
+هيونداي,Hyundai,سانتافي,Santa Fe,سنتافي|سانتا في|سنتافيه,MX5,2023,2027,suv,https://en.wikipedia.org/wiki/Hyundai_Santa_Fe,provisional
+هيونداي,Hyundai,كريتا,Creta,كريتا هيونداي,GS,2016,2020,suv,https://en.wikipedia.org/wiki/Hyundai_Creta,verify
+هيونداي,Hyundai,كريتا,Creta,كريتا هيونداي,SU2,2020,2027,suv,https://en.wikipedia.org/wiki/Hyundai_Creta,verify
+هيونداي,Hyundai,كونا,Kona,كونا هيونداي,OS,2017,2023,suv,https://en.wikipedia.org/wiki/Hyundai_Kona,verified
+هيونداي,Hyundai,كونا,Kona,كونا هيونداي,SX2,2023,2027,suv,https://en.wikipedia.org/wiki/Hyundai_Kona,provisional
+هيونداي,Hyundai,باليسيد,Palisade,باليسد|باليسايد,LX2,2019,2025,suv,https://en.wikipedia.org/wiki/Hyundai_Palisade,verified
+هيونداي,Hyundai,باليسيد,Palisade,باليسد|باليسايد,LX3,2025,2027,suv,https://en.wikipedia.org/wiki/Hyundai_Palisade,provisional
+هيونداي,Hyundai,ستاريا,Staria,ستاريا هيونداي,US4,2021,2027,van,https://en.wikipedia.org/wiki/Hyundai_Staria,provisional
+هيونداي,Hyundai,H-1,H-1,اتش ون|إتش ون|H1|ستاريكس,TQ,2008,2021,van,https://en.wikipedia.org/wiki/Hyundai_Starex,verified
+هيونداي,Hyundai,فينيو,Venue,فنيو,QX,2019,2025,suv,https://en.wikipedia.org/wiki/Hyundai_Venue,verified
+هيونداي,Hyundai,فينيو,Venue,فنيو,QU2,2025,2027,suv,https://en.wikipedia.org/wiki/Hyundai_Venue,verify
+هيونداي,Hyundai,فيلوستر,Veloster,فلوستر,FS,2011,2018,hatchback,https://en.wikipedia.org/wiki/Hyundai_Veloster,verified
+هيونداي,Hyundai,فيلوستر,Veloster,فلوستر,JS,2018,2022,hatchback,https://en.wikipedia.org/wiki/Hyundai_Veloster,verify
+هيونداي,Hyundai,جينيسيس,Genesis,جنسس|جنيسس|جينيسس|جينسس,BH,2008,2013,sedan,https://en.wikipedia.org/wiki/Hyundai_Genesis,verified
+هيونداي,Hyundai,جينيسيس,Genesis,جنسس|جنيسس|جينيسس|جينسس,DH,2013,2016,sedan,https://en.wikipedia.org/wiki/Hyundai_Genesis,verified
+هيونداي,Hyundai,جينيسيس كوبيه,Genesis Coupe,جنسس كوبيه|جينيسيس كوبي,BK,2009,2016,coupe,https://en.wikipedia.org/wiki/Hyundai_Genesis_Coupe,verified
+هيونداي,Hyundai,سنتنيال,Centennial,سنتينيال|إكوس|ايكوس,LZ,2008,2009,sedan,https://en.wikipedia.org/wiki/Hyundai_Equus,verify
+هيونداي,Hyundai,سنتنيال,Centennial,سنتينيال|إكوس|ايكوس,VI,2009,2016,sedan,https://en.wikipedia.org/wiki/Hyundai_Equus,verified
+هيونداي,Hyundai,فيراكروز,Veracruz,فيراكروس,EN,2008,2012,suv,https://en.wikipedia.org/wiki/Hyundai_Veracruz,verify
+هيونداي,Hyundai,أيونيك,Ioniq,ايونيك,AE,2017,2022,hatchback,https://en.wikipedia.org/wiki/Hyundai_Ioniq,verify
+هيونداي,Hyundai,أيونيك 5,Ioniq 5,ايونيك 5,NE,2022,2027,suv,https://en.wikipedia.org/wiki/Hyundai_Ioniq_5,verify
+هيونداي,Hyundai,أيونيك 6,Ioniq 6,ايونيك 6,CE,2023,2027,sedan,https://en.wikipedia.org/wiki/Hyundai_Ioniq_6,verify
+هيونداي,Hyundai,ستارجيزر,Stargazer,ستار جيزر|ستارقيزر,KS,2022,2027,mpv,https://en.wikipedia.org/wiki/Hyundai_Stargazer,provisional
+هيونداي,Hyundai,i10,i10,اي تن|اي 10|جراند اي 10|Grand i10,PA,2008,2013,hatchback,https://en.wikipedia.org/wiki/Hyundai_i10,verified
+هيونداي,Hyundai,i10,i10,اي تن|اي 10|جراند اي 10|Grand i10,BA,2013,2020,hatchback,https://en.wikipedia.org/wiki/Hyundai_i10,verify
+هيونداي,Hyundai,i10,i10,اي تن|اي 10|جراند اي 10|Grand i10,,2020,2027,hatchback,https://en.wikipedia.org/wiki/Hyundai_i10,verify
+هوندا,Honda,أكورد,Accord,اكورد|اكرد,CP,2008,2012,sedan,https://en.wikipedia.org/wiki/Honda_Accord_(North_America_eighth_generation),verified
+هوندا,Honda,أكورد,Accord,اكورد|اكرد,CR,2012,2017,sedan,https://en.wikipedia.org/wiki/Honda_Accord_(ninth_generation),verified
+هوندا,Honda,أكورد,Accord,اكورد|اكرد,CV,2017,2023,sedan,https://en.wikipedia.org/wiki/Honda_Accord,verified
+هوندا,Honda,أكورد,Accord,اكورد|اكرد,CY,2023,2027,sedan,https://en.wikipedia.org/wiki/Honda_Accord,provisional
+هوندا,Honda,سيفيك,Civic,سيفك|سفك,FD,2008,2011,sedan,https://en.wikipedia.org/wiki/Honda_Civic_(eighth_generation),verified
+هوندا,Honda,سيفيك,Civic,سيفك|سفك,FB,2011,2015,sedan,https://en.wikipedia.org/wiki/Honda_Civic_(ninth_generation),verified
+هوندا,Honda,سيفيك,Civic,سيفك|سفك,FC,2015,2021,sedan,https://en.wikipedia.org/wiki/Honda_Civic_(tenth_generation),verified
+هوندا,Honda,سيفيك,Civic,سيفك|سفك,FE,2021,2027,sedan,https://en.wikipedia.org/wiki/Honda_Civic_(eleventh_generation),provisional
+هوندا,Honda,سيتي,City,ستي|هوندا سيتي,GM2,2008,2013,sedan,https://en.wikipedia.org/wiki/Honda_City,verify
+هوندا,Honda,سيتي,City,ستي|هوندا سيتي,GM6,2013,2020,sedan,https://en.wikipedia.org/wiki/Honda_City,verify
+هوندا,Honda,سيتي,City,ستي|هوندا سيتي,GN,2020,2027,sedan,https://en.wikipedia.org/wiki/Honda_City,verify
+هوندا,Honda,سي آر في,CR-V,سي ار في|CRV,RE,2008,2012,suv,https://en.wikipedia.org/wiki/Honda_CR-V_(third_generation),verified
+هوندا,Honda,سي آر في,CR-V,سي ار في|CRV,RM,2012,2017,suv,https://en.wikipedia.org/wiki/Honda_CR-V_(fourth_generation),verified
+هوندا,Honda,سي آر في,CR-V,سي ار في|CRV,RW,2017,2023,suv,https://en.wikipedia.org/wiki/Honda_CR-V_(fifth_generation),verified
+هوندا,Honda,سي آر في,CR-V,سي ار في|CRV,RS,2023,2027,suv,https://en.wikipedia.org/wiki/Honda_CR-V_(sixth_generation),provisional
+هوندا,Honda,إتش آر في,HR-V,اتش ار في|HRV,RU,2015,2022,suv,https://en.wikipedia.org/wiki/Honda_HR-V,verified
+هوندا,Honda,إتش آر في,HR-V,اتش ار في|HRV,RV,2022,2027,suv,https://en.wikipedia.org/wiki/Honda_HR-V,verify
+هوندا,Honda,زد آر في,ZR-V,زد ار في|ZRV,RZ,2023,2027,suv,https://en.wikipedia.org/wiki/Honda_ZR-V,verify
+هوندا,Honda,بايلوت,Pilot,بيلوت|بايلت,YF1/2,2008,2008,suv,https://en.wikipedia.org/wiki/Honda_Pilot,verified
+هوندا,Honda,بايلوت,Pilot,بيلوت|بايلت,YF3/4,2008,2015,suv,https://en.wikipedia.org/wiki/Honda_Pilot,verified
+هوندا,Honda,بايلوت,Pilot,بيلوت|بايلت,YF5/6,2015,2022,suv,https://en.wikipedia.org/wiki/Honda_Pilot,verified
+هوندا,Honda,بايلوت,Pilot,بيلوت|بايلت,YG1/2,2022,2027,suv,https://en.wikipedia.org/wiki/Honda_Pilot,provisional
+هوندا,Honda,أوديسي,Odyssey,اوديسي|اوديسا,RL3/4,2008,2010,mpv,https://en.wikipedia.org/wiki/Honda_Odyssey_(North_America),verify
+هوندا,Honda,أوديسي,Odyssey,اوديسي|اوديسا,RL5,2010,2017,mpv,https://en.wikipedia.org/wiki/Honda_Odyssey_(North_America),verified
+هوندا,Honda,أوديسي,Odyssey,اوديسي|اوديسا,RL6,2017,2027,mpv,https://en.wikipedia.org/wiki/Honda_Odyssey_(North_America),provisional
+هوندا,Honda,أوديسي J,Odyssey J,اوديسي جي|اوديسي الياباني,RB3/4,2008,2013,mpv,https://en.wikipedia.org/wiki/Honda_Odyssey_(international),verify
+هوندا,Honda,أوديسي J,Odyssey J,اوديسي جي|اوديسي الياباني,RC,2013,2027,mpv,https://en.wikipedia.org/wiki/Honda_Odyssey_(international),verify
+هوندا,Honda,جاز,Jazz,فيت|هوندا فيت|جاز هوندا,GE,2008,2013,hatchback,https://en.wikipedia.org/wiki/Honda_Fit_(second_generation),verified
+هوندا,Honda,جاز,Jazz,فيت|هوندا فيت|جاز هوندا,GK,2013,2020,hatchback,https://en.wikipedia.org/wiki/Honda_Fit,verified
+هوندا,Honda,جاز,Jazz,فيت|هوندا فيت|جاز هوندا,GR,2020,2027,hatchback,https://en.wikipedia.org/wiki/Honda_Fit,verify
+هوندا,Honda,ليجند,Legend,ليجيند|لجند,KB,2008,2012,sedan,https://en.wikipedia.org/wiki/Honda_Legend,verified
+هوندا,Honda,ليجند,Legend,ليجيند|لجند,KC,2014,2021,sedan,https://en.wikipedia.org/wiki/Honda_Legend,verify
+هوندا,Honda,كروس تور,Crosstour,كروستور|اكورد كروس تور,TF,2010,2015,suv,https://en.wikipedia.org/wiki/Honda_Crosstour,verified
+فورد,Ford,إكسبلورر,Explorer,اكسبلورر|اكسبلور|اكسبلوره,U251,2008,2010,suv,https://en.wikipedia.org/wiki/Ford_Explorer,verified
+فورد,Ford,إكسبلورر,Explorer,اكسبلورر|اكسبلور|اكسبلوره,U502,2010,2019,suv,https://en.wikipedia.org/wiki/Ford_Explorer,verified
+فورد,Ford,إكسبلورر,Explorer,اكسبلورر|اكسبلور|اكسبلوره,U625,2019,2027,suv,https://en.wikipedia.org/wiki/Ford_Explorer,provisional
+فورد,Ford,إكسبيديشن,Expedition,اكسبيديشن|اكسبديشن|اكسبدشن,U324,2008,2017,suv,https://en.wikipedia.org/wiki/Ford_Expedition,verified
+فورد,Ford,إكسبيديشن,Expedition,اكسبيديشن|اكسبديشن|اكسبدشن,U553,2017,2025,suv,https://en.wikipedia.org/wiki/Ford_Expedition,verified
+فورد,Ford,إكسبيديشن,Expedition,اكسبيديشن|اكسبديشن|اكسبدشن,U717,2025,2027,suv,https://en.wikipedia.org/wiki/Ford_Expedition,provisional
+فورد,Ford,F-150,F-150,اف 150|اف150|F150|فورد 150|ف 150,P221,2008,2008,pickup,https://en.wikipedia.org/wiki/Ford_F-Series_(eleventh_generation),verified
+فورد,Ford,F-150,F-150,اف 150|اف150|F150|فورد 150|ف 150,P415,2008,2014,pickup,https://en.wikipedia.org/wiki/Ford_F-Series_(twelfth_generation),verified
+فورد,Ford,F-150,F-150,اف 150|اف150|F150|فورد 150|ف 150,P552,2014,2020,pickup,https://en.wikipedia.org/wiki/Ford_F-Series_(thirteenth_generation),verified
+فورد,Ford,F-150,F-150,اف 150|اف150|F150|فورد 150|ف 150,P702,2020,2027,pickup,https://en.wikipedia.org/wiki/Ford_F-Series_(fourteenth_generation),provisional
+فورد,Ford,سوبر ديوتي,Super Duty,سوبر ديوتى|F-250|F-350|اف 250|اف 350,P356,2008,2010,pickup,https://en.wikipedia.org/wiki/Ford_Super_Duty,verified
+فورد,Ford,سوبر ديوتي,Super Duty,سوبر ديوتى|F-250|F-350|اف 250|اف 350,P473,2010,2016,pickup,https://en.wikipedia.org/wiki/Ford_Super_Duty,verified
+فورد,Ford,سوبر ديوتي,Super Duty,سوبر ديوتى|F-250|F-350|اف 250|اف 350,P558,2016,2022,pickup,https://en.wikipedia.org/wiki/Ford_Super_Duty,verified
+فورد,Ford,سوبر ديوتي,Super Duty,سوبر ديوتى|F-250|F-350|اف 250|اف 350,P708,2022,2027,pickup,https://en.wikipedia.org/wiki/Ford_Super_Duty,provisional
+فورد,Ford,تورس,Taurus,توروس|تاورس,,2010,2020,sedan,https://en.wikipedia.org/wiki/Ford_Taurus_(sixth_generation),verify
+فورد,Ford,تورس,Taurus,توروس|تاورس,,2020,2023,sedan,https://en.wikipedia.org/wiki/Ford_Taurus_(China),verify
+فورد,Ford,تورس,Taurus,توروس|تاورس,,2023,2027,sedan,https://en.wikipedia.org/wiki/Ford_Taurus,verify
+فورد,Ford,فيوجن,Fusion,فيوشن|فيوجين,,2008,2012,sedan,https://en.wikipedia.org/wiki/Ford_Fusion_(Americas),verify
+فورد,Ford,فيوجن,Fusion,فيوشن|فيوجين,,2012,2020,sedan,https://en.wikipedia.org/wiki/Ford_Fusion_(Americas),verify
+فورد,Ford,موستنج,Mustang,موستنق|ماستنج|موستانج|موستنغ,S197,2008,2014,coupe,https://en.wikipedia.org/wiki/Ford_Mustang_(fifth_generation),verified
+فورد,Ford,موستنج,Mustang,موستنق|ماستنج|موستانج|موستنغ,S550,2014,2023,coupe,https://en.wikipedia.org/wiki/Ford_Mustang_(sixth_generation),verified
+فورد,Ford,موستنج,Mustang,موستنق|ماستنج|موستانج|موستنغ,S650,2023,2027,coupe,https://en.wikipedia.org/wiki/Ford_Mustang_(seventh_generation),provisional
+فورد,Ford,إيدج,Edge,ايدج|ادج,U387,2008,2014,suv,https://en.wikipedia.org/wiki/Ford_Edge,verified
+فورد,Ford,إيدج,Edge,ايدج|ادج,CD539,2014,2023,suv,https://en.wikipedia.org/wiki/Ford_Edge,verified
+فورد,Ford,إيدج,Edge,ايدج|ادج,CDX706,2023,2027,suv,https://en.wikipedia.org/wiki/Ford_Edge,provisional
+فورد,Ford,إسكيب,Escape,اسكيب|اسكايب,,2008,2012,suv,https://en.wikipedia.org/wiki/Ford_Escape,verify
+فورد,Ford,إسكيب,Escape,اسكيب|اسكايب,,2012,2019,suv,https://en.wikipedia.org/wiki/Ford_Escape,verify
+فورد,Ford,إسكيب,Escape,اسكيب|اسكايب,,2019,2027,suv,https://en.wikipedia.org/wiki/Ford_Escape,verify
+فورد,Ford,رينجر,Ranger,رنجر|رينجر فورد,,2008,2011,pickup,https://en.wikipedia.org/wiki/Ford_Ranger_(international),verify
+فورد,Ford,رينجر,Ranger,رنجر|رينجر فورد,P375,2011,2022,pickup,https://en.wikipedia.org/wiki/Ford_Ranger_(T6),verified
+فورد,Ford,رينجر,Ranger,رنجر|رينجر فورد,P703,2022,2027,pickup,https://en.wikipedia.org/wiki/Ford_Ranger_(T6),provisional
+فورد,Ford,تيريتوري,Territory,تريتوري|تيريتوري فورد,CX743MCA,2023,2027,suv,https://en.wikipedia.org/wiki/Ford_Territory_(China),verify
+فورد,Ford,فوكس,Focus,فوكاس|فوكس فورد,C307,2008,2011,sedan,https://en.wikipedia.org/wiki/Ford_Focus_(second_generation%2C_Europe),verify
+فورد,Ford,فوكس,Focus,فوكاس|فوكس فورد,C346,2011,2018,sedan,https://en.wikipedia.org/wiki/Ford_Focus_(third_generation),verified
+فورد,Ford,فوكس,Focus,فوكاس|فوكس فورد,C519,2018,2022,sedan,https://en.wikipedia.org/wiki/Ford_Focus_(fourth_generation),verify
+فورد,Ford,فيجو,Figo,فيغو,B517,2010,2015,hatchback,https://en.wikipedia.org/wiki/Ford_Figo,verify
+فورد,Ford,فيجو,Figo,فيغو,B562,2015,2021,hatchback,https://en.wikipedia.org/wiki/Ford_Figo,verify
+فورد,Ford,فليكس,Flex,فلكس,,2008,2019,suv,https://en.wikipedia.org/wiki/Ford_Flex,verify
+فورد,Ford,كراون فكتوريا,Crown Victoria,كراون فيكتوريا|فكتوريا|فيكتوريا,EN114,2008,2012,sedan,https://en.wikipedia.org/wiki/Ford_Crown_Victoria,verified
+فورد,Ford,إيكوسبورت,EcoSport,ايكوسبورت|ايكو سبورت|اكوسبورت,B515,2013,2022,suv,https://en.wikipedia.org/wiki/Ford_EcoSport,verify
+فورد,Ford,برونكو,Bronco,برانكو|برونكو فورد,U725,2021,2027,suv,https://en.wikipedia.org/wiki/Ford_Bronco,provisional
+فورد,Ford,إيفرست,Everest,ايفرست|افرست,U375,2015,2022,suv,https://en.wikipedia.org/wiki/Ford_Everest,verified
+فورد,Ford,إيفرست,Everest,ايفرست|افرست,U704,2022,2027,suv,https://en.wikipedia.org/wiki/Ford_Everest,provisional
+فورد,Ford,موستنج ماك-إي,Mustang Mach-E,ماك اي|ماك-إي|موستنج ماك اي|ماخ اي,CX727,2021,2027,suv,https://en.wikipedia.org/wiki/Ford_Mustang_Mach-E,verify
+فورد,Ford,ترانزيت,Transit,ترانزت|فان ترانزيت,,2008,2014,van,https://en.wikipedia.org/wiki/Ford_Transit,verify
+فورد,Ford,ترانزيت,Transit,ترانزت|فان ترانزيت,,2014,2027,van,https://en.wikipedia.org/wiki/Ford_Transit,verify
+جمس,GMC,يوكن,Yukon,يوكون|جمس يوكن,GMT900,2008,2014,suv,https://en.wikipedia.org/wiki/Chevrolet_Tahoe,verified
+جمس,GMC,يوكن,Yukon,يوكون|جمس يوكن,K2XX,2014,2020,suv,https://en.wikipedia.org/wiki/Chevrolet_Tahoe,verified
+جمس,GMC,يوكن,Yukon,يوكون|جمس يوكن,T1XX,2020,2027,suv,https://en.wikipedia.org/wiki/Chevrolet_Tahoe,provisional
+جمس,GMC,يوكن XL,Yukon XL,يوكن اكس ال|يوكون اكس ال|يوكن اكسل,GMT900,2008,2014,suv,https://en.wikipedia.org/wiki/Chevrolet_Suburban,verified
+جمس,GMC,يوكن XL,Yukon XL,يوكن اكس ال|يوكون اكس ال|يوكن اكسل,K2XX,2014,2020,suv,https://en.wikipedia.org/wiki/Chevrolet_Suburban,verified
+جمس,GMC,يوكن XL,Yukon XL,يوكن اكس ال|يوكون اكس ال|يوكن اكسل,T1XX,2020,2027,suv,https://en.wikipedia.org/wiki/Chevrolet_Suburban,provisional
+جمس,GMC,سييرا,Sierra,سيرا|سييرا 1500|جمس سييرا,GMT900,2008,2013,pickup,https://en.wikipedia.org/wiki/Chevrolet_Silverado,verified
+جمس,GMC,سييرا,Sierra,سيرا|سييرا 1500|جمس سييرا,K2XX,2013,2018,pickup,https://en.wikipedia.org/wiki/Chevrolet_Silverado,verified
+جمس,GMC,سييرا,Sierra,سيرا|سييرا 1500|جمس سييرا,T1XX,2018,2027,pickup,https://en.wikipedia.org/wiki/Chevrolet_Silverado,provisional
+جمس,GMC,سييرا HD,Sierra HD,سييرا اتش دي|سيرا اتش دي|سييرا 2500|سييرا 3500,GMT900,2008,2014,pickup,https://en.wikipedia.org/wiki/Chevrolet_Silverado,verified
+جمس,GMC,سييرا HD,Sierra HD,سييرا اتش دي|سيرا اتش دي|سييرا 2500|سييرا 3500,K2XX,2014,2019,pickup,https://en.wikipedia.org/wiki/Chevrolet_Silverado,verify
+جمس,GMC,سييرا HD,Sierra HD,سييرا اتش دي|سيرا اتش دي|سييرا 2500|سييرا 3500,T1XX,2019,2027,pickup,https://en.wikipedia.org/wiki/Chevrolet_Silverado,provisional
+جمس,GMC,أكاديا,Acadia,اكاديا|اكاديه,GMT968,2008,2016,suv,https://en.wikipedia.org/wiki/GMC_Acadia,verified
+جمس,GMC,أكاديا,Acadia,اكاديا|اكاديه,C1XX,2016,2024,suv,https://en.wikipedia.org/wiki/GMC_Acadia,verified
+جمس,GMC,أكاديا,Acadia,اكاديا|اكاديه,,2024,2027,suv,https://en.wikipedia.org/wiki/GMC_Acadia,verify
+جمس,GMC,تيرين,Terrain,تيرن|تيرين جمس,GMT177,2010,2017,suv,https://en.wikipedia.org/wiki/GMC_Terrain,verified
+جمس,GMC,تيرين,Terrain,تيرن|تيرين جمس,D2XX,2017,2024,suv,https://en.wikipedia.org/wiki/GMC_Terrain,verified
+جمس,GMC,تيرين,Terrain,تيرن|تيرين جمس,,2024,2027,suv,https://en.wikipedia.org/wiki/GMC_Terrain,verify
+جمس,GMC,سافانا,Savana,سفانا|سافانا جمس,GMT610,2008,2027,van,https://en.wikipedia.org/wiki/Chevrolet_Express,provisional
+جمس,GMC,إنفوي,Envoy,انفوي|انفوى,GMT360,2008,2009,suv,https://en.wikipedia.org/wiki/GMC_Envoy,verified
+جمس,GMC,كانيون,Canyon,كنيون,GMT355,2008,2012,pickup,https://en.wikipedia.org/wiki/Chevrolet_Colorado,verify
+جمس,GMC,كانيون,Canyon,كنيون,31XX,2015,2022,pickup,https://en.wikipedia.org/wiki/Chevrolet_Colorado,verify
+جمس,GMC,كانيون,Canyon,كنيون,31XX-2,2023,2027,pickup,https://en.wikipedia.org/wiki/Chevrolet_Colorado,verify
+جمس,GMC,هامر EV,Hummer EV,همر|هامر|هامر اي في|همر اي في,BT1,2022,2027,pickup,https://en.wikipedia.org/wiki/GMC_Hummer_EV,verify

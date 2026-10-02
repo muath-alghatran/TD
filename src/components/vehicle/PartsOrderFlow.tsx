@@ -45,6 +45,7 @@ export function PartsOrderFlow({
       make: result.make,
       model: result.model,
       year: result.year,
+      generationCode: result.generationCode,
       trim: UNKNOWN_TRIM,
       vin: result.vin,
       plate: "—",
@@ -108,7 +109,14 @@ export function PartsOrderFlow({
           part={selectedPart}
           cityName={receivingChoice.cityName}
           mode={receivingChoice.mode}
-          vehicle={{ id: saved.id, vin: saved.vin, make: saved.make, model: saved.model, year: saved.year }}
+          vehicle={{
+            id: saved.id,
+            vin: saved.vin,
+            make: saved.make,
+            model: saved.model,
+            year: saved.year,
+            generationCode: saved.generationCode ?? "",
+          }}
           onBack={() => setStep("receiving")}
           onOutcome={(order) => {
             setFinalOrder(order);

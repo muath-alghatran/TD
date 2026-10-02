@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "catalog:vehicles": "tsx scripts/build-vehicle-catalog.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {

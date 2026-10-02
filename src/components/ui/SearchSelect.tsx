@@ -1,30 +1,13 @@
 "use client";
 
 import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
-import { normalizeArabic } from "@/lib/arabic-text";
+import { filterOptions, type SearchOption } from "@/lib/search-options";
 
-export interface SearchOption {
-  value: string;
-  label: string;
-}
-
-/** ما يبدأ بالنص أولاً، ثم ما يحتويه — بالترتيب الأصلي داخل كل مجموعة */
-function filterOptions(options: SearchOption[], query: string): SearchOption[] {
-  const q = normalizeArabic(query);
-  if (!q) return options;
-  const starts: SearchOption[] = [];
-  const contains: SearchOption[] = [];
-  for (const option of options) {
-    const label = normalizeArabic(option.label);
-    if (label.startsWith(q)) starts.push(option);
-    else if (label.includes(q)) contains.push(option);
-  }
-  return [...starts, ...contains];
-}
+export type { SearchOption };
 
 /**
  * قائمة يُبحث فيها بالكتابة — نمط combobox من ARIA 1.2: الأسهم تتنقل، Enter
- * يختار، Escape يغلق. البحث يقبل الكتابات الشائعة («اكورد» = «أكورد»، «2022» = «٢٠٢٢»).
+ * يختار، Escape يغلق. البحث يقبل الكتابات الشائعة («اكورد» = «أكورد»، «2022» = «٢٠٢٢») والبديلة (keywords).
  */
 export function SearchSelect({
   label,
