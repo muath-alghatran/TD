@@ -26,8 +26,8 @@ export const CENTER = {
   /** رقم التواصل المباشر — نفس رقم واتساب الأعمال */
   phoneDisplay: "059 047 8098",
   phoneTel: "+966590478098",
-  /** رابط الموقع على خرائط Google — يظهر زر «الموقع على الخريطة» حين يُضاف */
-  mapUrl: null as string | null,
+  /** رابط الموقع على خرائط Google — يظهر في الواجهة («زرنا في المركز») والهوية والدعم */
+  mapUrl: "https://maps.app.goo.gl/trwRFYg6fBAsKvSR9" as string | null,
   /** مثل «السبت–الخميس · ٨ص–١٠م» — يظهر في صفحة الدعم حين يُضاف */
   hours: null as string | null,
 } as const;
@@ -48,6 +48,19 @@ export const HOW_WE_WORK: { text: string; icon: IconName }[] = [
   { text: "لا نبدأ إلا بموافقتك", icon: "check" },
   { text: "تتابع سيارتك خطوة بخطوة بالصور والفيديو من الورشة", icon: "camera" },
   { text: "ضمان واحد مكتوب يشمل القطع والتركيب معًا", icon: "scrollText" },
+];
+
+/**
+ * محطات الطريق الست في أول الرئيسية بوعودها — كما كتبها المالك (برومت أكتوبر ٢٠٢٦).
+ * المفاتيح تطابق مراحل الطلب في src/lib/order-progress.ts.
+ */
+export const JOURNEY_STOPS: { key: string; short: string; promise: string }[] = [
+  { key: "requested", short: "الطلب", promise: "حدّد سيارتك والقطعة، وتعرف الوعد بالأيام قبل أي دفع" },
+  { key: "confirmed", short: "التأكيد", promise: "السعر مفصّل ومكتوب، ولا يتغير بعد التأكيد" },
+  { key: "paid", short: "الدفع", promise: "بموافقتك — ومن لحظة الدفع يبدأ عدّاد الوعد" },
+  { key: "prep", short: "التجهيز", promise: "تتابع كل مرحلة بالصور على واتساب" },
+  { key: "handover", short: "التركيب", promise: `في مركزنا ب${CENTER.city}، أو نشحنها إلى مدينتك` },
+  { key: "delivered", short: "التسليم", promise: "ضمان واحد مكتوب للقطع والتركيب" },
 ];
 
 export interface TeamMember {
