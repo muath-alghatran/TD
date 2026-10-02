@@ -1571,7 +1571,7 @@ select:disabled {
   font-weight: 600;
   letter-spacing: 0.16em;
   text-anchor: middle;
-  fill: color-mix(in srgb, var(--n-100) 40%, transparent);
+  fill: var(--glint);
 }
 /* لون العدّاد لحالة التوفر وحدها (قاعدة 1) — المضاءة لأنه على حقل فولاذي في الوضعين */
 .g-fill.ok {
@@ -1608,8 +1608,8 @@ select:disabled {
   inset: 0;
   pointer-events: none;
   background:
-    repeating-linear-gradient(0deg, transparent 0 47px, #ffffff08 47px 48px),
-    repeating-linear-gradient(90deg, transparent 0 47px, #ffffff08 47px 48px);
+    repeating-linear-gradient(0deg, transparent 0 47px, color-mix(in srgb, var(--n-100) 3%, transparent) 47px 48px),
+    repeating-linear-gradient(90deg, transparent 0 47px, color-mix(in srgb, var(--n-100) 3%, transparent) 47px 48px);
 }
 .verdict > * {
   position: relative;
@@ -4041,7 +4041,7 @@ html[data-motion="ok"] .journey-replay {
     box-shadow 0.15s var(--ease);
 }
 .recv-card:hover {
-  border-color: var(--accent);
+  border-color: var(--dash);
 }
 .recv-card[aria-checked="true"] {
   border-color: var(--accent);
@@ -4050,6 +4050,14 @@ html[data-motion="ok"] .journey-replay {
 .recv-card:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
+}
+/* الحقل الفولاذي يعيد تعريف ألوانه لما بداخله، لكن العلامات والتركيز خارجه فوق الصفحة:
+   --text و--steel-2 يحملان لون الصفحة وهويتها من الجذر */
+.steel.blueprint.recv-card > .corner {
+  color: color-mix(in srgb, var(--text) 55%, transparent);
+}
+.steel.recv-card:focus-visible {
+  outline-color: var(--steel-2);
 }
 /* علامة الاختيار: مربع فارغ، ويمتلئ بلون الهوية مع ✓ للمختارة */
 .recv-check {
@@ -4061,7 +4069,7 @@ html[data-motion="ok"] .journey-replay {
   place-items: center;
   width: 24px;
   height: 24px;
-  border: 1.5px solid var(--dash);
+  border: 1.5px solid var(--muted);
   background: var(--bg);
   color: transparent;
 }
@@ -4240,12 +4248,13 @@ html[data-motion="ok"] .journey-replay {
 .order-bill .ledger-row {
   padding: 6px 0;
 }
-.ledger .pending {
+.ledger .ledger-row .pending:last-child,
+.ledger .ledger-sum .pending:last-child {
   direction: rtl;
   font-weight: 600;
   color: var(--fg);
 }
-.ledger-sum .pending {
+.ledger .ledger-sum .pending:last-child {
   font-size: 15px;
 }
 /* حالة المنطقة داخل القراءة الفولاذية: ألوان الحقل المضاءة (التباين على الفولاذي) */
