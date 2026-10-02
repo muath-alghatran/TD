@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
 import { PACKAGES } from "@/lib/packages";
-import { ZONES } from "@/lib/zone-catalog";
 
 // TODO(نطاق حقيقي): اضبط NEXT_PUBLIC_SITE_URL في بيئة الإنتاج قبل النشر.
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -22,19 +21,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: page.priority,
   }));
 
-  const partUrls: MetadataRoute.Sitemap = ZONES.flatMap((zone) => zone.parts)
-    .filter((p) => p.avail !== false)
-    .map((p) => ({
-      url: `${BASE_URL}/parts/${p.oem}`,
-      changeFrequency: "weekly",
-      priority: 0.7,
-    }));
-
   const packageUrls: MetadataRoute.Sitemap = PACKAGES.map((p) => ({
     url: `${BASE_URL}/packages/${p.slug}`,
     changeFrequency: "monthly",
     priority: 0.8,
   }));
 
-  return [...pages, ...packageUrls, ...partUrls];
+  // صفحات قطع كامري التجريبية سُحبت في المرحلة 5 — /parts/<رقم> تتحول إلى /parts
+  return [...pages, ...packageUrls];
 }

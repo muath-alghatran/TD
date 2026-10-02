@@ -13,6 +13,15 @@ export function buildWhatsAppLink(message: string): string {
   return `https://wa.me/${BUSINESS_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
+/**
+ * سطر الجيل في رسائل القطع (قاعدة 7). فارغ = لم يحدده العميل («لا أعرف» أو جيل بلا رمز)
+ * فيُنبَّه المركز ليحدده من رقم الهيكل؛ undefined = لا سطر.
+ */
+export function generationLine(code: string | undefined): string | null {
+  if (code === undefined) return null;
+  return `الجيل: ${code || "يُحدَّد عند التأكيد من رقم الهيكل"}`;
+}
+
 export interface PartsOrderMessageInput {
   vehicleLabel: string;
   /** فارغ حين لم يُدخله العميل */
@@ -35,10 +44,7 @@ export function buildPartsOrderMessage(input: PartsOrderMessageInput): string {
     "طلب قطعة غيار — Trust Drive",
     "",
     `السيارة: ${input.vehicleLabel}`,
-    // فارغ = لم يحدده العميل («لا أعرف» أو جيل بلا رمز) — ينبّه المركز ليحدده من رقم الهيكل
-    input.generationCode === undefined
-      ? null
-      : `الجيل: ${input.generationCode || "يُحدَّد عند التأكيد من رقم الهيكل"}`,
+    generationLine(input.generationCode),
     input.vin ? `رقم الهيكل: ${input.vin}` : null,
     `القطعة: ${input.partName} (${input.partOem})`,
     `الاستلام: ${receiving}`,

@@ -18,6 +18,13 @@ export function formatWholePrice(value: number): string {
   return Math.round(value).toLocaleString("en-US", { maximumFractionDigits: 0 });
 }
 
+/** سعر القائمة بلا كسور حين يكون صحيحاً: «199» · «228.85» — أرقام لاتينية (قاعدة 3) */
+export function formatListPrice(value: number): string {
+  return Number.isInteger(value)
+    ? value.toLocaleString("en-US")
+    : value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 /** مدى سنوات الموديل سرداً بشرياً: «٢٠٠٨–٢٠١٥» */
 export function formatYearRange(from: number, to: number): string {
   return toArabicDigits(`${from}–${to}`);
