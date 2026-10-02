@@ -7,8 +7,9 @@
  * وسنة التحول (آخر سنة لجيل = أول سنة للتالي) ترجع جيلين فيُسأل العميل.
  */
 import { normalizeArabic } from "./arabic-text";
+import { formatYearRange, toArabicDigits } from "./format";
 import { VEHICLE_ROWS } from "./vehicle-catalog.data";
-import type { VehicleCatalogEntry } from "./vehicle-catalog-schema";
+import { CATALOG_YEAR_MAX, CATALOG_YEAR_MIN, type VehicleCatalogEntry } from "./vehicle-catalog-schema";
 
 export * from "./vehicle-catalog-schema";
 export { VEHICLE_ROWS };
@@ -62,6 +63,27 @@ export function generationsFor(make: string, model: string, year: number): Vehic
   return modelRows(make, model)
     .filter((r) => r.yearFrom <= year && year <= r.yearTo)
     .sort((a, b) => a.yearFrom - b.yearFrom);
+}
+
+/**
+ * يُسأل العميل «أي جيل؟» فقط حين تطابق السنة أكثر من جيل ولكلٍّ منها رمز معروف —
+ * جيل بلا رمز لا يحفظ اختيار العميل شيئاً، فيحدده المركز عند التأكيد بدل سؤال بلا أثر.
+ */
+export function needsGenerationChoice(generations: readonly Pick<VehicleCatalogEntry, "generationCode">[]): boolean {
+  return generations.length > 1 && generations.every((g) => g.generationCode !== "");
+}
+
+/**
+ * مدى الجيل للعرض. 2008 و2027 حدود الكتالوج لا سنوات الجيل الحقيقية، فلا تُعرض
+ * كأنها بدايته أو نهايته: «من ٢٠٢١» · «حتى ٢٠١٤» · «٢٠١٢–٢٠١٧».
+ */
+export function generationRangeLabel(g: Pick<VehicleCatalogEntry, "yearFrom" | "yearTo">): string {
+  const openStart = g.yearFrom <= CATALOG_YEAR_MIN;
+  const openEnd = g.yearTo >= CATALOG_YEAR_MAX;
+  if (openStart && openEnd) return "كل السنوات";
+  if (openEnd) return `من ${toArabicDigits(g.yearFrom)}`;
+  if (openStart) return `حتى ${toArabicDigits(g.yearTo)}`;
+  return formatYearRange(g.yearFrom, g.yearTo);
 }
 
 /** يطابق الموديل المكتوب بأي كتابة شائعة أو بالإنجليزي — لقراءة الاستمارة والأسماء القديمة */

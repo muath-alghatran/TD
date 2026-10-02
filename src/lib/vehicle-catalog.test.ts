@@ -9,9 +9,11 @@ import {
   CATALOG_YEAR_MIN,
   VEHICLE_ROWS,
   catalogYears,
+  generationRangeLabel,
   generationsFor,
   makeOptions,
   modelOptions,
+  needsGenerationChoice,
   resolveModel,
 } from "./vehicle-catalog";
 import { WMI_MAKES } from "./vin";
@@ -88,6 +90,19 @@ describe("من السنة إلى الجيل (قاعدة 7)", () => {
         }
       }
     }
+  });
+
+  it("يُسأل العميل فقط حين يكون لكل جيل رمز — جيل بلا رمز يحدده المركز", () => {
+    expect(needsGenerationChoice(generationsFor("تويوتا", "كامري", 2017))).toBe(true);
+    expect(needsGenerationChoice(generationsFor("تويوتا", "كامري", 2015))).toBe(false);
+    expect(needsGenerationChoice(generationsFor("فورد", "تورس", 2020))).toBe(false);
+    expect(needsGenerationChoice(generationsFor("هيونداي", "i10", 2020))).toBe(false);
+  });
+
+  it("حدود الكتالوج لا تُعرض كأنها بداية الجيل أو نهايته", () => {
+    expect(generationRangeLabel({ yearFrom: 2021, yearTo: 2027 })).toBe("من ٢٠٢١");
+    expect(generationRangeLabel({ yearFrom: 2008, yearTo: 2014 })).toBe("حتى ٢٠١٤");
+    expect(generationRangeLabel({ yearFrom: 2012, yearTo: 2017 })).toBe("٢٠١٢–٢٠١٧");
   });
 
   it("السنوات الأحدث أولاً وبلا تكرار", () => {

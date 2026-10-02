@@ -19,8 +19,11 @@ describe("رسالة طلب القطعة", () => {
     expect(msg).toContain("الجيل: XV70");
   });
 
-  it("بلا سطر جيل حين لا يُعرف", () => {
-    expect(buildPartsOrderMessage({ ...base, generationCode: "" })).not.toContain("الجيل:");
+  it("حين لم يحدده العميل يُنبَّه المركز ليحدده من رقم الهيكل", () => {
+    expect(buildPartsOrderMessage({ ...base, generationCode: "" })).toContain("الجيل: يُحدَّد عند التأكيد من رقم الهيكل");
+  });
+
+  it("بلا سطر جيل حين لا يمرره المتصل", () => {
     expect(buildPartsOrderMessage(base)).not.toContain("الجيل:");
   });
 });

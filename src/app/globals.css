@@ -3266,15 +3266,15 @@ html[data-motion="ok"] .journey-replay {
   font-size: 12.5px;
   color: var(--muted);
 }
-/* رمز الجيل بجانب اسم السيارة أو الجيل — XV70 */
-.gen-code {
-  font-size: 11px;
-  color: var(--ink-accent);
+.gen-hint {
+  margin: 0 0 10px;
 }
-/* t-code اتجاهه ltr، فالهامش المنطقي ينقلب — هامشان متساويان يفصلانه عن السنة في الاتجاهين */
-.car-name .gen-code {
-  margin: 0 8px;
-  vertical-align: 1px;
+/* رمز الجيل — بيانات نظام لاتينية بخط البيانات وبلون خافت كما في بطاقة كراجي المرجعية (XV70 · 2.5L) */
+.gen-code {
+  font-weight: 500;
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
 }
 
 /* خطوات مرقّمة قصيرة */

@@ -1,13 +1,22 @@
 "use client";
 
-import { useRef, useState, type FormEvent, type MouseEvent } from "react";
+import { useId, useRef, useState, type FormEvent, type MouseEvent } from "react";
 import { Corners } from "@/components/ui/Corners";
 import { Icon } from "@/components/ui/Icon";
 import { SearchSelect } from "@/components/ui/SearchSelect";
 import { logDemandGap } from "@/lib/demand-gap";
-import { formatYearRange, toArabicDigits } from "@/lib/format";
+import { toArabicDigits } from "@/lib/format";
 import { FEATURE_FORM_OCR, extractVehicleForm } from "@/lib/ocr";
-import { CATALOG_MAKES, catalogYears, generationsFor, makeOptions, modelOptions, resolveModel } from "@/lib/vehicle-catalog";
+import {
+  CATALOG_MAKES,
+  catalogYears,
+  generationRangeLabel,
+  generationsFor,
+  makeOptions,
+  modelOptions,
+  needsGenerationChoice,
+  resolveModel,
+} from "@/lib/vehicle-catalog";
 import { cleanVinInput, isCompleteVin } from "@/lib/vin";
 import { buildVehicleNotListedMessage, buildWhatsAppLink } from "@/lib/whatsapp-requests";
 import { VinField } from "./VinField";
@@ -47,11 +56,16 @@ export function VehicleIdentifyForm({ onIdentified }: { onIdentified: (result: V
   const models = make ? modelOptions(make) : [];
   const years = make && model ? catalogYears(make, model) : [];
   const generations = make && model && year ? generationsFor(make, model, Number(year)) : [];
-  const askGeneration = generations.length > 1;
+  const askGeneration = needsGenerationChoice(generations);
   const generationKey = (g: (typeof generations)[number]) => `${g.generationCode}|${g.yearFrom}`;
+  // فارغ = يحدده المركز: «لا أعرف»، أو سنة تطابق أجيالاً بلا رمز معروف
   const generationCode = askGeneration
     ? (generations.find((g) => generationKey(g) === generationPick)?.generationCode ?? "")
-    : (generations[0]?.generationCode ?? "");
+    : generations.length === 1
+      ? generations[0].generationCode
+      : "";
+  const generationHintId = useId();
+  const pair = generations.length === 2;
   const vinOk = vin === "" || isCompleteVin(vin);
   const canContinue = Boolean(make && model && year) && vinOk && (!askGeneration || generationPick !== null);
   const notListedValue = notListedText.trim();
@@ -194,10 +208,10 @@ export function VehicleIdentifyForm({ onIdentified }: { onIdentified: (result: V
         </div>
 
         {askGeneration && (
-          <fieldset className="form-block">
+          <fieldset className="form-block" aria-describedby={generationHintId}>
             <legend className="label">أي جيل؟</legend>
-            <p className="hint" style={{ marginTop: 0, marginBottom: 10 }}>
-              سنة {toArabicDigits(year)} فيها جيلان من {model}، وبعض القطع تختلف بينهما.
+            <p id={generationHintId} className="hint gen-hint">
+              سنة {toArabicDigits(year)} فيها {pair ? "جيلان" : "أكثر من جيل"} من {model}، وبعض القطع تختلف {pair ? "بينهما" : "بينها"}.
             </p>
             {generations.map((g, i) => (
               <button
@@ -210,10 +224,10 @@ export function VehicleIdentifyForm({ onIdentified }: { onIdentified: (result: V
                 <span className="dot" />
                 <span className="gen-say">
                   <span className="gen-name">
-                    {i === 0 ? "الجيل الأقدم" : "الجيل الأحدث"}
-                    {g.generationCode && <span className="t-code gen-code">{g.generationCode}</span>}
+                    {pair ? (i === 0 ? "الجيل الأقدم" : "الجيل الأحدث") : `الجيل ${toArabicDigits(i + 1)}`}
+                    <span className="t-data gen-code">{g.generationCode}</span>
                   </span>
-                  <span className="gen-sub">موديلات {formatYearRange(g.yearFrom, g.yearTo)}</span>
+                  <span className="gen-sub">موديلات {generationRangeLabel(g)}</span>
                 </span>
               </button>
             ))}
@@ -239,6 +253,7 @@ export function VehicleIdentifyForm({ onIdentified }: { onIdentified: (result: V
             <Corners />
             متابعة
           </button>
+          {askGeneration && generationPick === null && <p className="hint">اختر الجيل — أو «لا أعرف» — للمتابعة.</p>}
           {!vinOk && <p className="hint">أكمل رقم الهيكل (١٧ خانة) أو امسحه للمتابعة بدونه.</p>}
         </div>
       </form>

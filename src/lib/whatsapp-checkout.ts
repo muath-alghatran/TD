@@ -35,7 +35,10 @@ export function buildPartsOrderMessage(input: PartsOrderMessageInput): string {
     "طلب قطعة غيار — Trust Drive",
     "",
     `السيارة: ${input.vehicleLabel}`,
-    input.generationCode ? `الجيل: ${input.generationCode}` : null,
+    // فارغ = لم يحدده العميل («لا أعرف» أو جيل بلا رمز) — ينبّه المركز ليحدده من رقم الهيكل
+    input.generationCode === undefined
+      ? null
+      : `الجيل: ${input.generationCode || "يُحدَّد عند التأكيد من رقم الهيكل"}`,
     input.vin ? `رقم الهيكل: ${input.vin}` : null,
     `القطعة: ${input.partName} (${input.partOem})`,
     `الاستلام: ${receiving}`,
