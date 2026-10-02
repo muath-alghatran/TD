@@ -110,7 +110,7 @@ export function SearchSelect({
       />
       {open && !disabled && (
         <div className="combo-pop" onMouseDown={(e) => e.preventDefault()}>
-          <ul id={listId} role="listbox" aria-label={label} className="combo-list">
+          <ul id={listId} role="listbox" aria-label={label} className="combo-list" tabIndex={-1}>
             {shown.map((option, i) => (
               <li
                 key={option.value}
