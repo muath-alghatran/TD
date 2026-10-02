@@ -2,7 +2,10 @@
 
 import { useEffect } from "react";
 import { Icon } from "@/components/ui/Icon";
-import { formatListPrice, toArabicDigits } from "@/lib/format";
+import { VehicleDiagramLevel1 } from "@/components/vehicle/VehicleDiagramLevel1";
+import { VehicleDiagramLevel2 } from "@/components/vehicle/VehicleDiagramLevel2";
+import { formatListPrice, typesWord } from "@/lib/format";
+import { STOCK_MAKE } from "@/lib/part-promise";
 import { PART_CATEGORIES, PART_TYPES, fromPrice } from "@/lib/parts-offer";
 import { PRICING_SETTINGS } from "@/lib/pricing-settings";
 import { groupVin } from "@/lib/vin";
@@ -13,16 +16,10 @@ const TYPES_BY_CATEGORY = PART_CATEGORIES.map((c) => ({
   types: PART_TYPES.filter((t) => t.category === c.key),
 }));
 
-function typesWord(n: number): string {
-  if (n === 1) return "نوع واحد";
-  if (n === 2) return "نوعان";
-  if (n <= 10) return `${toArabicDigits(n)} أنواع`;
-  return `${toArabicDigits(n)} نوعاً`;
-}
 
 /**
  * مسار القطع لكل الماركات (المرحلة 5): السيارة · البحث · «كل القطع» بالفئات الـ14.
- * المخطط يعود لهوندا في المرحلة 6.
+ * وهوندا لها المخطط التفاعلي (المرحلة 6) بين البحث والفئات.
  */
 export function PartsBrowser({
   vehicle,
@@ -33,6 +30,8 @@ export function PartsBrowser({
   openCategories,
   onToggleCategory,
   returnFocusTo,
+  selectedZone,
+  onSelectZone,
 }: {
   vehicle: SearchVehicle;
   initialQuery: string;
@@ -44,7 +43,11 @@ export function PartsBrowser({
   onToggleCategory: (key: string, open: boolean) => void;
   /** القطعة التي فُتحت بطاقتها — يعود إليها التركيز عند الرجوع، وإلا حقل البحث */
   returnFocusTo: string | null;
+  /** منطقة المخطط المختارة (هوندا) — تبقى مختارة بعد الرجوع من بطاقة */
+  selectedZone: string | null;
+  onSelectZone: (zoneId: string) => void;
 }) {
+  const partVehicle = { make: vehicle.make, model: vehicle.model, generationCode: vehicle.generationCode ?? "" };
   useEffect(() => {
     if (!returnFocusTo) return;
     const opener =
@@ -74,6 +77,14 @@ export function PartsBrowser({
       <div className="form-block">
         <PartSearch vehicle={vehicle} initialQuery={initialQuery} onQueryChange={onQueryChange} onPick={onPick} />
       </div>
+
+      {/* المخطط لهوندا فقط (قرار المالك): مناطقه بمخزون المركز الحقيقي أو وعد التوريد */}
+      {vehicle.make === STOCK_MAKE && (
+        <div className="form-block">
+          <VehicleDiagramLevel1 vehicle={partVehicle} selectedZone={selectedZone} onSelectZone={onSelectZone} />
+          {selectedZone && <VehicleDiagramLevel2 zoneId={selectedZone} vehicle={partVehicle} onPick={onPick} />}
+        </div>
+      )}
 
       <div className="sec-hd">
         <h2 className="sec-title">كل القطع</h2>

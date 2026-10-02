@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { RoadTrack } from "@/components/orders/RoadTrack";
 import { Icon } from "@/components/ui/Icon";
-import { formatDayNumber, formatMonth, formatRemaining, formatWeekday, toArabicDigits } from "@/lib/format";
+import { dayWord, formatDayNumber, formatMonth, formatRemaining, formatWeekday, toArabicDigits } from "@/lib/format";
 import { useGaragedVehicles, useLocalOrders, useNow } from "@/lib/local-store";
 import { markJourneyPlayed } from "@/lib/motion";
 import { activeOrders, orderProgress } from "@/lib/order-progress";
@@ -39,6 +39,13 @@ export function ActiveOrder() {
   const progress = orderProgress(order);
   const vehicle = findOrderVehicle(vehicles, order);
   const others = active.length - 1;
+  const ranged = order.promisedDaysMin !== undefined && order.promisedDaysMin < order.promisedDays;
+  // «يوم واحد» و«يومين» كلمة لا رقماً — «خلال ١ يوم» ركيكة
+  const [bigDays, dayUnit] = ranged
+    ? [`${toArabicDigits(order.promisedDaysMin ?? 0)}–${toArabicDigits(order.promisedDays)}`, "أيام "]
+    : order.promisedDays <= 2
+      ? [dayWord(order.promisedDays), ""]
+      : [toArabicDigits(order.promisedDays), order.promisedDays <= 10 ? "أيام " : "يوماً "];
 
   return (
     <section ref={ref} className="steel" aria-label="طلبك النشط">
@@ -74,8 +81,8 @@ export function ActiveOrder() {
               <span className="t-disp" style={{ fontSize: 19 }}>
                 خلال
               </span>
-              <span className="big">{toArabicDigits(order.promisedDays)}</span>
-              <span style={{ fontSize: 15 }}>{order.promisedDays >= 3 && order.promisedDays <= 10 ? "أيام" : "يوم"} من الدفع</span>
+              <span className="big">{bigDays}</span>
+              <span style={{ fontSize: 15 }}>{dayUnit}من الدفع</span>
             </div>
             <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 6 }}>
               {progress.statusLabel} · يبدأ عدّاد الوعد بعد موافقتك والدفع

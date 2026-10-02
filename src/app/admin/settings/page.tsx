@@ -11,6 +11,9 @@ const PROMISE_ROWS: { label: string; value: string | number }[] = [
   { label: "يوم تركيب إضافي", value: DEFAULT_PROMISE_SETTINGS.fitDays },
   { label: "ثقة المخزون الداخلي", value: DEFAULT_PROMISE_SETTINGS.internalStockConfidence },
   { label: "ثقة أساس المورد الضعيف", value: DEFAULT_PROMISE_SETTINGS.weakSupplierBaseConfidence },
+  { label: "أدنى أيام التوريد للماركات بلا مخزون", value: DEFAULT_PROMISE_SETTINGS.supplyMinDays },
+  { label: "أقصى أيام التوريد للماركات بلا مخزون", value: DEFAULT_PROMISE_SETTINGS.supplyMaxDays },
+  { label: "ثقة وعد التوريد", value: DEFAULT_PROMISE_SETTINGS.supplyConfidence },
 ];
 
 const PRICING_ROWS: { label: string; value: string | number }[] = [

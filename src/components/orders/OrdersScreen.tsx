@@ -6,7 +6,7 @@ import { Icon } from "@/components/ui/Icon";
 import { dayWord, formatDayDate, formatPrice } from "@/lib/format";
 import { findOrderVehicle, vehicleLabel } from "@/lib/garage";
 import { useGaragedVehicles, useHydrated, useLocalOrders } from "@/lib/local-store";
-import { orderProgress } from "@/lib/order-progress";
+import { orderDaysLabel, orderProgress } from "@/lib/order-progress";
 import { orderCode } from "@/lib/orders";
 import { StageBar } from "./RoadTrack";
 
@@ -67,14 +67,19 @@ export function OrdersScreen() {
                 {progress.failed
                   ? "سجّلناها ونبلغك فور توفرها"
                   : progress.delivered
-                    ? `سُلّم في ${dayWord(order.actualDays ?? 0)} — الوعد ${dayWord(order.promisedDays)}`
+                    ? `سُلّم في ${dayWord(order.actualDays ?? 0)} — الوعد ${orderDaysLabel(order)}`
                     : progress.dueAt
                       ? `الموعد المحسوب: ${formatDayDate(progress.dueAt)}`
-                      : `خلال ${dayWord(order.promisedDays)} من الدفع`}
+                      : `خلال ${orderDaysLabel(order)} من الدفع`}
               </span>
-              <span className="t-data" style={{ fontSize: 13, fontWeight: 600 }}>
-                {formatPrice(order.totalPrice)} ر.س
-              </span>
+              {order.pricePending ? (
+                <span style={{ color: "var(--muted)" }}>السعر عند التأكيد</span>
+              ) : (
+                <span style={{ fontSize: 13, fontWeight: 600 }}>
+                  {order.priceIndicative && <span style={{ fontWeight: 400, color: "var(--muted)" }}>استرشادي </span>}
+                  <span className="t-data">{formatPrice(order.totalPrice)}</span> ر.س
+                </span>
+              )}
             </div>
           </Link>
         );

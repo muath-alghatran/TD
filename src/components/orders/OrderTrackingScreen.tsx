@@ -8,8 +8,10 @@ import { Corners } from "@/components/ui/Corners";
 import { Icon } from "@/components/ui/Icon";
 import { CENTER } from "@/lib/center-info";
 import {
+  dayRangeWord,
   dayWord,
   formatClock,
+  formatHours,
   formatPrice,
   formatShortDate,
   formatWeekday,
@@ -19,7 +21,7 @@ import {
 } from "@/lib/format";
 import { findOrderVehicle, vehicleLabel } from "@/lib/garage";
 import { useGaragedVehicles, useHydrated, useLocalOrders, useNow } from "@/lib/local-store";
-import { orderProgress, type OrderStage } from "@/lib/order-progress";
+import { orderDaysLabel, orderProgress, type OrderStage } from "@/lib/order-progress";
 import { orderCode, type LocalOrder } from "@/lib/orders";
 import { PRICING_SETTINGS } from "@/lib/pricing-settings";
 import { useRunWhenVisible } from "@/lib/use-run-when-visible";
@@ -44,8 +46,9 @@ function MotionTimeline({ children }: { children: ReactNode }) {
 
 /** عرض السعر المفصّل — يبقى داخل المرحلة التي وافقت فيها (1a) */
 function PriceLedger({ order }: { order: LocalOrder }) {
-  const hasLines = order.unitPrice !== undefined;
+  const hasLines = order.unitPrice !== undefined || order.pricePending;
   const part = catalogPart(order.partOem);
+  const hours = order.laborHours ?? part?.hrs ?? null;
   return (
     <div className="ledger">
       {hasLines && (
@@ -55,22 +58,25 @@ function PriceLedger({ order }: { order: LocalOrder }) {
               {order.partName}
               {order.qualityTier ? ` · ${order.qualityTier}` : ""}
             </span>
-            <span>{formatPrice(order.unitPrice ?? 0)}</span>
+            <span>{order.pricePending ? "عند التأكيد" : formatPrice(order.unitPrice ?? 0)}</span>
           </div>
           {order.mode === "fit" ? (
             <>
               <div className="ledger-row">
                 <span>
                   أجرة التركيب
-                  {part?.hrs
-                    ? ` · ${part.hrs === 1 ? "ساعة واحدة" : `${toArabicDigits(part.hrs)} ساعة`} × ${PRICING_SETTINGS.hourRate}`
-                    : ""}
+                  {hours ? (
+                    <>
+                      {" "}
+                      ({hours === 1 ? "ساعة واحدة" : formatHours(hours)} × <span className="t-data">{PRICING_SETTINGS.hourRate}</span> ر.س)
+                    </>
+                  ) : null}
                 </span>
-                <span>{formatPrice(order.laborCost ?? 0)}</span>
+                <span>{order.laborPending ? "تُحدَّد عند التأكيد" : formatPrice(order.laborCost ?? 0)}</span>
               </div>
               {(order.discount ?? 0) > 0 && (
                 <div className="ledger-row credit-line">
-                  <span>خصم «اطلب وركّب» على أجرة اليد ١٠٪</span>
+                  <span>خصم «اطلب وركّب» على أجرة اليد {toArabicDigits(Math.round(PRICING_SETTINGS.fitDiscount * 100))}٪</span>
                   <span>−{formatPrice(order.discount ?? 0)}</span>
                 </div>
               )}
@@ -84,9 +90,20 @@ function PriceLedger({ order }: { order: LocalOrder }) {
         </>
       )}
       <div className="ledger-sum">
-        <span>{order.status === "requested" ? "الإجمالي التقديري" : "الإجمالي المعتمد"}</span>
-        <span>{formatPrice(order.totalPrice)} ر.س</span>
+        <span>
+          {order.status !== "requested"
+            ? "الإجمالي المعتمد"
+            : order.fromStock && !order.priceIndicative
+              ? "الإجمالي"
+              : "الإجمالي التقديري"}
+        </span>
+        <span>{order.pricePending ? "يُحدَّد عند التأكيد" : `${formatPrice(order.totalPrice)} ر.س`}</span>
       </div>
+      {order.status === "requested" && order.priceIndicative && (
+        <p className="hint">
+          سعر استرشادي من قائمة الأسعار — يُثبَّت عند التأكيد ولا يتغير بعده{order.laborPending ? "، وأجرة التركيب تُضاف عند التأكيد" : ""}.
+        </p>
+      )}
     </div>
   );
 }
@@ -168,10 +185,16 @@ export function OrderTrackingScreen({ id }: { id: string }) {
               </div>
               <div style={{ fontSize: 12.5, color: "var(--muted)" }}>
                 {order.partName}
-                {tier ? ` · ${tier}` : ""} ·{" "}
-                <span className="t-data" style={{ fontSize: 12 }}>
-                  {order.partOem}
-                </span>
+                {tier ? ` · ${tier}` : ""}
+                {/* طلب من قائمة الأسعار بلا رقم قطعة بعد — يحدده المركز عند التأكيد */}
+                {order.partOem && (
+                  <>
+                    {" · "}
+                    <span className="t-data" style={{ fontSize: 12 }}>
+                      {order.partOem}
+                    </span>
+                  </>
+                )}
               </div>
             </div>
             <span className={tagClass}>{progress.statusLabel}</span>
@@ -199,7 +222,7 @@ export function OrderTrackingScreen({ id }: { id: string }) {
                   <div className="cell-v big">—</div>
                 ) : (
                   <>
-                    <div className="cell-v big">{dayWord(order.promisedDays)}</div>
+                    <div className="cell-v big">{orderDaysLabel(order)}</div>
                     <div className="cell-sub">من لحظة الدفع</div>
                   </>
                 )}
@@ -209,7 +232,7 @@ export function OrderTrackingScreen({ id }: { id: string }) {
                 {progress.delivered ? (
                   <>
                     <div className="cell-v accent">{dayWord(order.actualDays ?? 0)}</div>
-                    <div className="cell-sub">الوعد {dayWord(order.promisedDays)}</div>
+                    <div className="cell-sub">الوعد {orderDaysLabel(order)}</div>
                   </>
                 ) : progress.dueAt && now > 0 ? (
                   (() => {
@@ -239,7 +262,8 @@ export function OrderTrackingScreen({ id }: { id: string }) {
                 <div className="calc-hd">
                   <span style={{ fontWeight: 600 }}>كيف حسبنا الموعد</span>
                   <span style={{ color: "var(--muted)" }}>
-                    {dayWord(Math.max(1, totalLegDays))} {paid ? "من الدفع" : "بعد الدفع"}
+                    {order.promisedDaysMin !== undefined ? orderDaysLabel(order) : dayWord(Math.max(1, totalLegDays))}{" "}
+                    {paid ? "من الدفع" : "بعد الدفع"}
                   </span>
                 </div>
                 <div className="calc-bar" aria-hidden="true">
@@ -256,7 +280,7 @@ export function OrderTrackingScreen({ id }: { id: string }) {
                     <span key={leg.label} style={{ flex: Math.max(leg.days, 0.6) }}>
                       {leg.label}
                       <br />
-                      {leg.days === 0 ? "فوراً" : dayWord(leg.days)}
+                      {leg.days === 0 ? "فوراً" : dayRangeWord(leg.daysMin ?? leg.days, leg.days)}
                     </span>
                   ))}
                 </div>

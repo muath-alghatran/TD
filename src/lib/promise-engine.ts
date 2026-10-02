@@ -40,6 +40,12 @@ export interface PromiseSettings {
   internalStockConfidence: number;
   /** ثقة أساس المورد الضعيف */
   weakSupplierBaseConfidence: number;
+  /** أدنى أيام التوريد للماركات بلا مخزون لدى المركز (المرحلة 6) */
+  supplyMinDays: number;
+  /** أقصى أيام التوريد للماركات بلا مخزون لدى المركز */
+  supplyMaxDays: number;
+  /** ثقة وعد التوريد — داخل الكهرماني */
+  supplyConfidence: number;
 }
 
 export interface PromiseResult {
@@ -100,4 +106,46 @@ export function calcPromise(
     confidence >= settings.hiConf ? "ok" : confidence >= settings.midConf ? "wait" : "spec";
 
   return { days, confidence, status };
+}
+
+/**
+ * ── وعد المدى (المرحلة 6، برومت أكتوبر ٢٠٢٦) ──
+ * للماركات التي لا مخزون لها لدى المركز (وقطع هوندا خارج ملف المخزون): توريد بمدى
+ * [أدنى–أقصى] من الإعدادات. قرار المالك: المدى يشمل التركيب في المركز والاستلام في
+ * مدينة المركز — فلا يوم تركيب إضافي، والمتصل يمرر shipDaysMax = 0 لمدينة المركز —
+ * ويُضاف الشحن فقط للمدن الأخرى. الأيام تُحسب من الدفع (قاعدة 13).
+ * لا يغيّر calcPromise ولا سياسة التعويض.
+ */
+export interface PromiseRangeResult extends PromiseResult {
+  /** الحد الأدنى للأيام — و`days` هو الحد الأعلى (الموعد = الدفع + الأعلى) */
+  daysMin: number;
+}
+
+export interface SupplyRangeLegs {
+  supplyMinDays: number;
+  supplyMaxDays: number;
+  /** الشحن إلى مدينة العميل — صفر للتركيب ولمدينة المركز */
+  shipDays: number;
+}
+
+export function supplyRangeLegs(city: PromiseCity, mode: PromiseMode, settings: PromiseSettings): SupplyRangeLegs {
+  return {
+    supplyMinDays: settings.supplyMinDays,
+    supplyMaxDays: settings.supplyMaxDays,
+    shipDays: mode === "fit" ? 0 : city.shipDaysMax,
+  };
+}
+
+export function calcSupplyRangePromise(city: PromiseCity, mode: PromiseMode, settings: PromiseSettings): PromiseRangeResult {
+  const legs = supplyRangeLegs(city, mode, settings);
+  // يوم واحد على الأقل كـcalcPromise، والأعلى لا ينزل عن الأدنى حتى لو أُخطئ في الإعدادات
+  const daysMin = Math.max(1, legs.supplyMinDays + legs.shipDays);
+  return {
+    daysMin,
+    days: Math.max(daysMin, legs.supplyMaxDays + legs.shipDays),
+    // معامل ثقة المدينة للشحن كالوعد الحالي، والتركيب داخل المركز يلغيه
+    confidence: settings.supplyConfidence * (mode === "fit" ? 1 : city.trustFactor),
+    // كهرماني دائماً (البرومت): لا أخضر ولا دفع فوري قبل تأكيد المركز (قاعدة 11)
+    status: "wait",
+  };
 }

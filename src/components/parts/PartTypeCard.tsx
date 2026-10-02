@@ -4,33 +4,53 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Corners } from "@/components/ui/Corners";
 import { Icon } from "@/components/ui/Icon";
 import { StatusPill } from "@/components/ui/StatusPill";
-import { formatListPrice, toArabicDigits } from "@/lib/format";
+import { DEFAULT_PROMISE_SETTINGS } from "@/lib/default-promise-settings";
+import { dayRangeWord, dayWord, formatListPrice, monthsWord, toArabicDigits } from "@/lib/format";
 import { POSITION_OPTIONS, SIDE_OPTIONS, partModifiers } from "@/lib/part-modifiers";
-import {
-  VISIBLE_TIERS,
-  categoryName,
-  partAvailability,
-  qualityOptions,
-  tierLabel,
-  type PartType,
-  type QualityTier,
-} from "@/lib/parts-offer";
+import { partOptions, partStatus, stockFitDays, type PartOption } from "@/lib/part-promise";
+import { VISIBLE_TIERS, categoryName, tierLabel, type PartType } from "@/lib/parts-offer";
 import { PRICING_SETTINGS } from "@/lib/pricing-settings";
-import { buildPartRequestMessage, buildWhatsAppLink } from "@/lib/whatsapp-requests";
 import type { SearchVehicle } from "./PartSearch";
 
+const SUPPLY = dayRangeWord(DEFAULT_PROMISE_SETTINGS.supplyMinDays, DEFAULT_PROMISE_SETTINGS.supplyMaxDays);
+
+export interface PartChoice {
+  option: PartOption | null;
+  /** الطرف والموضع — «يمين» · «فوق» */
+  details: string[];
+}
+
 /**
- * بطاقة الشفافية (المرحلة 5): خيارات الجودة جنباً إلى جنب بأسعار القائمة الاسترشادية،
- * والضمان والتوافق «عند التأكيد»، ثم طلب عبر واتساب يؤكد فيه المركز التوفر والسعر والموعد.
+ * بطاقة الشفافية (المرحلتان 5 و6): خيارات الجودة جنباً إلى جنب — مخزون المركز أولاً بسعره
+ * الحقيقي وضمانه (أخضر، دفع فوري)، ثم أسعار القائمة الاسترشادية بوعد التوريد (كهرماني، بلا
+ * دفع حتى التأكيد) — ثم «اطلب القطعة» إلى نموذج الطلب.
  */
-export function PartTypeCard({ type, vehicle, onBack }: { type: PartType; vehicle: SearchVehicle; onBack: () => void }) {
-  const options = qualityOptions(type.key);
+export function PartTypeCard({
+  type,
+  vehicle,
+  initialChoice,
+  onBack,
+  onOrder,
+}: {
+  type: PartType;
+  vehicle: SearchVehicle;
+  initialChoice?: PartChoice | null;
+  onBack: () => void;
+  onOrder: (choice: PartChoice) => void;
+}) {
+  const partVehicle = { make: vehicle.make, model: vehicle.model, generationCode: vehicle.generationCode ?? "" };
+  const options = partOptions(partVehicle, type.key);
+  const status = partStatus(partVehicle, type.key);
   const modifiers = partModifiers(type.key);
-  const [tier, setTier] = useState<QualityTier | null>(null);
+  // مخزون المركز يُختار تلقائياً — هو الأسرع والأوضح سعراً
+  const [optionId, setOptionId] = useState<string | null>(
+    initialChoice?.option?.id ?? options.find((o) => o.kind === "stock")?.id ?? null,
+  );
   const [showAll, setShowAll] = useState(false);
-  const [side, setSide] = useState<string | null>(null);
-  const [position, setPosition] = useState<string | null>(null);
-  const [sent, setSent] = useState(false);
+  const [side, setSide] = useState<string | null>(initialChoice?.details.find((d) => (SIDE_OPTIONS as readonly string[]).includes(d)) ?? null);
+  const [position, setPosition] = useState<string | null>(
+    initialChoice?.details.find((d) => (POSITION_OPTIONS as readonly string[]).includes(d)) ?? null,
+  );
   const titleRef = useRef<HTMLHeadingElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const hintId = useId();
@@ -42,24 +62,21 @@ export function PartTypeCard({ type, vehicle, onBack }: { type: PartType; vehicl
 
   const shown = showAll ? options : options.slice(0, VISIBLE_TIERS);
   const hidden = options.length - shown.length;
-  const chosen = options.find((o) => o.tier === tier) ?? null;
+  const chosen = options.find((o) => o.id === optionId) ?? null;
   const needsSide = modifiers.includes("side") && side === null;
   const needsPosition = modifiers.includes("position") && position === null;
   const ready = !needsSide && !needsPosition;
-  const prices = PRICING_SETTINGS.showListPrices;
-
-  const message = buildPartRequestMessage({
-    vehicle,
-    partName: type.name,
-    details: [side ?? "", position ?? ""],
-    tier: chosen ? tierLabel(chosen.tier) : null,
-    price: chosen?.price ?? null,
-  });
+  const fromStock = chosen?.kind === "stock";
 
   function showMore() {
     setShowAll(true);
     // التركيز على أول خيار ظهر بدل أن يضيع مع زر «المزيد»
     requestAnimationFrame(() => gridRef.current?.querySelectorAll<HTMLButtonElement>(".tier-cell")[VISIBLE_TIERS]?.focus());
+  }
+
+  function order() {
+    if (!ready) return;
+    onOrder({ option: chosen, details: [side ?? "", position ?? ""].filter(Boolean) });
   }
 
   return (
@@ -77,7 +94,10 @@ export function PartTypeCard({ type, vehicle, onBack }: { type: PartType; vehicl
         {type.synonyms.length > 0 && <p>يعرفها السوق أيضاً: {type.synonyms.slice(0, 3).join("، ")}</p>}
       </div>
 
-      <StatusPill status={partAvailability(vehicle.make, type.key)} label="التوفر يُؤكَّد عند الطلب" />
+      <StatusPill
+        status={status}
+        label={status === "ok" ? `في مخزون المركز · تركيب خلال ${dayWord(stockFitDays())}` : `توريد ${SUPPLY} · بعد تأكيد المركز`}
+      />
 
       {modifiers.includes("side") && (
         <fieldset className="form-block">
@@ -111,19 +131,27 @@ export function PartTypeCard({ type, vehicle, onBack }: { type: PartType; vehicl
             <div className="tier-grid" ref={gridRef}>
               {shown.map((o) => (
                 <button
-                  key={o.tier}
+                  key={o.id}
                   type="button"
                   className="tier-cell"
-                  aria-pressed={tier === o.tier}
-                  onClick={() => setTier(tier === o.tier ? null : o.tier)}
+                  aria-pressed={optionId === o.id}
+                  onClick={() => setOptionId(optionId === o.id ? null : o.id)}
                 >
                   <span className="tier-name">{tierLabel(o.tier)}</span>
+                  {o.kind === "stock" && (
+                    <span className="stat ok tier-stock">
+                      <i />
+                      في المخزون: {toArabicDigits(o.stockQty)}
+                    </span>
+                  )}
                   {o.price !== null ? (
                     <>
                       <span className="tier-price">
                         <b className="t-data">{formatListPrice(o.price)}</b> ر.س
                       </span>
-                      <span className="tier-note">سعر استرشادي — يُثبَّت عند التأكيد</span>
+                      <span className="tier-note">
+                        {o.kind === "stock" ? "السعر النهائي شامل الضريبة" : "سعر استرشادي — يُثبَّت عند التأكيد"}
+                      </span>
                     </>
                   ) : (
                     <span className="tier-note">السعر عند التأكيد</span>
@@ -137,7 +165,7 @@ export function PartTypeCard({ type, vehicle, onBack }: { type: PartType; vehicl
               </button>
             )}
             <p className="hint">
-              {prices ? "الأسعار شاملة ضريبة القيمة المضافة. " : "الأسعار عند التأكيد. "}
+              {PRICING_SETTINGS.showListPrices ? "الأسعار شاملة ضريبة القيمة المضافة. " : "الأسعار عند التأكيد. "}
               اختر جودة، أو اطلب ونعرض عليك ما نؤكده من خيارات.
             </p>
           </>
@@ -152,50 +180,46 @@ export function PartTypeCard({ type, vehicle, onBack }: { type: PartType; vehicl
           <li>
             <Icon name="scrollText" size={18} />
             <span>
-              <b>الضمان</b> يُحدَّد عند التأكيد
+              <b>الضمان</b>{" "}
+              {fromStock && chosen?.warrantyMonths ? `ضمان مكتوب ${monthsWord(chosen.warrantyMonths)}` : "يُحدَّد عند التأكيد"}
             </span>
           </li>
           <li>
             <Icon name="car" size={18} />
             <span>
-              <b>التوافق</b> يتأكد مع {vehicle.label} عند التأكيد{vehicle.vin ? "" : "، ورقم الهيكل يساعد"}
+              <b>التوافق</b>{" "}
+              {fromStock
+                ? `من مخزون المركز لجيل ${vehicle.generationCode} من ${vehicle.model}`
+                : `يتأكد مع ${vehicle.label} عند التأكيد${vehicle.vin ? "" : "، ورقم الهيكل يساعد"}`}
             </span>
           </li>
           <li>
             <Icon name="receipt" size={18} />
             <span>
-              <b>الدفع</b> بعد أن يؤكد المركز التوفر والسعر والموعد
+              <b>الدفع</b>{" "}
+              {fromStock
+                ? "فوري مع تأكيد الطلب — والشحن لأبعد المدن بعد تأكيد المركز"
+                : "بعد أن يؤكد المركز التوفر والسعر، برابط صالح ١٢ ساعة"}
             </span>
           </li>
         </ul>
       </div>
 
       <div className="form-block">
-        {/* قبل اختيار الطرف لا رابط أصلاً — فلا يتجاوزه «فتح في تبويب جديد» */}
-        <a
-          href={ready ? buildWhatsAppLink(message) : undefined}
-          role="link"
-          tabIndex={0}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          type="button"
           className="btn btn-primary btn-lg btn-block blueprint"
           aria-disabled={!ready}
           aria-describedby={ready ? undefined : hintId}
-          onClick={() => ready && setSent(true)}
+          onClick={order}
         >
           <Corners />
-          <Icon name="messageCircle" size={20} />
-          اطلب عبر واتساب
-        </a>
+          اطلب القطعة
+        </button>
         {!ready && (
           <p id={hintId} className="hint">
             اختر {needsSide ? "الطرف" : "الموضع"} للمتابعة.
           </p>
-        )}
-        {sent && (
-          <div className="memo" role="status" style={{ marginTop: 12 }}>
-            <b>فتحنا لك واتساب برسالة الطلب.</b> أرسلها، ونرد عليك بتأكيد التوفر والسعر والموعد.
-          </div>
         )}
       </div>
     </section>

@@ -6,7 +6,6 @@
 import { PART_TYPES } from "./parts-dictionary";
 import { PART_PRICES } from "./parts-prices";
 import { PART_CATEGORIES, QUALITY_TIERS, UNSPECIFIED_TIER, type PartType, type QualityTier } from "./parts-schema";
-import type { PromiseStatus } from "./promise-engine";
 import { PRICING_SETTINGS } from "./pricing-settings";
 
 export * from "./parts-schema";
@@ -67,11 +66,4 @@ export function tierLabel(tier: QualityTier): string {
   return tier === UNSPECIFIED_TIER ? "الجودة تُحدَّد عند التأكيد" : tier;
 }
 
-/**
- * حالة التوفر في مسار القطع. لا أخضر قبل مخزون وسعر حقيقيين (البرومت 0-6): كل نوع
- * لكل ماركة «بانتظار التأكيد» — بلا دفع حتى يؤكد المركز (قاعدة 11). مخزون هوندا في المرحلة 6.
- */
-export function partAvailability(_make: string, _key: string): PromiseStatus {
-  return "spec";
-}
 

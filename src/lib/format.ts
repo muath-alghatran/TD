@@ -30,6 +30,20 @@ export function formatYearRange(from: number, to: number): string {
   return toArabicDigits(`${from}–${to}`);
 }
 
+/** عدد أنواع القطع سرداً: «نوع واحد» · «نوعان» · «٩ أنواع» · «٤٢ نوعاً» */
+export function typesWord(n: number): string {
+  if (n === 1) return "نوع واحد";
+  if (n === 2) return "نوعان";
+  if (n <= 10) return `${toArabicDigits(n)} أنواع`;
+  return `${toArabicDigits(n)} نوعاً`;
+}
+
+/** مدى الوعد سرداً: «٣–٤ أيام»، أو «يومين» حين يتساوى الحدّان */
+export function dayRangeWord(min: number, max: number): string {
+  if (min >= max) return dayWord(max);
+  return `${toArabicDigits(min)}–${toArabicDigits(max)} أيام`;
+}
+
 export function dayWord(days: number): string {
   if (days === 1) return "يوم واحد";
   if (days === 2) return "يومين";
@@ -87,6 +101,14 @@ export function formatClock(date: Date): { time: string; period: "ص" | "م" } {
   const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
   const time = `${String(h12).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
   return { time, period: h24 < 12 ? "ص" : "م" };
+}
+
+const HOURS = new Intl.NumberFormat("ar-SA-u-nu-arab", { maximumFractionDigits: 2 });
+
+/** ساعات العمل سرداً: «ساعة» · «ساعتان» · «١٫٥ ساعة» — الفاصلة العشرية عربية مع الأرقام العربية */
+export function formatHours(hours: number): string {
+  if (Number.isInteger(hours)) return hourWord(hours);
+  return `${HOURS.format(hours)} ساعة`;
 }
 
 function hourWord(hours: number): string {

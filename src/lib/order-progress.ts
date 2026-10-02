@@ -7,6 +7,7 @@
  */
 import { catalogPartLegs } from "./catalog-promise";
 import { CITIES } from "./city-catalog";
+import { dayRangeWord } from "./format";
 import type { LocalOrder } from "./orders";
 import { ZONES } from "./zone-catalog";
 
@@ -26,7 +27,10 @@ export interface OrderStage {
 
 export interface PromiseLeg {
   label: string;
+  /** الحد الأعلى للجزء */
   days: number;
+  /** الحد الأدنى حين يكون الجزء مدى (التوريد «3–4 أيام») */
+  daysMin?: number;
 }
 
 export interface OrderProgress {
@@ -48,7 +52,14 @@ function toDate(value: string | null): Date | null {
   return value ? new Date(value) : null;
 }
 
+/** أيام الوعد للعرض: «٣–٤ أيام» للمدى، أو «يومين» */
+export function orderDaysLabel(order: Pick<LocalOrder, "promisedDays" | "promisedDaysMin">): string {
+  return dayRangeWord(order.promisedDaysMin ?? order.promisedDays, order.promisedDays);
+}
+
 function legsFor(order: LocalOrder): PromiseLeg[] | null {
+  // طلبات المرحلة 6 تحمل أجزاء وعدها كما حُسبت عند الطلب
+  if (order.promiseLegs) return order.promiseLegs.map((leg) => ({ label: leg.label, days: leg.daysMax, daysMin: leg.daysMin }));
   const part = ZONES.flatMap((z) => z.parts).find((p) => p.oem === order.partOem && p.avail !== false);
   const city = CITIES.find((c) => c.n === order.cityName);
   if (!part || !city) return null;
@@ -71,6 +82,18 @@ export function orderProgress(order: LocalOrder): OrderProgress {
   const confirmedDone = order.confirmedAt !== null && !failed;
   const paidAt = toDate(order.paidAt);
   const fit = order.mode === "fit";
+  // المرحلة 6: الدفع تحكمه الحالة (قاعدة 11) — أخضر فوري، وكهرماني بلا دفع حتى التأكيد ثم رابط ١٢ ساعة —
+  // ومصدر القطعة مستقل عنها: مخزون المركز المشحون لأبعد المدن كهرماني
+  const fromStock = order.fromStock === true;
+  const immediate = order.promiseStatus === "ok";
+  const pendingNote =
+    order.promiseStatus === "ok"
+      ? "القطعة في مخزون المركز — نرسل لك رابط الدفع مباشرة على واتساب."
+      : order.promiseStatus === "wait"
+        ? fromStock
+          ? "القطعة في مخزون المركز — نؤكد الشحن إلى مدينتك، ثم يصلك رابط دفع صالح ١٢ ساعة."
+          : "نتأكد من التوفر والسعر، ثم يصلك رابط دفع صالح ١٢ ساعة."
+        : "نتأكد من المورد، ونرسل لك السعر المفصّل على واتساب.";
 
   const stages: OrderStage[] = [
     {
@@ -83,13 +106,13 @@ export function orderProgress(order: LocalOrder): OrderProgress {
     },
     {
       key: "confirmed",
-      label: failed ? "لم تتوفر القطعة" : "تأكيد التوفر والسعر",
+      label: failed ? "لم تتوفر القطعة" : immediate ? "تأكيد الطلب ورابط الدفع" : "تأكيد التوفر والسعر",
       short: "التأكيد",
       note: failed
         ? "سجّلناها في قائمة الطلب المفقود، ونبلغك فور توفرها."
         : confirmedDone
           ? "أكّدنا التوفر، والسعر مثبّت ولا يتغير بعد التأكيد."
-          : "نتأكد من المورد، ونرسل لك السعر المفصّل على واتساب.",
+          : pendingNote,
       at: toDate(order.confirmedAt),
       state: failed ? "failed" : confirmedDone || paid ? "done" : "current",
     },
@@ -107,7 +130,7 @@ export function orderProgress(order: LocalOrder): OrderProgress {
       key: "prep",
       label: "تجهيز القطعة",
       short: "التجهيز",
-      note: "من المورد إلى مركز حائل، وصور كل مرحلة تصلك على واتساب.",
+      note: fromStock ? "من مخزون المركز مباشرة، وصور كل مرحلة تصلك على واتساب." : "من المورد إلى مركز حائل، وصور كل مرحلة تصلك على واتساب.",
       at: null,
       state: delivered ? "done" : paid ? "current" : "next",
     },
@@ -141,7 +164,9 @@ export function orderProgress(order: LocalOrder): OrderProgress {
         ? "قيد التجهيز"
         : order.status === "confirmed"
           ? "بانتظار موافقتك"
-          : "بانتظار تأكيد التوفر";
+          : immediate
+            ? "بانتظار رابط الدفع"
+            : "بانتظار تأكيد التوفر";
 
   return {
     stages,
