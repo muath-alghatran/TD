@@ -3686,3 +3686,286 @@ html[data-motion="ok"] .journey-replay {
     stroke-dashoffset: 0;
   }
 }
+
+/*═══════════════════════════════════════════════════════════════
+  قطع الغيار لكل الماركات (المرحلة 5): البحث · كل القطع · بطاقة الشفافية
+═══════════════════════════════════════════════════════════════*/
+
+/* بحث القطع — النتائج تحت الحقل مباشرة (لا تغطي الفئات) */
+.ps-field {
+  position: relative;
+}
+.ps-ic {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 14px;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+.ps-input {
+  padding-inline-start: 42px;
+}
+.ps-pop {
+  margin-top: 6px;
+  border: 1px solid var(--accent);
+  background: var(--bg);
+}
+.ps-list {
+  padding: 4px 0;
+}
+.ps-hd {
+  padding: 10px 12px 4px;
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.ps-opt {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  border-inline-start: 2px solid transparent;
+}
+.ps-opt[data-active] {
+  background: var(--tint);
+  border-inline-start-color: var(--accent);
+}
+.ps-opt-main {
+  min-width: 0;
+}
+.ps-name {
+  display: block;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 15.5px;
+  line-height: 1.35;
+}
+.ps-alias {
+  display: block;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.ps-opt-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex: none;
+}
+.ps-from {
+  font-size: 12px;
+  color: var(--muted);
+}
+.ps-mark {
+  background: var(--tint);
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 3px;
+}
+.ps-empty:first-child {
+  border-top: 0;
+}
+.ps-empty {
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-2);
+  border-top: 1px solid var(--hair);
+}
+.ps-miss {
+  display: block;
+  width: 100%;
+  padding: 11px 12px;
+  border-top: 1px solid var(--divider);
+  text-align: start;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink-accent);
+}
+.ps-miss:hover {
+  background: var(--tint);
+}
+.ps-wa {
+  margin-top: 10px;
+}
+
+/* كل القطع: الفئات الـ14 قابلة للطي */
+.pcat-list {
+  margin-top: 10px;
+  border-top: 1px solid var(--divider);
+}
+.pcat {
+  border-bottom: 1px solid var(--divider);
+}
+.pcat > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 0;
+  cursor: pointer;
+  list-style: none;
+}
+.pcat > summary::-webkit-details-marker {
+  display: none;
+}
+.pcat-name {
+  flex: 1;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 16.5px;
+}
+.pcat-count {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.pcat-chev {
+  flex: none;
+  color: var(--muted);
+}
+.pcat[open] .pcat-chev {
+  transform: rotate(180deg);
+}
+.pcat ul {
+  padding-bottom: 10px;
+}
+.pcat-type {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 12px;
+  text-align: start;
+  border-inline-start: 2px solid var(--hair);
+}
+.pcat-type:hover {
+  background: var(--tint);
+  border-inline-start-color: var(--accent);
+}
+.pcat-type-name {
+  flex: 1;
+  font-size: 15px;
+}
+.pcat-type-price {
+  font-size: 12.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.pcat-go {
+  flex: none;
+  color: var(--accent);
+}
+
+/* بطاقة الشفافية: الجودة جنباً إلى جنب (حتى 3 ظاهرة) */
+.tier-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.tier-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 10px;
+  border: 1px solid var(--divider);
+  text-align: start;
+  color: var(--fg);
+}
+.tier-cell:hover {
+  border-color: var(--accent);
+}
+.tier-cell[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--tint);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.tier-name {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.3;
+}
+.tier-price {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.tier-price b {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--fg);
+}
+.tier-note {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.tier-more {
+  margin-top: 8px;
+}
+.tier-none {
+  padding: 14px;
+  border: 1px dashed var(--dash);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-2);
+}
+.part-terms {
+  margin-top: 22px;
+}
+.part-terms li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.part-terms li + li {
+  border-top: 1px solid var(--hair);
+}
+.part-terms svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--accent);
+}
+.part-terms b {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  margin-inline-end: 4px;
+}
+@media (max-width: 380px) {
+  .tier-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* بحث القطع في الرئيسية */
+.home-search {
+  margin-top: 22px;
+  padding-bottom: 28px;
+}
+/* زر المسح الأصلي في حقول البحث لا يتبع الرموز — Escape يمسح */
+.ps-input::-webkit-search-cancel-button,
+.hsearch-row .input::-webkit-search-cancel-button {
+  appearance: none;
+}
+.hsearch-title {
+  display: block;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+.hsearch-row {
+  display: flex;
+  gap: 8px;
+}
+.hsearch-row .input {
+  flex: 1;
+  min-width: 0;
+}

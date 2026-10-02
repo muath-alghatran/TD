@@ -1,44 +1,64 @@
 "use client";
 
-import Link from "next/link";
-import { useState } from "react";
-import { PromiseVerdict } from "@/components/vehicle/PromiseVerdict";
-import { ReceivingStep } from "@/components/vehicle/ReceivingStep";
-import { VehicleDiagramLevel1 } from "@/components/vehicle/VehicleDiagramLevel1";
-import { VehicleDiagramLevel2 } from "@/components/vehicle/VehicleDiagramLevel2";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { PartTypeCard } from "@/components/parts/PartTypeCard";
+import { PartsBrowser } from "@/components/parts/PartsBrowser";
+import type { SearchVehicle } from "@/components/parts/PartSearch";
 import { VehicleIdentifyForm, type VehicleIdentifyResult } from "@/components/vehicle/VehicleIdentifyForm";
-import { RegMarks } from "@/components/ui/Sheet";
-import { toArabicDigits } from "@/lib/format";
-import { saveVehicleToGarage, type GaragedVehicle } from "@/lib/garage";
-import { orderCode, type LocalOrder } from "@/lib/orders";
-import type { PromiseMode } from "@/lib/promise-engine";
-import { ZONES, type CatalogPart, type CatalogZone } from "@/lib/zone-catalog";
-
-type Step = "identify" | "diagram1" | "diagram2" | "receiving" | "verdict" | "outcome";
-
-interface ReceivingChoice {
-  cityName: string;
-  mode: PromiseMode;
-}
+import { saveVehicleToGarage, vehicleLabel, type GaragedVehicle } from "@/lib/garage";
+import { findPartType } from "@/lib/parts-offer";
 
 /** الفئة لا تُسأل في التحديد اليدوي — تُحدَّد عند التأكيد، ورقم الهيكل يساعد */
 const UNKNOWN_TRIM = "الفئة غير محددة — قد تختلف بعض القطع";
 
-/** تدفق طلب قطع الغيار: تحديد السيارة ← المخطط ← القطعة ← الاستلام ← الوعد. */
-export function PartsOrderFlow({
-  initialVehicle,
-  onHome,
-}: {
-  /** سيارة محفوظة من "كراجي" — إن مُرِّرت، يبدأ التدفق مباشرة من المخطط العام بدل تعريف مركبة جديدة. */
-  initialVehicle?: GaragedVehicle;
-  onHome: () => void;
-}) {
-  const [step, setStep] = useState<Step>(initialVehicle ? "diagram1" : "identify");
+function toSearchVehicle(v: GaragedVehicle): SearchVehicle {
+  return { make: v.make, model: v.model, year: v.year, label: vehicleLabel(v), generationCode: v.generationCode ?? "", vin: v.vin };
+}
+
+/** يضيف ‎?part=‎ للرابط أو يحذفه — مع بقية المعاملات كما هي */
+function partUrl(key: string | null): string {
+  const params = new URLSearchParams(window.location.search);
+  if (key) params.set("part", key);
+  else params.delete("part");
+  const qs = params.toString();
+  return qs ? `?${qs}` : window.location.pathname;
+}
+
+/**
+ * تدفق قطع الغيار لكل الماركات (المرحلة 5): تحديد السيارة ← البحث أو «كل القطع» ← بطاقة
+ * الشفافية ← طلب عبر واتساب. البطاقة المفتوحة في الرابط (‎?part=‎)، فزر الرجوع يعود للقائمة.
+ * المخطط والوعد (VehicleDiagramLevel1/2، ReceivingStep، PromiseVerdict) يعودان لهوندا في المرحلة 6.
+ */
+export function PartsOrderFlow({ initialVehicle, initialQuery = "" }: { initialVehicle?: GaragedVehicle; initialQuery?: string }) {
+  const searchParams = useSearchParams();
   const [saved, setSaved] = useState<GaragedVehicle | null>(initialVehicle ?? null);
-  const [selectedZone, setSelectedZone] = useState<CatalogZone | null>(null);
-  const [selectedPart, setSelectedPart] = useState<CatalogPart | null>(null);
-  const [receivingChoice, setReceivingChoice] = useState<ReceivingChoice | null>(null);
-  const [finalOrder, setFinalOrder] = useState<LocalOrder | null>(null);
+  const [query, setQuery] = useState(initialQuery);
+  const pushedCard = useRef(false);
+  // الرجوع من بطاقة يعيد القائمة كما تُركت: الفئات المفتوحة، وموضع التمرير، والتركيز على ما فتحها
+  const [openCategories, setOpenCategories] = useState<ReadonlySet<string>>(() => new Set());
+  const [returnFocusTo, setReturnFocusTo] = useState<string | null>(null);
+  const browseScroll = useRef(0);
+  const lastStep = useRef<string | null>(null);
+
+  const partKey = searchParams.get("part");
+  const type = partKey ? findPartType(partKey) : undefined;
+  const step = !saved ? "identify" : type ? "card" : "browse";
+
+  useEffect(() => {
+    const backToBrowse = step === "browse" && lastStep.current === "card";
+    window.scrollTo(0, backToBrowse ? browseScroll.current : 0);
+    lastStep.current = step;
+  }, [step, partKey]);
+
+  function toggleCategory(key: string, open: boolean) {
+    setOpenCategories((prev) => {
+      const next = new Set(prev);
+      if (open) next.add(key);
+      else next.delete(key);
+      return next;
+    });
+  }
 
   function handleIdentified(result: VehicleIdentifyResult) {
     const record = saveVehicleToGarage({
@@ -51,107 +71,58 @@ export function PartsOrderFlow({
       plate: "—",
     });
     setSaved(record);
-    setStep("diagram1");
   }
 
-  function resetToIdentify() {
+  function openPart(key: string) {
+    browseScroll.current = window.scrollY;
+    setReturnFocusTo(key);
+    pushedCard.current = true;
+    window.history.pushState(null, "", partUrl(key));
+  }
+
+  function closePart() {
+    // رجعنا من بطاقة فتحناها نحن ← خطوة للخلف؛ ومن رابط مباشر ← نحذف المعامل فقط
+    if (pushedCard.current) {
+      pushedCard.current = false;
+      window.history.back();
+    } else {
+      window.history.replaceState(null, "", partUrl(null));
+    }
+  }
+
+  function changeVehicle() {
+    if (partKey) window.history.replaceState(null, "", partUrl(null));
     setSaved(null);
-    setSelectedZone(null);
-    setSelectedPart(null);
-    setReceivingChoice(null);
-    setFinalOrder(null);
-    setStep("identify");
   }
 
   return (
     <main className="stage">
-      {step === "identify" && <VehicleIdentifyForm onIdentified={handleIdentified} />}
-
-      {step === "diagram1" && saved && (
-        <VehicleDiagramLevel1
-          vehicleLabel={`${saved.make} ${saved.model} ${toArabicDigits(saved.year)}`}
-          vehicleTrim={saved.trim}
-          vehicleVin={saved.vin}
-          onSelectZone={(zoneId) => {
-            const zone = ZONES.find((z) => z.id === zoneId) ?? null;
-            setSelectedZone(zone);
-            setStep("diagram2");
-          }}
-          onChangeVehicle={resetToIdentify}
-        />
-      )}
-
-      {step === "diagram2" && saved && selectedZone && (
-        <VehicleDiagramLevel2
-          zone={selectedZone}
-          vehicle={{ make: saved.make, model: saved.model, year: saved.year }}
-          onBack={() => setStep("diagram1")}
-          onPickPart={(part) => {
-            setSelectedPart(part);
-            setStep("receiving");
-          }}
-        />
-      )}
-
-      {step === "receiving" && selectedPart && (
-        <ReceivingStep
-          part={selectedPart}
-          onBack={() => setStep("diagram2")}
-          onIssuePromise={(cityName, mode) => {
-            setReceivingChoice({ cityName, mode });
-            setStep("verdict");
-          }}
-        />
-      )}
-
-      {step === "verdict" && selectedPart && receivingChoice && saved && (
-        <PromiseVerdict
-          part={selectedPart}
-          cityName={receivingChoice.cityName}
-          mode={receivingChoice.mode}
-          vehicle={{
-            id: saved.id,
-            vin: saved.vin,
-            make: saved.make,
-            model: saved.model,
-            year: saved.year,
-            generationCode: saved.generationCode ?? "",
-          }}
-          onBack={() => setStep("receiving")}
-          onOutcome={(order) => {
-            setFinalOrder(order);
-            setStep("outcome");
-          }}
-        />
-      )}
-
-      {step === "outcome" && finalOrder && (
-        <section>
-          <div className="lede">
-            <span className="t-eyebrow">تم إرسال طلبك · {orderCode(finalOrder.id)}</span>
-            <h1>
-              راجع رسالة واتساب
-              <br />
-              <em>وأرسلها لتأكيد الطلب</em>
-            </h1>
-            <p>
-              {finalOrder.partName} · {finalOrder.partOem}
-            </p>
-          </div>
-          <div className="sheet">
-            <RegMarks />
-            <div className="memo" style={{ marginTop: 0 }}>
-              <b>لم يُخصم أي مبلغ.</b> فتحنا لك محادثة واتساب برسالة الطلب جاهزة — أرسلها ونؤكد التوفر والسعر
-              والدفع معك مباشرة هناك.
+      {step === "identify" && (
+        <>
+          {query.trim() && (
+            <div className="memo" role="status" style={{ marginBottom: 18 }}>
+              <b>حدّد سيارتك أولاً</b> — ثم نعرض لك نتائج «{query.trim()}».
             </div>
-            <Link className="act" style={{ marginTop: 14 }} href={`/orders/${finalOrder.id}`}>
-              تابع طلبك خطوة بخطوة
-            </Link>
-            <button className="act act-2" style={{ marginTop: 10 }} onClick={onHome}>
-              الرئيسية
-            </button>
-          </div>
-        </section>
+          )}
+          <VehicleIdentifyForm onIdentified={handleIdentified} />
+        </>
+      )}
+
+      {step === "browse" && saved && (
+        <PartsBrowser
+          vehicle={toSearchVehicle(saved)}
+          initialQuery={query}
+          onQueryChange={setQuery}
+          onPick={openPart}
+          onChangeVehicle={changeVehicle}
+          openCategories={openCategories}
+          onToggleCategory={toggleCategory}
+          returnFocusTo={returnFocusTo}
+        />
+      )}
+
+      {step === "card" && saved && type && (
+        <PartTypeCard key={type.key} type={type} vehicle={toSearchVehicle(saved)} onBack={closePart} />
       )}
     </main>
   );

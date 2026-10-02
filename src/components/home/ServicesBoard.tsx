@@ -3,7 +3,7 @@ import { Corners } from "@/components/ui/Corners";
 import { Icon, type IconName } from "@/components/ui/Icon";
 
 const SERVICES: { no: string; href: string; name: string; hint: string; icon: IconName }[] = [
-  { no: "01", href: "/parts", name: "قطع الغيار", hint: "وعد تسليم محسوب", icon: "cog" },
+  { no: "01", href: "/parts", name: "قطع الغيار", hint: "لكل الماركات · بالاسم الذي تعرفه", icon: "cog" },
   { no: "02", href: "/booking", name: "حجز موعد فحص", hint: "اختر اليوم والساعة", icon: "calendarCheck" },
   { no: "03", href: "/tow", name: "طلب سطحة", hint: "مجانية عند موافقتك على السعر", icon: "truck" },
   { no: "04", href: "/orders", name: "تتبع الطلب", hint: "خطوة بخطوة بالصور والفيديو", icon: "route" },
