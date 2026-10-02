@@ -10,12 +10,10 @@ import {
   displayPrice,
   findPartType,
   fromPrice,
-  partAvailability,
   qualityOptions,
   tierLabel,
 } from "./parts-offer";
-import { CATALOG_MAKES } from "./vehicle-catalog";
-import { buildPartNotFoundMessage, buildPartRequestMessage } from "./whatsapp-requests";
+import { buildPartNotFoundMessage } from "./whatsapp-requests";
 
 const read = (name: string) => readFileSync(new URL(`../../docs/data/${name}`, import.meta.url), "utf8");
 const GLOSSARY = parsePartsGlossary(read("parts-glossary-seed.csv"));
@@ -65,14 +63,6 @@ describe("سلامة القاموس وقائمة الأسعار", () => {
   });
 });
 
-describe("لا أخضر قبل مخزون حقيقي (البرومت 0-6)", () => {
-  it("لكل ماركة في الكتالوج ولكل نوع: التوفر ليس «متوفر»", () => {
-    for (const make of CATALOG_MAKES) {
-      for (const type of PART_TYPES) expect(partAvailability(make, type.key), `${make} ${type.key}`).not.toBe("ok");
-    }
-  });
-});
-
 describe("عرض الأسعار الاسترشادية", () => {
   const base = { showListPrices: true, listPricesIncludeVat: false, vatRate: 0.15 };
 
@@ -112,24 +102,8 @@ describe("عرض الأسعار الاسترشادية", () => {
   });
 });
 
-describe("رسائل القطع على واتساب", () => {
+describe("«ما لقيت قطعتي» على واتساب", () => {
   const vehicle = { label: "تويوتا كامري ٢٠١٧", generationCode: "XV50", vin: "" };
-
-  it("الطلب يحمل السيارة وجيلها والقطعة وطرفها والجودة والسعر شاملاً", () => {
-    const msg = buildPartRequestMessage({ vehicle, partName: "شمعة أمامية", details: ["يمين"], tier: "كوري", price: 228.85 });
-    expect(msg).toContain("الجيل: XV50");
-    expect(msg).toContain("القطعة: شمعة أمامية — يمين");
-    expect(msg).toContain("الجودة: كوري");
-    expect(msg).toContain("السعر الاسترشادي: 228.85 ر.س شامل الضريبة");
-    expect(msg).toContain("قبل أي دفع");
-  });
-
-  it("بلا سعر ولا جودة: «عند التأكيد» وعرض الخيارات", () => {
-    const msg = buildPartRequestMessage({ vehicle: { ...vehicle, generationCode: "" }, partName: "بطارية", details: [], tier: null, price: null });
-    expect(msg).toContain("السعر: عند التأكيد");
-    expect(msg).toContain("أرجو عرض الخيارات المتوفرة");
-    expect(msg).toContain("الجيل: يُحدَّد عند التأكيد من رقم الهيكل");
-  });
 
   it("«ما لقيت قطعتي» ينقل النص كما كتبه العميل", () => {
     expect(buildPartNotFoundMessage({ vehicle, searchText: "لمبة خلفية" })).toContain("«لمبة خلفية»");

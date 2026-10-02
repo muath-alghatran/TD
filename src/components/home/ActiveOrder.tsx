@@ -74,7 +74,11 @@ export function ActiveOrder() {
               <span className="t-disp" style={{ fontSize: 19 }}>
                 خلال
               </span>
-              <span className="big">{toArabicDigits(order.promisedDays)}</span>
+              <span className="big">
+                {order.promisedDaysMin !== undefined && order.promisedDaysMin < order.promisedDays
+                  ? `${toArabicDigits(order.promisedDaysMin)}–${toArabicDigits(order.promisedDays)}`
+                  : toArabicDigits(order.promisedDays)}
+              </span>
               <span style={{ fontSize: 15 }}>{order.promisedDays >= 3 && order.promisedDays <= 10 ? "أيام" : "يوم"} من الدفع</span>
             </div>
             <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 6 }}>

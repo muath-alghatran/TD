@@ -7,6 +7,7 @@ import { StatusPill } from "@/components/ui/StatusPill";
 import { Tag } from "@/components/ui/Tag";
 import { logDemandGap } from "@/lib/demand-gap";
 import { toArabicDigits } from "@/lib/format";
+import { orderDaysLabel } from "@/lib/order-progress";
 import { findOrderVehicle, getGaragedVehicles } from "@/lib/garage";
 import { listLocalOrders, orderCode, updateLocalOrder, type LocalOrder, type OrderStatus } from "@/lib/orders";
 import { buildSupplierMessage } from "@/lib/whatsapp-message";
@@ -117,7 +118,8 @@ export default function AdminOrdersPage() {
                     {order.partName}
                   </div>
                   <div className="t-data" style={{ fontSize: 11.5, color: "var(--text-3)", marginTop: 2 }}>
-                    {orderCode(order.id)} · {order.partOem} · {vehicleLabelFor(order)}
+                    {orderCode(order.id)}
+                    {order.partOem ? ` · ${order.partOem}` : ""} · {vehicleLabelFor(order)}
                   </div>
                 </div>
                 <StatusPill status={meta.pill} label={meta.label} />
@@ -126,11 +128,14 @@ export default function AdminOrdersPage() {
               <div className="mt-2.5 flex flex-wrap gap-2">
                 <Tag>{order.cityName}</Tag>
                 <Tag>{order.mode === "fit" ? "تركيب" : "توصيل"}</Tag>
-                <Tag>{toArabicDigits(order.totalPrice.toFixed(2))} ريال</Tag>
+                <Tag>
+                  {order.pricePending ? "السعر عند التأكيد" : `${toArabicDigits(order.totalPrice.toFixed(2))} ريال${order.priceIndicative ? " · استرشادي" : ""}`}
+                </Tag>
+                {order.promiseStatus === "ok" && <Tag>من المخزون · دفع فوري</Tag>}
                 <Tag>{toArabicDigits(Math.round(order.confidenceAtOrder * 100))}% ثقة</Tag>
                 {order.actualDays !== null && (
                   <Tag>
-                    الوعد {toArabicDigits(order.promisedDays)} · الفعلي {toArabicDigits(order.actualDays)}
+                    الوعد {orderDaysLabel(order)} · الفعلي {toArabicDigits(order.actualDays)}
                   </Tag>
                 )}
               </div>

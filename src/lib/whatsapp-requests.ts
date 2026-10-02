@@ -2,7 +2,7 @@
  * رسائل واتساب لطلبات الحجز والسطحة والمتابعة — نفس نهج whatsapp-checkout.ts:
  * رابط wa.me مُعبّأ مسبقاً يراجعه العميل ويرسله بنفسه، ثم يؤكَّد الطلب بشرياً.
  */
-import { formatListPrice, formatWholePrice, formatYearRange } from "./format";
+import { formatWholePrice, formatYearRange } from "./format";
 import { orderCode, type LocalOrder } from "./orders";
 import type { FaceliftPackage } from "./packages";
 import { buildWhatsAppLink, generationLine } from "./whatsapp-checkout";
@@ -81,35 +81,6 @@ function vehicleLines(vehicle: PartRequestVehicle): (string | null)[] {
   return [`السيارة: ${vehicle.label}`, generationLine(vehicle.generationCode), vehicle.vin ? `رقم الهيكل: ${vehicle.vin}` : null];
 }
 
-/**
- * «اطلب عبر واتساب» من بطاقة القطعة (المرحلة 5): النوع وطرفه والجودة المختارة وسعرها
- * الاسترشادي — والمركز يؤكد التوفر والسعر والموعد قبل أي دفع (قواعد 11 و14 و15).
- */
-export function buildPartRequestMessage(input: {
-  vehicle: PartRequestVehicle;
-  partName: string;
-  /** «يمين» · «فوق» … */
-  details: string[];
-  /** اسم الجودة للعرض، أو null حين لم يختر */
-  tier: string | null;
-  /** السعر المعروض شاملاً الضريبة، أو null */
-  price: number | null;
-}): string {
-  const detail = input.details.filter(Boolean).join(" · ");
-  return [
-    "طلب قطعة غيار — Trust Drive",
-    "",
-    ...vehicleLines(input.vehicle),
-    `القطعة: ${input.partName}${detail ? ` — ${detail}` : ""}`,
-    input.tier ? `الجودة: ${input.tier}` : "الجودة: أرجو عرض الخيارات المتوفرة",
-    input.price !== null ? `السعر الاسترشادي: ${formatListPrice(input.price)} ر.س شامل الضريبة` : "السعر: عند التأكيد",
-    "",
-    "أرجو تأكيد التوفر والسعر والموعد قبل أي دفع.",
-  ]
-    .filter((line): line is string => line !== null)
-    .join("\n");
-}
-
 /** «ما لقيت قطعتي» — يصل المركز النص كما كتبه العميل */
 export function buildPartNotFoundMessage(input: { vehicle: PartRequestVehicle | null; searchText: string }): string {
   return [
@@ -135,7 +106,9 @@ export function buildVehicleNotListedMessage(vehicleText: string): string {
 }
 
 export function buildOrderFollowUpMessage(order: LocalOrder): string {
-  return [`استفسار عن طلب ${orderCode(order.id)} — Trust Drive`, `القطعة: ${order.partName} (${order.partOem})`].join("\n");
+  // طلب من قائمة الأسعار بلا رقم قطعة بعد — يحدده المركز عند التأكيد
+  const part = order.partOem ? `${order.partName} (${order.partOem})` : order.partName;
+  return [`استفسار عن طلب ${orderCode(order.id)} — Trust Drive`, `القطعة: ${part}`].join("\n");
 }
 
 export const HELLO_MESSAGE = "السلام عليكم، عندي استفسار — Trust Drive";

@@ -10,6 +10,7 @@
     "test": "vitest run",
     "catalog:vehicles": "tsx scripts/build-vehicle-catalog.ts",
     "catalog:parts": "tsx scripts/build-parts-data.ts",
+    "catalog:honda": "tsx scripts/build-honda-inventory.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {

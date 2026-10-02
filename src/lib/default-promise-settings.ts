@@ -10,4 +10,7 @@ export const DEFAULT_PROMISE_SETTINGS: PromiseSettings = {
   fitDays: 1,
   internalStockConfidence: 0.99,
   weakSupplierBaseConfidence: 0.5,
+  supplyMinDays: 3,
+  supplyMaxDays: 4,
+  supplyConfidence: 0.75,
 };

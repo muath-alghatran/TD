@@ -2,68 +2,61 @@
 
 import { useState } from "react";
 import { Ruler } from "@/components/ui/Ruler";
-import { STATUS_LABEL } from "@/components/ui/StatusPill";
-import { CITIES } from "@/lib/city-catalog";
-import { zoneStatus } from "@/lib/catalog-promise";
-import { toArabicDigits } from "@/lib/format";
-import { groupVin } from "@/lib/vin";
-import { LAYERS, ZONES, type CatalogZone } from "@/lib/zone-catalog";
+import { dayRangeWord, toArabicDigits, typesWord } from "@/lib/format";
+import { DEFAULT_PROMISE_SETTINGS } from "@/lib/default-promise-settings";
+import { DIAGRAM_LAYERS, DIAGRAM_ZONES, partsInZone, type DiagramZone } from "@/lib/diagram-zones";
+import { partStatus, type PartVehicle } from "@/lib/part-promise";
+import type { PromiseStatus } from "@/lib/promise-engine";
 
-const LIT: Record<string, string> = {
+const LIT: Record<PromiseStatus, string> = {
   ok: "var(--ok-lit)",
   wait: "var(--wait-lit)",
   spec: "var(--spec-lit)",
 };
 
-const DEFAULT_CITY = CITIES[0]; // حائل — قبل بناء شاشة اختيار المدينة (المرحلة 5)
+const SUPPLY = dayRangeWord(DEFAULT_PROMISE_SETTINGS.supplyMinDays, DEFAULT_PROMISE_SETTINGS.supplyMaxDays);
 
-function covered(zone: CatalogZone) {
-  return zone.parts.filter((p) => p.avail !== false).length;
+interface ZoneState {
+  zone: DiagramZone;
+  types: number;
+  inStock: number;
+  status: PromiseStatus;
 }
 
-export function VehicleDiagramLevel1({
-  vehicleLabel,
-  vehicleTrim,
-  vehicleVin,
-  onSelectZone,
-  onChangeVehicle,
-}: {
-  vehicleLabel: string;
-  vehicleTrim: string;
-  vehicleVin: string;
-  onSelectZone: (zoneId: string) => void;
-  onChangeVehicle: () => void;
-}) {
-  const [layer, setLayer] = useState<string>(LAYERS[0]);
-  const [readout, setReadout] = useState<{ zone: CatalogZone; status: string } | null>(null);
+/** حالة المنطقة لسيارة: خضراء إن كان فيها نوع في مخزون المركز، وإلا كهرمانية (توريد) */
+function zoneState(zone: DiagramZone, vehicle: PartVehicle): ZoneState {
+  const keys = partsInZone(zone.id);
+  const inStock = keys.filter((key) => partStatus(vehicle, key) === "ok").length;
+  return { zone, types: keys.length, inStock, status: inStock > 0 ? "ok" : "wait" };
+}
 
-  function peek(zone: CatalogZone) {
-    setReadout({ zone, status: zoneStatus(zone, DEFAULT_CITY) });
-  }
+function statusText(state: ZoneState): string {
+  return state.status === "ok" ? `${toArabicDigits(state.inStock)} في مخزون المركز` : `توريد ${SUPPLY}`;
+}
+
+/**
+ * مخطط المركبة — المستوى الأول (المرحلة 6): لهوندا فقط. المناطق الثماني بأنواع القطع من
+ * القاموس — خضراء بمخزون المركز الحقيقي لجيل السيارة، وكهرمانية بوعد التوريد.
+ */
+export function VehicleDiagramLevel1({
+  vehicle,
+  selectedZone,
+  onSelectZone,
+}: {
+  vehicle: PartVehicle;
+  selectedZone: string | null;
+  onSelectZone: (zoneId: string) => void;
+}) {
+  const [layer, setLayer] = useState<string>(DIAGRAM_LAYERS[0]);
+  const states = DIAGRAM_ZONES.map((zone) => zoneState(zone, vehicle));
+  const [readout, setReadout] = useState<ZoneState | null>(null);
+  const shown = readout ?? states.find((s) => s.zone.id === selectedZone) ?? null;
 
   return (
-    <section>
-      <div className="vplate">
-        <div className="ic">
-          <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
-            <path d="M3 13.5l1.7-4.8A2.2 2.2 0 0 1 6.8 7h10.4a2.2 2.2 0 0 1 2.1 1.7L21 13.5V18h-2.4M3 18v-4.5M3 18h2.4m13.2 0H5.4" />
-            <circle cx="7.4" cy="18" r="1.8" />
-            <circle cx="16.6" cy="18" r="1.8" />
-          </svg>
-        </div>
-        <div>
-          <strong>{vehicleLabel}</strong>
-          <small>{vehicleTrim}</small>
-          {vehicleVin && <div className="t-data">{groupVin(vehicleVin)}</div>}
-        </div>
-        <button className="chg" onClick={onChangeVehicle}>
-          تغيير
-        </button>
-      </div>
-
+    <section aria-label="مخطط المركبة">
       <div className="layers">
-        {LAYERS.map((l) => (
-          <button key={l} className="lay" aria-pressed={l === layer} onClick={() => setLayer(l)}>
+        {DIAGRAM_LAYERS.map((l) => (
+          <button key={l} type="button" className="lay" aria-pressed={l === layer} onClick={() => setLayer(l)}>
             {l}
           </button>
         ))}
@@ -71,11 +64,11 @@ export function VehicleDiagramLevel1({
 
       <div className="field">
         <div className="field-hd">
-          <span className="t-eyebrow">مخطط المركبة — المستوى الأول</span>
+          <span className="t-eyebrow">مخطط المركبة — اختر منطقة</span>
           <span className="t-data">PLATE 01 · GENERAL ARRANGEMENT</span>
         </div>
         <div className="plate">
-          <svg viewBox="0 0 900 400" role="img" aria-label="مخطط جانبي للمركبة بمناطق تفاعلية">
+          <svg viewBox="0 0 900 400" role="group" aria-label="مخطط جانبي للمركبة بمناطق تفاعلية">
             <Ruler />
             <line className="ln ln-fine" x1={40} y1={359} x2={862} y2={359} strokeDasharray="6 7" />
             <g>
@@ -101,10 +94,10 @@ export function VehicleDiagramLevel1({
               <circle className="ln ln-fine drawn" pathLength={1} style={{ animationDelay: "1.15s" }} cx={664} cy={300} r={33} />
             </g>
             <g>
-              {ZONES.map((zone, i) => {
-                const status = zoneStatus(zone, DEFAULT_CITY);
+              {states.map((state, i) => {
+                const { zone, status } = state;
                 const color = LIT[status];
-                const off = layer !== LAYERS[0] && zone.layer !== layer;
+                const off = layer !== DIAGRAM_LAYERS[0] && zone.layer !== layer;
                 return (
                   <g
                     key={zone.id}
@@ -112,10 +105,13 @@ export function VehicleDiagramLevel1({
                     style={{ animationDelay: `${1200 + i * 55}ms` }}
                     tabIndex={0}
                     role="button"
-                    aria-label={`${zone.name} — ${covered(zone)} قطعة مغطاة — ${STATUS_LABEL[status]}`}
+                    aria-pressed={selectedZone === zone.id}
+                    aria-label={`${zone.name} — ${typesWord(state.types)} — ${statusText(state)}`}
                     onClick={() => onSelectZone(zone.id)}
-                    onMouseEnter={() => peek(zone)}
-                    onFocus={() => peek(zone)}
+                    onMouseEnter={() => setReadout(state)}
+                    onMouseLeave={() => setReadout(null)}
+                    onFocus={() => setReadout(state)}
+                    onBlur={() => setReadout(null)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
@@ -130,7 +126,7 @@ export function VehicleDiagramLevel1({
                       {i + 1}
                     </text>
                     <text className="cov" x={zone.x} y={zone.y + 38}>
-                      {covered(zone)}/{zone.total}
+                      {state.types}
                     </text>
                   </g>
                 );
@@ -139,33 +135,29 @@ export function VehicleDiagramLevel1({
           </svg>
         </div>
         <div className="readout">
-          {readout ? (
+          {shown ? (
             <>
-              <span className="t-data">{readout.zone.ref}</span>
+              <span className="t-data">{shown.zone.ref}</span>
               <span>
-                <b>{readout.zone.name}</b> · {toArabicDigits(covered(readout.zone))} من{" "}
-                {toArabicDigits(readout.zone.total)} قطعة مغطاة
+                <b>{shown.zone.name}</b> — {typesWord(shown.types)}
               </span>
-              <span className={`stat ${readout.status}`} style={{ marginInlineStart: "auto" }}>
+              <span className={`stat ${shown.status}`} style={{ marginInlineStart: "auto" }}>
                 <i />
-                {STATUS_LABEL[readout.status as "ok" | "wait" | "spec"]}
+                {statusText(shown)}
               </span>
             </>
           ) : (
-            <span className="idle">مرّر على أي موضع — الرقم أسفل النقطة هو عدد القطع المغطاة فيه</span>
+            <span className="idle">اختر موضعاً — الرقم أسفل النقطة عدد أنواع القطع فيه</span>
           )}
         </div>
       </div>
 
       <div className="key">
         <span>
-          <i style={{ background: "var(--ok-lit)" }} /> متوفر ومؤكد
+          <i style={{ background: "var(--ok-lit)" }} /> في مخزون المركز · دفع فوري
         </span>
         <span>
-          <i style={{ background: "var(--wait-lit)" }} /> يحتاج تأكيد المورد
-        </span>
-        <span>
-          <i style={{ background: "var(--spec-lit)" }} /> طلب خاص
+          <i style={{ background: "var(--wait-lit)" }} /> توريد {SUPPLY} · بعد تأكيد المركز
         </span>
       </div>
     </section>

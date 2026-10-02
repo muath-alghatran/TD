@@ -9,6 +9,7 @@
  * بشرية خارج التطبيق، ثم تُحدَّث الحالة يدوياً من /admin/orders.
  */
 import { notifyLocalChange } from "./local-events";
+import type { PromiseStatus } from "./promise-engine";
 
 export const ORDERS_STORAGE_KEY = "td-orders-local";
 
@@ -43,6 +44,26 @@ export interface LocalOrder {
   shipCost?: number;
   warrantyMonths?: number | null;
   qualityTier?: string | null;
+  /**
+   * ── المرحلة 6: طلب نوع قطعة من القاموس ──
+   * promisedDays يبقى الحد الأعلى (الموعد = الدفع + الأعلى، قاعدة 13) والأدنى هنا.
+   */
+  partKey?: string;
+  promisedDaysMin?: number;
+  /** ok مخزون المركز (دفع فوري) · wait توريد بالمدى (بلا دفع حتى التأكيد) — قاعدة 11 */
+  promiseStatus?: PromiseStatus;
+  /** أجزاء الوعد كما حُسبت عند الطلب — «كيف حسبنا الموعد» */
+  promiseLegs?: { label: string; daysMin: number; daysMax: number }[];
+  /** سعر القائمة الاسترشادي — يُثبَّت عند التأكيد (قاعدة 15) */
+  priceIndicative?: boolean;
+  /** لا سعر بعد للقطعة: نوع بلا سعر أو لم تُختر جودة */
+  pricePending?: boolean;
+  /** أجرة التركيب تُحدَّد عند التأكيد */
+  laborPending?: boolean;
+  laborHours?: number | null;
+  /** الطرف والموضع — «يمين · فوق» */
+  details?: string;
+  notes?: string;
 }
 
 export function listLocalOrders(): LocalOrder[] {

@@ -2,11 +2,14 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { PartTypeCard } from "@/components/parts/PartTypeCard";
+import { PartOrderOutcome } from "@/components/parts/PartOrderOutcome";
+import { PartOrderStep } from "@/components/parts/PartOrderStep";
+import { PartTypeCard, type PartChoice } from "@/components/parts/PartTypeCard";
 import { PartsBrowser } from "@/components/parts/PartsBrowser";
 import type { SearchVehicle } from "@/components/parts/PartSearch";
 import { VehicleIdentifyForm, type VehicleIdentifyResult } from "@/components/vehicle/VehicleIdentifyForm";
 import { saveVehicleToGarage, vehicleLabel, type GaragedVehicle } from "@/lib/garage";
+import type { LocalOrder } from "@/lib/orders";
 import { findPartType } from "@/lib/parts-offer";
 
 /** الفئة لا تُسأل في التحديد اليدوي — تُحدَّد عند التأكيد، ورقم الهيكل يساعد */
@@ -26,9 +29,9 @@ function partUrl(key: string | null): string {
 }
 
 /**
- * تدفق قطع الغيار لكل الماركات (المرحلة 5): تحديد السيارة ← البحث أو «كل القطع» ← بطاقة
- * الشفافية ← طلب عبر واتساب. البطاقة المفتوحة في الرابط (‎?part=‎)، فزر الرجوع يعود للقائمة.
- * المخطط والوعد (VehicleDiagramLevel1/2، ReceivingStep، PromiseVerdict) يعودان لهوندا في المرحلة 6.
+ * تدفق قطع الغيار (المرحلتان 5 و6): تحديد السيارة ← البحث أو «كل القطع» (وهوندا: المخطط) ←
+ * بطاقة الشفافية ← نموذج الطلب (الاستلام والوعد والسعر) ← طلب في «طلباتي» ورسالة واتساب.
+ * البطاقة المفتوحة في الرابط (‎?part=‎)، فزر الرجوع يعود للقائمة.
  */
 export function PartsOrderFlow({ initialVehicle, initialQuery = "" }: { initialVehicle?: GaragedVehicle; initialQuery?: string }) {
   const searchParams = useSearchParams();
@@ -40,10 +43,16 @@ export function PartsOrderFlow({ initialVehicle, initialQuery = "" }: { initialV
   const [returnFocusTo, setReturnFocusTo] = useState<string | null>(null);
   const browseScroll = useRef(0);
   const lastStep = useRef<string | null>(null);
+  const [selectedZone, setSelectedZone] = useState<string | null>(null);
+  // اختيار البطاقة (الجودة والطرف) يبقى عند الرجوع من نموذج الطلب، والنموذج مربوط بقطعته
+  const [draft, setDraft] = useState<{ key: string; choice: PartChoice } | null>(null);
+  const [orderFor, setOrderFor] = useState<string | null>(null);
+  const [placed, setPlaced] = useState<LocalOrder | null>(null);
 
   const partKey = searchParams.get("part");
   const type = partKey ? findPartType(partKey) : undefined;
-  const step = !saved ? "identify" : type ? "card" : "browse";
+  const ordering = partKey !== null && orderFor === partKey && draft?.key === partKey;
+  const step = !saved ? "identify" : placed ? "done" : type ? (ordering ? "order" : "card") : "browse";
 
   useEffect(() => {
     const backToBrowse = step === "browse" && lastStep.current === "card";
@@ -74,6 +83,7 @@ export function PartsOrderFlow({ initialVehicle, initialQuery = "" }: { initialV
   }
 
   function openPart(key: string) {
+    setOrderFor(null);
     browseScroll.current = window.scrollY;
     setReturnFocusTo(key);
     pushedCard.current = true;
@@ -92,7 +102,15 @@ export function PartsOrderFlow({ initialVehicle, initialQuery = "" }: { initialV
 
   function changeVehicle() {
     if (partKey) window.history.replaceState(null, "", partUrl(null));
+    setSelectedZone(null);
     setSaved(null);
+  }
+
+  function another() {
+    setPlaced(null);
+    setDraft(null);
+    setOrderFor(null);
+    closePart();
   }
 
   return (
@@ -118,12 +136,37 @@ export function PartsOrderFlow({ initialVehicle, initialQuery = "" }: { initialV
           openCategories={openCategories}
           onToggleCategory={toggleCategory}
           returnFocusTo={returnFocusTo}
+          selectedZone={selectedZone}
+          onSelectZone={(zoneId) => setSelectedZone((current) => (current === zoneId ? null : zoneId))}
         />
       )}
 
       {step === "card" && saved && type && (
-        <PartTypeCard key={type.key} type={type} vehicle={toSearchVehicle(saved)} onBack={closePart} />
+        <PartTypeCard
+          key={type.key}
+          type={type}
+          vehicle={toSearchVehicle(saved)}
+          initialChoice={draft?.key === type.key ? draft.choice : null}
+          onBack={closePart}
+          onOrder={(choice) => {
+            setDraft({ key: type.key, choice });
+            setOrderFor(type.key);
+          }}
+        />
       )}
+
+      {step === "order" && saved && type && draft && (
+        <PartOrderStep
+          type={type}
+          vehicle={toSearchVehicle(saved)}
+          vehicleId={saved.id}
+          choice={draft.choice}
+          onBack={() => setOrderFor(null)}
+          onPlaced={setPlaced}
+        />
+      )}
+
+      {step === "done" && placed && <PartOrderOutcome order={placed} onAnother={another} />}
     </main>
   );
 }

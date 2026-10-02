@@ -30,6 +30,20 @@ export function formatYearRange(from: number, to: number): string {
   return toArabicDigits(`${from}–${to}`);
 }
 
+/** عدد أنواع القطع سرداً: «نوع واحد» · «نوعان» · «٩ أنواع» · «٤٢ نوعاً» */
+export function typesWord(n: number): string {
+  if (n === 1) return "نوع واحد";
+  if (n === 2) return "نوعان";
+  if (n <= 10) return `${toArabicDigits(n)} أنواع`;
+  return `${toArabicDigits(n)} نوعاً`;
+}
+
+/** مدى الوعد سرداً: «٣–٤ أيام»، أو «يومين» حين يتساوى الحدّان */
+export function dayRangeWord(min: number, max: number): string {
+  if (min >= max) return dayWord(max);
+  return `${toArabicDigits(min)}–${toArabicDigits(max)} أيام`;
+}
+
 export function dayWord(days: number): string {
   if (days === 1) return "يوم واحد";
   if (days === 2) return "يومين";

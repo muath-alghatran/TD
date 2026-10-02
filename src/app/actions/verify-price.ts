@@ -1,56 +1,45 @@
 "use server";
 
 /**
- * تحقق سعر خادمي — docs/payment-spec.md §8: "السعر يُعاد التحقق منه في
- * الخادم" قبل أي دفع. لا يثق بأي سعر/وعد قادم من العميل — يعيد اشتقاق
- * كل شيء من src/lib/zone-catalog.ts خادمياً.
+ * تحقق خادمي من عرض القطعة قبل إنشاء الطلب — قاعدة 18 وdocs/payment-spec.md §8: «السعر
+ * يُعاد التحقق منه في الخادم». لا يثق بأي سعر أو وعد قادم من العميل: يعيد اشتقاق الخيار
+ * (مخزون هوندا أو قائمة الأسعار) والسعر والوعد من بيانات الخادم (المرحلة 6).
  */
-import { catalogPartPromise } from "@/lib/catalog-promise";
 import { CITIES } from "@/lib/city-catalog";
-import type { PromiseMode, PromiseStatus } from "@/lib/promise-engine";
-import { PRICING_SETTINGS } from "@/lib/pricing-settings";
-import { ZONES } from "@/lib/zone-catalog";
+import { offerPricing, offerPromise, partOptions, type OfferPricing, type OfferPromise, type PartOption, type PartVehicle } from "@/lib/part-promise";
+import { findPartType } from "@/lib/parts-offer";
+import type { PromiseMode } from "@/lib/promise-engine";
 
-export interface VerifiedPrice {
-  oem: string;
+export interface VerifiedOffer {
+  partKey: string;
   partName: string;
-  unitPrice: number;
-  laborCost: number;
-  discount: number;
-  shipCost: number;
-  total: number;
-  days: number;
-  confidence: number;
-  status: PromiseStatus;
-}
-
-export async function verifyPrice(input: {
-  oem: string;
+  /** null حين لم تُختر جودة — يعرض المركز الخيارات عند التأكيد */
+  option: PartOption | null;
   cityName: string;
   mode: PromiseMode;
-}): Promise<VerifiedPrice | null> {
-  const part = ZONES.flatMap((zone) => zone.parts).find((p) => p.oem === input.oem);
-  if (!part || part.avail === false) return null;
+  pricing: OfferPricing;
+  promise: OfferPromise;
+}
 
+export async function verifyPartOffer(input: {
+  vehicle: PartVehicle;
+  partKey: string;
+  optionId: string | null;
+  cityName: string;
+  mode: PromiseMode;
+}): Promise<VerifiedOffer | null> {
+  const type = findPartType(input.partKey);
+  if (!type) return null;
   const city = CITIES.find((c) => c.n === input.cityName) ?? CITIES[0];
-  const result = catalogPartPromise(part, city, input.mode);
-
-  const laborCost = input.mode === "fit" ? (part.hrs ?? 0) * PRICING_SETTINGS.hourRate : 0;
-  const discount = laborCost * PRICING_SETTINGS.fitDiscount;
-  const shipCost = input.mode === "fit" ? 0 : city.c;
-  const unitPrice = part.price ?? 0;
-  const total = unitPrice + shipCost + laborCost - discount;
-
+  const mode: PromiseMode = input.mode === "fit" ? "fit" : "ship";
+  const option = input.optionId ? (partOptions(input.vehicle, type.key).find((o) => o.id === input.optionId) ?? null) : null;
   return {
-    oem: part.oem,
-    partName: part.n,
-    unitPrice,
-    laborCost,
-    discount,
-    shipCost,
-    total,
-    days: result.days,
-    confidence: result.confidence,
-    status: result.status,
+    partKey: type.key,
+    partName: type.name,
+    option,
+    cityName: city.n,
+    mode,
+    pricing: offerPricing(option, city, mode),
+    promise: offerPromise(option, city, mode),
   };
 }
