@@ -5,9 +5,9 @@ import { Corners } from "@/components/ui/Corners";
 import { Icon } from "@/components/ui/Icon";
 import { SearchSelect } from "@/components/ui/SearchSelect";
 import { logDemandGap } from "@/lib/demand-gap";
-import { toArabicDigits } from "@/lib/format";
+import { formatYearRange, toArabicDigits } from "@/lib/format";
 import { FEATURE_FORM_OCR, extractVehicleForm } from "@/lib/ocr";
-import { VEHICLE_CATALOG } from "@/lib/vehicle-catalog";
+import { CATALOG_MAKES, catalogYears, generationsFor, makeOptions, modelOptions, resolveModel } from "@/lib/vehicle-catalog";
 import { cleanVinInput, isCompleteVin } from "@/lib/vin";
 import { buildVehicleNotListedMessage, buildWhatsAppLink } from "@/lib/whatsapp-requests";
 import { VinField } from "./VinField";
@@ -18,15 +18,21 @@ export interface VehicleIdentifyResult {
   year: number;
   /** فارغ حين لا يُدخله العميل */
   vin: string;
+  /** رمز الجيل (قاعدة 7) — فارغ حين لا يُعرف فيحدده المركز عند التأكيد */
+  generationCode: string;
 }
 
-const MAKES = Object.keys(VEHICLE_CATALOG);
+/** خيار «لا أعرف» في سؤال الجيل */
+const GENERATION_UNKNOWN = "unknown";
+const MAKE_OPTIONS = makeOptions();
 
 /** «حدّد سيارتك»: الماركة ← الموديل ← السنة، ثم رقم الهيكل اختيارياً */
 export function VehicleIdentifyForm({ onIdentified }: { onIdentified: (result: VehicleIdentifyResult) => void }) {
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
+  /** اختيار العميل في سنة التحول — مفتاح الجيل أو «لا أعرف» */
+  const [generationPick, setGenerationPick] = useState<string | null>(null);
   const [vin, setVin] = useState("");
 
   const [notListedOpen, setNotListedOpen] = useState(false);
@@ -38,16 +44,27 @@ export function VehicleIdentifyForm({ onIdentified }: { onIdentified: (result: V
   const [reading, setReading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const models = make ? Object.keys(VEHICLE_CATALOG[make]) : [];
-  const years = make && model ? VEHICLE_CATALOG[make][model] : [];
+  const models = make ? modelOptions(make) : [];
+  const years = make && model ? catalogYears(make, model) : [];
+  const generations = make && model && year ? generationsFor(make, model, Number(year)) : [];
+  const askGeneration = generations.length > 1;
+  const generationKey = (g: (typeof generations)[number]) => `${g.generationCode}|${g.yearFrom}`;
+  const generationCode = askGeneration
+    ? (generations.find((g) => generationKey(g) === generationPick)?.generationCode ?? "")
+    : (generations[0]?.generationCode ?? "");
   const vinOk = vin === "" || isCompleteVin(vin);
-  const canContinue = Boolean(make && model && year) && vinOk;
+  const canContinue = Boolean(make && model && year) && vinOk && (!askGeneration || generationPick !== null);
   const notListedValue = notListedText.trim();
 
   function chooseMake(next: string) {
     setMake(next);
     setModel("");
-    setYear("");
+    chooseYear("");
+  }
+
+  function chooseYear(next: string) {
+    setYear(next);
+    setGenerationPick(null);
   }
 
   function openNotListed(prefill: string) {
@@ -91,12 +108,12 @@ export function VehicleIdentifyForm({ onIdentified }: { onIdentified: (result: V
     const read = await extractVehicleForm(file);
     setReading(false);
     const readMake = read.make.value;
-    if (VEHICLE_CATALOG[readMake]) {
+    if (CATALOG_MAKES.includes(readMake)) {
       chooseMake(readMake);
-      const readModel = read.model.value;
-      if (VEHICLE_CATALOG[readMake][readModel]) {
+      const readModel = resolveModel(readMake, read.model.value);
+      if (readModel) {
         setModel(readModel);
-        if (VEHICLE_CATALOG[readMake][readModel].includes(read.year.value)) setYear(String(read.year.value));
+        if (catalogYears(readMake, readModel).includes(read.year.value)) chooseYear(String(read.year.value));
       }
     }
     setVin(cleanVinInput(read.vin.value).value);
@@ -105,7 +122,7 @@ export function VehicleIdentifyForm({ onIdentified }: { onIdentified: (result: V
   function submit(e: FormEvent) {
     e.preventDefault();
     if (!canContinue) return;
-    onIdentified({ make, model, year: Number(year), vin });
+    onIdentified({ make, model, year: Number(year), vin, generationCode });
   }
 
   return (
@@ -144,7 +161,7 @@ export function VehicleIdentifyForm({ onIdentified }: { onIdentified: (result: V
           <SearchSelect
             label="الماركة"
             placeholder="اكتب أو اختر — مثل: تويوتا"
-            options={MAKES.map((m) => ({ value: m, label: m }))}
+            options={MAKE_OPTIONS}
             value={make}
             onChange={chooseMake}
             renderEmpty={(q) => notListedAction(q)}
@@ -154,11 +171,11 @@ export function VehicleIdentifyForm({ onIdentified }: { onIdentified: (result: V
           <SearchSelect
             label="الموديل"
             placeholder={make ? "اكتب أو اختر الموديل" : "اختر الماركة أولاً"}
-            options={models.map((m) => ({ value: m, label: m }))}
+            options={models}
             value={model}
             onChange={(next) => {
               setModel(next);
-              setYear("");
+              chooseYear("");
             }}
             disabled={!make}
             renderEmpty={(q) => notListedAction(`${make} ${q}`)}
@@ -170,13 +187,52 @@ export function VehicleIdentifyForm({ onIdentified }: { onIdentified: (result: V
             placeholder={model ? "اكتب أو اختر السنة" : "اختر الموديل أولاً"}
             options={years.map((y) => ({ value: String(y), label: toArabicDigits(y) }))}
             value={year}
-            onChange={setYear}
+            onChange={chooseYear}
             disabled={!model}
             renderEmpty={(q) => notListedAction(`${make} ${model} ${q}`)}
           />
         </div>
 
-        <VinField value={vin} onChange={setVin} selectedMake={make} knownMakes={MAKES} onSwitchMake={chooseMake} />
+        {askGeneration && (
+          <fieldset className="form-block">
+            <legend className="label">أي جيل؟</legend>
+            <p className="hint" style={{ marginTop: 0, marginBottom: 10 }}>
+              سنة {toArabicDigits(year)} فيها جيلان من {model}، وبعض القطع تختلف بينهما.
+            </p>
+            {generations.map((g, i) => (
+              <button
+                key={generationKey(g)}
+                type="button"
+                className="choice"
+                aria-pressed={generationPick === generationKey(g)}
+                onClick={() => setGenerationPick(generationKey(g))}
+              >
+                <span className="dot" />
+                <span className="gen-say">
+                  <span className="gen-name">
+                    {i === 0 ? "الجيل الأقدم" : "الجيل الأحدث"}
+                    {g.generationCode && <span className="t-code gen-code">{g.generationCode}</span>}
+                  </span>
+                  <span className="gen-sub">موديلات {formatYearRange(g.yearFrom, g.yearTo)}</span>
+                </span>
+              </button>
+            ))}
+            <button
+              type="button"
+              className="choice"
+              aria-pressed={generationPick === GENERATION_UNKNOWN}
+              onClick={() => setGenerationPick(GENERATION_UNKNOWN)}
+            >
+              <span className="dot" />
+              <span className="gen-say">
+                <span className="gen-name">لا أعرف</span>
+                <span className="gen-sub">يحدده المركز من رقم الهيكل عند التأكيد</span>
+              </span>
+            </button>
+          </fieldset>
+        )}
+
+        <VinField value={vin} onChange={setVin} selectedMake={make} knownMakes={CATALOG_MAKES} onSwitchMake={chooseMake} />
 
         <div className="form-block">
           <button type="submit" className="btn btn-primary btn-lg btn-block blueprint" disabled={!canContinue}>

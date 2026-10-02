@@ -17,6 +17,8 @@ export interface GaragedVehicle {
   trim: string;
   /** رقم الهيكل — اختياري للعميل، فيُخزَّن غيابه قيمةً فارغة */
   vin: string;
+  /** رمز الجيل من كتالوج السيارات (قاعدة 7). غائب في السجلات الأقدم، وفارغ حين لا يُعرف */
+  generationCode?: string;
   plate: string;
   savedAt: string;
 }

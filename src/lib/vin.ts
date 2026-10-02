@@ -141,6 +141,9 @@ const WMI_TABLE: Record<string, { make: string; country: string | null }> = {
   "5G3": { make: "جمس", country: "أمريكا" },
 };
 
+/** الماركات التي يعرفها جدول الرمز — أسماء كتالوج السيارات تطابقها (اختبار في vehicle-catalog.test.ts) */
+export const WMI_MAKES: ReadonlySet<string> = new Set(Object.values(WMI_TABLE).map((entry) => entry.make));
+
 export const VIN_LENGTH = 17;
 
 /** جدول ISO 3779 لرمز السنة في الخانة العاشرة — دورة 30 عاماً، بلا I/O/Q/U/Z */

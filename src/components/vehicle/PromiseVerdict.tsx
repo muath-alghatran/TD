@@ -47,6 +47,8 @@ export interface VerdictVehicle {
   make: string;
   model: string;
   year: number;
+  /** فارغ حين لا يُعرف — يحدده المركز عند التأكيد */
+  generationCode: string;
 }
 
 export function PromiseVerdict({
@@ -135,6 +137,7 @@ export function PromiseVerdict({
     const message = buildPartsOrderMessage({
       vehicleLabel: vehicleLabel(vehicle),
       vin: vehicle.vin,
+      generationCode: vehicle.generationCode,
       partName: verified.partName,
       partOem: verified.oem,
       cityName,
