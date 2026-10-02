@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { KsaPlate } from "@/components/garage/KsaPlate";
 import { RoadTrack } from "@/components/orders/RoadTrack";
 import { ActButton } from "@/components/ui/ActButton";
@@ -44,6 +45,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     </section>
   );
 }
+
+/** أداة تطويرية لمراجعة نظام التصميم — لا تُفهرس */
+export const metadata: Metadata = { title: "دليل التصميم", robots: { index: false, follow: false } };
 
 export default function StyleguidePage() {
   return (

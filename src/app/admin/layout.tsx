@@ -1,5 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
+
+/** أداة تطويرية حتى المرحلة 7 (المصادقة) — لا تُفهرس */
+export const metadata: Metadata = { title: "لوحة التحكم", robots: { index: false, follow: false } };
 
 const NAV_ITEMS = [
   { href: "/admin", label: "الرئيسية" },
