@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import Image from "next/image";
+import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { verifyPartOffer } from "@/app/actions/verify-price";
+import { Shield, Wordmark } from "@/components/brand/Brand";
 import { Corners } from "@/components/ui/Corners";
 import { Icon } from "@/components/ui/Icon";
+import { SearchSelect, type SearchOption } from "@/components/ui/SearchSelect";
+import { Sheet } from "@/components/ui/Sheet";
 import { StatusPill } from "@/components/ui/StatusPill";
-import { CENTER } from "@/lib/center-info";
+import { CENTER, FACADE_FOCUS, FACADE_PHOTO } from "@/lib/center-info";
 import { CITIES } from "@/lib/city-catalog";
 import { dayRangeWord, formatHours, formatListPrice, formatPrice, toArabicDigits } from "@/lib/format";
 import { orderCode, createLocalOrder } from "@/lib/orders";
@@ -14,16 +18,20 @@ import { tierLabel, type PartType } from "@/lib/parts-offer";
 import { PRICING_SETTINGS } from "@/lib/pricing-settings";
 import type { PromiseMode } from "@/lib/promise-engine";
 import { buildPartsOrderMessage, buildWhatsAppLink } from "@/lib/whatsapp-checkout";
+import { ConfidenceGauge } from "./ConfidenceGauge";
 import type { PlacedOrder } from "./PartOrderOutcome";
 import type { PartChoice } from "./PartTypeCard";
 import type { SearchVehicle } from "./PartSearch";
 
 const CENTER_CITY = CITIES.find((c) => c.n === CENTER.city) ?? CITIES[0];
+const CITY_OPTIONS: SearchOption[] = CITIES.map((c) => ({ value: c.n, label: c.n }));
 
 /**
  * نموذج طلب القطعة (المرحلة 6): السيارة + النوع + الطرف + الجودة وسعرها + الاستلام + ملاحظات.
  * الوعد يُحسب من الدفع (قاعدة 13)، والسعر يُعاد اشتقاقه في الخادم قبل الطلب (قاعدة 18).
  * مخزون المركز = دفع فوري، والتوريد = بلا دفع حتى يؤكد المركز ثم رابط ١٢ ساعة (قواعد 11 و14 و15).
+ * التصميم (ملاحظات المالك، الجولة 1): بطاقة التركيب الفاخرة بشعار المركز وصورة واجهته، وبطاقة التوصيل
+ * الأبسط — مجموعة اختيار واحدة — ثم مشهد الوعد بعدّاد الثقة، والفاتورة في ورقة.
  */
 export function PartOrderStep({
   type,
@@ -45,9 +53,11 @@ export function PartOrderStep({
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [failed, setFailed] = useState(false);
-  const cityId = useId();
+  const recvLabelId = useId();
   const notesId = useId();
   const titleRef = useRef<HTMLHeadingElement>(null);
+  const fitRef = useRef<HTMLButtonElement>(null);
+  const shipRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     titleRef.current?.focus({ preventScroll: true });
   }, []);
@@ -137,6 +147,19 @@ export function PartOrderStep({
     onPlaced({ order, whatsappLink, opened: win !== null });
   }
 
+  const statusHead = promise.status === "ok" ? "مضمون الوصول" : "متوقع الوصول";
+  const pillLabel =
+    promise.status === "ok" ? "في مخزون المركز · دفع فوري" : fromStock ? "من مخزون المركز · يؤكده المركز" : "متوقع — يؤكده المركز";
+
+  /** مجموعة اختيار حقيقية: الأسهم تنقل بين البطاقتين وتختار، والمختارة وحدها في ترتيب Tab */
+  function onRadioKey(e: KeyboardEvent<HTMLButtonElement>) {
+    if (!["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"].includes(e.key)) return;
+    e.preventDefault();
+    const next: PromiseMode = mode === "fit" ? "ship" : "fit";
+    setMode(next);
+    (next === "fit" ? fitRef : shipRef).current?.focus();
+  }
+
   return (
     <section aria-labelledby="order-title">
       <button type="button" className="retreat" onClick={onBack}>
@@ -156,46 +179,103 @@ export function PartOrderStep({
       </div>
 
       <div className="form-block">
-        <label className="label" htmlFor={cityId}>
-          المدينة
-        </label>
-        <select id={cityId} value={cityName} onChange={(e) => setCityName(e.target.value)}>
-          {CITIES.map((c) => (
-            <option key={c.n} value={c.n}>
-              {c.n}
-            </option>
-          ))}
-        </select>
+        <SearchSelect label="المدينة" options={CITY_OPTIONS} value={cityName} onChange={setCityName} placeholder="اكتب أو اختر مدينتك" />
       </div>
 
-      <fieldset className="form-block">
-        <legend className="label">طريقة الاستلام</legend>
-        <button type="button" className="choice" aria-pressed={mode === "fit"} onClick={() => setMode("fit")}>
-          <span className="dot" />
-          <span className="gen-say">
-            <span className="gen-name">تركيب في مركز {CENTER.city}</span>
-            <span className="gen-sub">
-              خلال {dayRangeWord(fitPromise.daysMin, fitPromise.days)} من الدفع · ضمان واحد يغطي القطعة والتركيب معاً
+      <div className="form-block">
+        <span className="label" id={recvLabelId}>
+          طريقة الاستلام
+        </span>
+        <div className="recv" role="radiogroup" aria-labelledby={recvLabelId}>
+          <button
+            ref={fitRef}
+            type="button"
+            role="radio"
+            aria-checked={mode === "fit"}
+            aria-labelledby={`${recvLabelId}-fit`}
+            aria-describedby={`${recvLabelId}-fit-perks`}
+            tabIndex={mode === "fit" ? 0 : -1}
+            className="recv-card recv-fit steel blueprint"
+            onClick={() => setMode("fit")}
+            onKeyDown={onRadioKey}
+          >
+            <Corners />
+            <span className="recv-media duotone">
+              <Image
+                src={FACADE_PHOTO}
+                alt=""
+                fill
+                sizes="(max-width: 720px) 100vw, 680px"
+                style={{ objectFit: "cover", objectPosition: FACADE_FOCUS }}
+              />
             </span>
-          </span>
-        </button>
-        <button type="button" className="choice" aria-pressed={mode === "ship"} onClick={() => setMode("ship")}>
-          <span className="dot" />
-          <span className="gen-say">
-            <span className="gen-name">{city.n === CENTER.city ? `استلام أو توصيل في ${city.n}` : `توصيل إلى ${city.n}`}</span>
-            <span className="gen-sub">
-              خلال {dayRangeWord(shipPromise.daysMin, shipPromise.days)} من الدفع · الشحن{" "}
-              {city.c === 0 ? (
-                "مجاني"
-              ) : (
-                <>
-                  <span className="t-data">{formatListPrice(city.c)}</span> ر.س
-                </>
-              )}
+            <span className="recv-shade" aria-hidden="true" />
+            <span className="recv-badge">الأنسب لك</span>
+            <span className="recv-check" aria-hidden="true">
+              <Icon name="check" size={14} />
             </span>
-          </span>
-        </button>
-      </fieldset>
+            <span className="recv-brand" aria-hidden="true">
+              <Shield size={30} />
+              <Wordmark tone="light" height={12} />
+            </span>
+            <span className="recv-body">
+              <span className="recv-center">مركز ترست درايف · {CENTER.city}</span>
+              <span className="recv-title" id={`${recvLabelId}-fit`}>
+                تركيب في مركز {CENTER.city}
+              </span>
+              <span className="recv-perks" id={`${recvLabelId}-fit-perks`}>
+                <span className="recv-perk">
+                  <Icon name="scrollText" size={17} />
+                  ضمان واحد يغطي القطعة والتركيب معاً
+                </span>
+                <span className="recv-perk">
+                  <Icon name="clock" size={17} />
+                  خلال {dayRangeWord(fitPromise.daysMin, fitPromise.days)} من الدفع
+                </span>
+                {PRICING_SETTINGS.fitDiscount > 0 && (
+                  <span className="recv-perk">
+                    <Icon name="receipt" size={17} />
+                    خصم «اطلب وركّب» على أجرة اليد {toArabicDigits(Math.round(PRICING_SETTINGS.fitDiscount * 100))}٪
+                  </span>
+                )}
+                <span className="recv-perk">
+                  <Icon name="camera" size={17} />
+                  صور كل مرحلة على واتساب
+                </span>
+              </span>
+            </span>
+          </button>
+
+          <button
+            ref={shipRef}
+            type="button"
+            role="radio"
+            aria-checked={mode === "ship"}
+            tabIndex={mode === "ship" ? 0 : -1}
+            className="recv-card recv-ship"
+            onClick={() => setMode("ship")}
+            onKeyDown={onRadioKey}
+          >
+            <span className="recv-check" aria-hidden="true">
+              <Icon name="check" size={14} />
+            </span>
+            <Icon name="truck" size={24} className="recv-ship-ic" />
+            <span>
+              <span className="recv-title">{city.n === CENTER.city ? `استلام أو توصيل في ${city.n}` : `توصيل إلى ${city.n}`}</span>
+              <span className="recv-sub">
+                خلال {dayRangeWord(shipPromise.daysMin, shipPromise.days)} من الدفع · الشحن{" "}
+                {city.c === 0 ? (
+                  "مجاني"
+                ) : (
+                  <>
+                    <span className="t-data">{formatListPrice(city.c)}</span> ر.س
+                  </>
+                )}
+              </span>
+            </span>
+          </button>
+        </div>
+      </div>
 
       <div className="form-block">
         <label className="label" htmlFor={notesId}>
@@ -204,6 +284,7 @@ export function PartOrderStep({
         <textarea
           id={notesId}
           className="textarea"
+          rows={3}
           value={notes}
           maxLength={300}
           onChange={(e) => setNotes(e.target.value)}
@@ -211,35 +292,39 @@ export function PartOrderStep({
         />
       </div>
 
-      <div className="blueprint order-sum">
-        <Corners />
-        <div className="order-promise">
-          <StatusPill
-            status={promise.status}
-            label={
-              promise.status === "ok" ? "في مخزون المركز · دفع فوري" : fromStock ? "من مخزون المركز · يؤكده المركز" : "متوقع — يؤكده المركز"
-            }
-          />
-          <div className="order-days">
-            خلال <b>{dayRangeWord(promise.daysMin, promise.days)}</b> من الدفع
+      {/* مشهد الوعد: حقل فولاذي بعدّاد الثقة — روح PromiseVerdict قبل المرحلة 5 */}
+      <section className="verdict order-verdict" aria-labelledby="order-verdict-head">
+        <StatusPill status={promise.status} label={pillLabel} />
+        <div className="gauge-wrap">
+          <ConfidenceGauge confidence={promise.confidence} status={promise.status} />
+          <div className="order-verdict-say">
+            <div className="say" id="order-verdict-head">
+              {statusHead}
+            </div>
+            <div className="order-days">
+              خلال <b>{dayRangeWord(promise.daysMin, promise.days)}</b> <span className="nowrap">من الدفع</span>
+            </div>
           </div>
-          <ul className="order-legs">
-            {promise.legs.map((leg) => (
-              <li key={leg.label}>
-                <span>{leg.label}</span>
-                <span>{leg.daysMax === 0 ? "فوراً" : dayRangeWord(leg.daysMin, leg.daysMax)}</span>
-              </li>
-            ))}
-          </ul>
         </div>
+        <ul className="order-legs">
+          {promise.legs.map((leg) => (
+            <li key={leg.label}>
+              <span>{leg.label}</span>
+              <span>{leg.daysMax === 0 ? "فوراً" : dayRangeWord(leg.daysMin, leg.daysMax)}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
+      <Sheet className="order-bill">
+        <span className="t-eyebrow">تفصيل الحساب</span>
         <div className="ledger">
           <div className="ledger-row">
             <span>
               {type.name}
               {option ? ` · ${tierLabel(option.tier)}` : ""}
             </span>
-            <span>{pricing.unitPrice === null ? "عند التأكيد" : formatPrice(pricing.unitPrice)}</span>
+            {pricing.unitPrice === null ? <span className="pending">عند التأكيد</span> : <span>{formatPrice(pricing.unitPrice)}</span>}
           </div>
           {mode === "fit" ? (
             <>
@@ -253,7 +338,11 @@ export function PartOrderStep({
                     </>
                   ) : null}
                 </span>
-                <span>{pricing.laborCost === null ? "تُحدَّد عند التأكيد" : formatPrice(pricing.laborCost)}</span>
+                {pricing.laborCost === null ? (
+                  <span className="pending">تُحدَّد عند التأكيد</span>
+                ) : (
+                  <span>{formatPrice(pricing.laborCost)}</span>
+                )}
               </div>
               {pricing.discount > 0 && (
                 <div className="ledger-row credit-line">
@@ -265,15 +354,19 @@ export function PartOrderStep({
           ) : (
             <div className="ledger-row">
               <span>الشحن إلى {city.n}</span>
-              <span>{pricing.shipCost === 0 ? "مجاني" : formatPrice(pricing.shipCost)}</span>
+              {pricing.shipCost === 0 ? <span className="pending">مجاني</span> : <span>{formatPrice(pricing.shipCost)}</span>}
             </div>
           )}
           <div className="ledger-sum">
             <span>{pricing.indicative ? "الإجمالي التقديري" : "الإجمالي"}</span>
-            <span>{pricing.total === null ? "يُحدَّد عند التأكيد" : `${formatPrice(pricing.total)} ر.س`}</span>
+            {pricing.total === null ? (
+              <span className="pending">يُحدَّد عند التأكيد</span>
+            ) : (
+              <span>{`${formatPrice(pricing.total)} ر.س`}</span>
+            )}
           </div>
         </div>
-      </div>
+      </Sheet>
 
       <div className="memo" style={{ marginTop: 14 }}>
         {promise.status === "ok" ? (
