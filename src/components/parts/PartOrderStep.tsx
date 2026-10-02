@@ -9,7 +9,7 @@ import { Icon } from "@/components/ui/Icon";
 import { SearchSelect, type SearchOption } from "@/components/ui/SearchSelect";
 import { Sheet } from "@/components/ui/Sheet";
 import { StatusPill } from "@/components/ui/StatusPill";
-import { CENTER, FACADE_FOCUS, FACADE_PHOTO } from "@/lib/center-info";
+import { CENTER, FACADE_PHOTO } from "@/lib/center-info";
 import { CITIES } from "@/lib/city-catalog";
 import { dayRangeWord, formatHours, formatListPrice, formatPrice, toArabicDigits } from "@/lib/format";
 import { orderCode, createLocalOrder } from "@/lib/orders";
@@ -25,6 +25,8 @@ import type { SearchVehicle } from "./PartSearch";
 
 const CENTER_CITY = CITIES.find((c) => c.n === CENTER.city) ?? CITIES[0];
 const CITY_OPTIONS: SearchOption[] = CITIES.map((c) => ({ value: c.n, label: c.n }));
+/** نقطة تركيز صورة الواجهة في شريط البطاقة العريض — أعلى من الواجهة لتبقى اللافتة في الإطار */
+const FACADE_STRIP_FOCUS = "12% 30%";
 
 /**
  * نموذج طلب القطعة (المرحلة 6): السيارة + النوع + الطرف + الجودة وسعرها + الاستلام + ملاحظات.
@@ -193,7 +195,7 @@ export function PartOrderStep({
             role="radio"
             aria-checked={mode === "fit"}
             aria-labelledby={`${recvLabelId}-fit`}
-            aria-describedby={`${recvLabelId}-fit-perks`}
+            aria-describedby={`${recvLabelId}-fit-badge ${recvLabelId}-fit-perks`}
             tabIndex={mode === "fit" ? 0 : -1}
             className="recv-card recv-fit steel blueprint"
             onClick={() => setMode("fit")}
@@ -206,11 +208,13 @@ export function PartOrderStep({
                 alt=""
                 fill
                 sizes="(max-width: 720px) 100vw, 680px"
-                style={{ objectFit: "cover", objectPosition: FACADE_FOCUS }}
+                style={{ objectPosition: FACADE_STRIP_FOCUS }}
               />
             </span>
             <span className="recv-shade" aria-hidden="true" />
-            <span className="recv-badge">الأنسب لك</span>
+            <span className="recv-badge" id={`${recvLabelId}-fit-badge`}>
+              الأنسب لك
+            </span>
             <span className="recv-check" aria-hidden="true">
               <Icon name="check" size={14} />
             </span>
@@ -354,7 +358,7 @@ export function PartOrderStep({
           ) : (
             <div className="ledger-row">
               <span>الشحن إلى {city.n}</span>
-              {pricing.shipCost === 0 ? <span className="pending">مجاني</span> : <span>{formatPrice(pricing.shipCost)}</span>}
+              <span>{pricing.shipCost === 0 ? "مجاني" : formatPrice(pricing.shipCost)}</span>
             </div>
           )}
           <div className="ledger-sum">
