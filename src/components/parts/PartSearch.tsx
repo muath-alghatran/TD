@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { logDemandGap } from "@/lib/demand-gap";
-import { formatListPrice } from "@/lib/format";
+import { formatListPrice, toArabicDigits } from "@/lib/format";
 import { highlightRanges, searchParts, type PartMatch } from "@/lib/part-search";
 import { createSearchGapTracker, type SearchGapTracker } from "@/lib/part-search-gap";
 import { categoryName, fromPrice } from "@/lib/parts-offer";
@@ -141,6 +141,13 @@ export function PartSearch({
   const listId = `${id}-list`;
   const optionId = (i: number) => `${id}-opt-${i}`;
   const showResults = open && query.trim() !== "";
+  const hasOptions = options.length > 0;
+  // إعلان واحد ثابت لقارئ الشاشة: عدد النتائج أو تعذّر البحث
+  const announcement = !query.trim()
+    ? ""
+    : result.failed
+      ? `ما وجدنا «${query.trim()}» في قاموس القطع`
+      : `${toArabicDigits(options.length)} ${options.length === 1 ? "نتيجة" : "نتائج"}`;
   const notFoundLink = buildWhatsAppLink(buildPartNotFoundMessage({ vehicle, searchText: text.trim() }));
 
   function renderOption(match: PartMatch, i: number) {
@@ -207,8 +214,8 @@ export function PartSearch({
           className="input ps-input"
           type="search"
           role="combobox"
-          aria-expanded={showResults}
-          aria-controls={listId}
+          aria-expanded={showResults && hasOptions}
+          aria-controls={showResults && hasOptions ? listId : undefined}
           aria-autocomplete="list"
           aria-activedescendant={showResults && active >= 0 ? optionId(active) : undefined}
           autoComplete="off"
@@ -229,27 +236,29 @@ export function PartSearch({
 
       {showResults && (
         <div className="ps-pop" onMouseDown={(e) => e.preventDefault()}>
-          <div id={listId} role="listbox" aria-label="نتائج البحث عن قطعة" className="ps-list">
-            {result.best && (
-              <div role="group" aria-labelledby={`${id}-best`}>
-                <div id={`${id}-best`} className="ps-hd">
-                  أفضل تطابق
+          {hasOptions && (
+            <div id={listId} role="listbox" aria-label="نتائج البحث عن قطعة" className="ps-list">
+              {result.best && (
+                <div role="group" aria-labelledby={`${id}-best`}>
+                  <div id={`${id}-best`} className="ps-hd">
+                    أفضل تطابق
+                  </div>
+                  {renderOption(result.best, 0)}
                 </div>
-                {renderOption(result.best, 0)}
-              </div>
-            )}
-            {result.near.length > 0 && (
-              <div role="group" aria-labelledby={`${id}-near`}>
-                <div id={`${id}-near`} className="ps-hd">
-                  {result.best ? "قريب مما تبحث عنه" : "أقرب ما وجدنا"}
+              )}
+              {result.near.length > 0 && (
+                <div role="group" aria-labelledby={`${id}-near`}>
+                  <div id={`${id}-near`} className="ps-hd">
+                    {result.best ? "قريب مما تبحث عنه" : "أقرب ما وجدنا"}
+                  </div>
+                  {result.near.map((m, i) => renderOption(m, i + (result.best ? 1 : 0)))}
                 </div>
-                {result.near.map((m, i) => renderOption(m, i + (result.best ? 1 : 0)))}
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
           {result.failed && (
-            <p className="ps-empty" role="status">
-              ما وجدنا «{query.trim()}» في قاموس القطع — سجّلناها لنضيفها، واطلبها منا مباشرة.
+            <p className="ps-empty">
+              ما وجدنا «{query.trim()}» في قاموس القطع. اطلبها منا مباشرة ونبحث لك عنها.
             </p>
           )}
           <button
@@ -264,6 +273,10 @@ export function PartSearch({
           </button>
         </div>
       )}
+
+      <p className="sr-only" role="status">
+        {announcement}
+      </p>
 
       {(missOpen || (result.failed && query.trim() !== "")) && (
         <a className="btn btn-secondary btn-block ps-wa" href={notFoundLink} target="_blank" rel="noopener noreferrer">

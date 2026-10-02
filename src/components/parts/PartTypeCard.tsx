@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type MouseEvent } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Corners } from "@/components/ui/Corners";
 import { Icon } from "@/components/ui/Icon";
 import { StatusPill } from "@/components/ui/StatusPill";
@@ -15,6 +15,7 @@ import {
   type PartType,
   type QualityTier,
 } from "@/lib/parts-offer";
+import { PRICING_SETTINGS } from "@/lib/pricing-settings";
 import { buildPartRequestMessage, buildWhatsAppLink } from "@/lib/whatsapp-requests";
 import type { SearchVehicle } from "./PartSearch";
 
@@ -30,6 +31,14 @@ export function PartTypeCard({ type, vehicle, onBack }: { type: PartType; vehicl
   const [side, setSide] = useState<string | null>(null);
   const [position, setPosition] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const hintId = useId();
+
+  // فتح البطاقة ينقل التركيز إلى عنوانها — قارئ الشاشة يعلن القطعة ولوحة المفاتيح تبدأ منها
+  useEffect(() => {
+    titleRef.current?.focus({ preventScroll: true });
+  }, []);
 
   const shown = showAll ? options : options.slice(0, VISIBLE_TIERS);
   const hidden = options.length - shown.length;
@@ -37,6 +46,7 @@ export function PartTypeCard({ type, vehicle, onBack }: { type: PartType; vehicl
   const needsSide = modifiers.includes("side") && side === null;
   const needsPosition = modifiers.includes("position") && position === null;
   const ready = !needsSide && !needsPosition;
+  const prices = PRICING_SETTINGS.showListPrices;
 
   const message = buildPartRequestMessage({
     vehicle,
@@ -46,12 +56,10 @@ export function PartTypeCard({ type, vehicle, onBack }: { type: PartType; vehicl
     price: chosen?.price ?? null,
   });
 
-  function request(e: MouseEvent<HTMLAnchorElement>) {
-    if (!ready) {
-      e.preventDefault();
-      return;
-    }
-    setSent(true);
+  function showMore() {
+    setShowAll(true);
+    // التركيز على أول خيار ظهر بدل أن يضيع مع زر «المزيد»
+    requestAnimationFrame(() => gridRef.current?.querySelectorAll<HTMLButtonElement>(".tier-cell")[VISIBLE_TIERS]?.focus());
   }
 
   return (
@@ -63,7 +71,9 @@ export function PartTypeCard({ type, vehicle, onBack }: { type: PartType; vehicl
 
       <div className="lede" style={{ marginTop: 14 }}>
         <span className="t-eyebrow">{categoryName(type.category)}</span>
-        <h1 id="part-title">{type.name}</h1>
+        <h1 id="part-title" ref={titleRef} tabIndex={-1}>
+          {type.name}
+        </h1>
         {type.synonyms.length > 0 && <p>يعرفها السوق أيضاً: {type.synonyms.slice(0, 3).join("، ")}</p>}
       </div>
 
@@ -98,7 +108,7 @@ export function PartTypeCard({ type, vehicle, onBack }: { type: PartType; vehicl
         <legend className="label">الجودة</legend>
         {options.length > 0 ? (
           <>
-            <div className="tier-grid">
+            <div className="tier-grid" ref={gridRef}>
               {shown.map((o) => (
                 <button
                   key={o.tier}
@@ -122,53 +132,66 @@ export function PartTypeCard({ type, vehicle, onBack }: { type: PartType; vehicl
               ))}
             </div>
             {hidden > 0 && (
-              <button type="button" className="btn btn-ghost tier-more" onClick={() => setShowAll(true)}>
+              <button type="button" className="btn btn-ghost tier-more" onClick={showMore}>
                 المزيد ({toArabicDigits(hidden)})
               </button>
             )}
-            <p className="hint">الأسعار شاملة ضريبة القيمة المضافة. اختر جودة، أو اطلب ونعرض عليك المتوفر.</p>
+            <p className="hint">
+              {prices ? "الأسعار شاملة ضريبة القيمة المضافة. " : "الأسعار عند التأكيد. "}
+              اختر جودة، أو اطلب ونعرض عليك ما نؤكده من خيارات.
+            </p>
           </>
         ) : (
-          <div className="tier-none">السعر عند التأكيد — نعرض عليك الخيارات المتوفرة وأسعارها قبل أي دفع.</div>
+          <div className="tier-none">السعر عند التأكيد — نعرض عليك ما نؤكده من خيارات وأسعارها قبل أي دفع.</div>
         )}
       </fieldset>
 
-      <ul className="blueprint part-terms" aria-label="قبل الطلب">
+      <div className="blueprint part-terms">
         <Corners />
-        <li>
-          <Icon name="scrollText" size={18} />
-          <span>
-            <b>الضمان</b> يُحدَّد عند التأكيد
-          </span>
-        </li>
-        <li>
-          <Icon name="car" size={18} />
-          <span>
-            <b>التوافق</b> يتأكد مع {vehicle.label} عند التأكيد{vehicle.vin ? "" : "، ورقم الهيكل يساعد"}
-          </span>
-        </li>
-        <li>
-          <Icon name="receipt" size={18} />
-          <span>
-            <b>الدفع</b> لا دفع قبل أن يؤكد المركز التوفر والسعر والموعد
-          </span>
-        </li>
-      </ul>
+        <ul aria-label="قبل الطلب">
+          <li>
+            <Icon name="scrollText" size={18} />
+            <span>
+              <b>الضمان</b> يُحدَّد عند التأكيد
+            </span>
+          </li>
+          <li>
+            <Icon name="car" size={18} />
+            <span>
+              <b>التوافق</b> يتأكد مع {vehicle.label} عند التأكيد{vehicle.vin ? "" : "، ورقم الهيكل يساعد"}
+            </span>
+          </li>
+          <li>
+            <Icon name="receipt" size={18} />
+            <span>
+              <b>الدفع</b> بعد أن يؤكد المركز التوفر والسعر والموعد
+            </span>
+          </li>
+        </ul>
+      </div>
 
       <div className="form-block">
+        {/* قبل اختيار الطرف لا رابط أصلاً — فلا يتجاوزه «فتح في تبويب جديد» */}
         <a
-          href={buildWhatsAppLink(message)}
+          href={ready ? buildWhatsAppLink(message) : undefined}
+          role="link"
+          tabIndex={0}
           target="_blank"
           rel="noopener noreferrer"
           className="btn btn-primary btn-lg btn-block blueprint"
           aria-disabled={!ready}
-          onClick={request}
+          aria-describedby={ready ? undefined : hintId}
+          onClick={() => ready && setSent(true)}
         >
           <Corners />
           <Icon name="messageCircle" size={20} />
           اطلب عبر واتساب
         </a>
-        {!ready && <p className="hint">اختر {needsSide ? "الطرف" : "الموضع"} للمتابعة.</p>}
+        {!ready && (
+          <p id={hintId} className="hint">
+            اختر {needsSide ? "الطرف" : "الموضع"} للمتابعة.
+          </p>
+        )}
         {sent && (
           <div className="memo" role="status" style={{ marginTop: 12 }}>
             <b>فتحنا لك واتساب برسالة الطلب.</b> أرسلها، ونرد عليك بتأكيد التوفر والسعر والموعد.

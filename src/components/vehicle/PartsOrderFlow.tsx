@@ -35,14 +35,30 @@ export function PartsOrderFlow({ initialVehicle, initialQuery = "" }: { initialV
   const [saved, setSaved] = useState<GaragedVehicle | null>(initialVehicle ?? null);
   const [query, setQuery] = useState(initialQuery);
   const pushedCard = useRef(false);
+  // الرجوع من بطاقة يعيد القائمة كما تُركت: الفئات المفتوحة، وموضع التمرير، والتركيز على ما فتحها
+  const [openCategories, setOpenCategories] = useState<ReadonlySet<string>>(() => new Set());
+  const [returnFocusTo, setReturnFocusTo] = useState<string | null>(null);
+  const browseScroll = useRef(0);
+  const lastStep = useRef<string | null>(null);
 
   const partKey = searchParams.get("part");
   const type = partKey ? findPartType(partKey) : undefined;
   const step = !saved ? "identify" : type ? "card" : "browse";
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const backToBrowse = step === "browse" && lastStep.current === "card";
+    window.scrollTo(0, backToBrowse ? browseScroll.current : 0);
+    lastStep.current = step;
   }, [step, partKey]);
+
+  function toggleCategory(key: string, open: boolean) {
+    setOpenCategories((prev) => {
+      const next = new Set(prev);
+      if (open) next.add(key);
+      else next.delete(key);
+      return next;
+    });
+  }
 
   function handleIdentified(result: VehicleIdentifyResult) {
     const record = saveVehicleToGarage({
@@ -58,6 +74,8 @@ export function PartsOrderFlow({ initialVehicle, initialQuery = "" }: { initialV
   }
 
   function openPart(key: string) {
+    browseScroll.current = window.scrollY;
+    setReturnFocusTo(key);
     pushedCard.current = true;
     window.history.pushState(null, "", partUrl(key));
   }
@@ -97,6 +115,9 @@ export function PartsOrderFlow({ initialVehicle, initialQuery = "" }: { initialV
           onQueryChange={setQuery}
           onPick={openPart}
           onChangeVehicle={changeVehicle}
+          openCategories={openCategories}
+          onToggleCategory={toggleCategory}
+          returnFocusTo={returnFocusTo}
         />
       )}
 

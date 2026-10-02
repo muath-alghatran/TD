@@ -3767,6 +3767,9 @@ html[data-motion="ok"] .journey-replay {
   text-decoration-color: var(--accent);
   text-underline-offset: 3px;
 }
+.ps-empty:first-child {
+  border-top: 0;
+}
 .ps-empty {
   padding: 10px 12px;
   font-size: 13px;
@@ -3897,7 +3900,7 @@ html[data-motion="ok"] .journey-replay {
   color: var(--fg);
 }
 .tier-note {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.45;
   color: var(--muted);
 }
@@ -3944,6 +3947,12 @@ html[data-motion="ok"] .journey-replay {
 /* بحث القطع في الرئيسية */
 .home-search {
   margin-top: 22px;
+  padding-bottom: 28px;
+}
+/* زر المسح الأصلي في حقول البحث لا يتبع الرموز — Escape يمسح */
+.ps-input::-webkit-search-cancel-button,
+.hsearch-row .input::-webkit-search-cancel-button {
+  appearance: none;
 }
 .hsearch-title {
   display: block;

@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { formatListPrice, toArabicDigits } from "@/lib/format";
 import { PART_CATEGORIES, PART_TYPES, fromPrice } from "@/lib/parts-offer";
+import { PRICING_SETTINGS } from "@/lib/pricing-settings";
 import { groupVin } from "@/lib/vin";
 import { PartSearch, type SearchVehicle } from "./PartSearch";
 
@@ -28,15 +30,33 @@ export function PartsBrowser({
   onQueryChange,
   onPick,
   onChangeVehicle,
+  openCategories,
+  onToggleCategory,
+  returnFocusTo,
 }: {
   vehicle: SearchVehicle;
   initialQuery: string;
   onQueryChange: (query: string) => void;
   onPick: (key: string) => void;
   onChangeVehicle: () => void;
+  /** الفئات المفتوحة — تبقى مفتوحة بعد الرجوع من بطاقة قطعة */
+  openCategories: ReadonlySet<string>;
+  onToggleCategory: (key: string, open: boolean) => void;
+  /** القطعة التي فُتحت بطاقتها — يعود إليها التركيز عند الرجوع، وإلا حقل البحث */
+  returnFocusTo: string | null;
 }) {
+  useEffect(() => {
+    if (!returnFocusTo) return;
+    const opener =
+      document.querySelector<HTMLElement>(`.pcat-type[data-key="${returnFocusTo}"]`) ?? document.querySelector<HTMLElement>(".ps-input");
+    opener?.focus({ preventScroll: true });
+  }, [returnFocusTo]);
+
   return (
-    <section aria-label="قطع الغيار">
+    <section aria-labelledby="parts-browser-title">
+      <h1 id="parts-browser-title" className="sr-only">
+        قطع الغيار — {vehicle.label}
+      </h1>
       <div className="vplate">
         <div className="ic">
           <Icon name="car" size={23} />
@@ -62,12 +82,21 @@ export function PartsBrowser({
         </span>
       </div>
       <p className="hint" style={{ marginTop: 6 }}>
-        أسعار استرشادية شاملة الضريبة، تُثبَّت عند التأكيد. والتوافق مع سيارتك يتأكد عند الطلب.
+        {PRICING_SETTINGS.showListPrices ? "أسعار استرشادية شاملة الضريبة، تُثبَّت عند التأكيد. " : "الأسعار عند التأكيد. "}
+        والتوافق مع سيارتك يتأكد عند الطلب.
       </p>
 
       <div className="pcat-list">
         {TYPES_BY_CATEGORY.map((category) => (
-          <details key={category.key} className="pcat">
+          <details
+            key={category.key}
+            className="pcat"
+            open={openCategories.has(category.key)}
+            onToggle={(e) => {
+              const open = e.currentTarget.open;
+              if (open !== openCategories.has(category.key)) onToggleCategory(category.key, open);
+            }}
+          >
             <summary>
               <span className="pcat-name">{category.name}</span>
               <span className="pcat-count">{typesWord(category.types.length)}</span>
@@ -78,7 +107,7 @@ export function PartsBrowser({
                 const from = fromPrice(type.key);
                 return (
                   <li key={type.key}>
-                    <button type="button" className="pcat-type" onClick={() => onPick(type.key)}>
+                    <button type="button" className="pcat-type" data-key={type.key} onClick={() => onPick(type.key)}>
                       <span className="pcat-type-name">{type.name}</span>
                       <span className="pcat-type-price">
                         {from !== null ? (

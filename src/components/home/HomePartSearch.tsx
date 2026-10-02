@@ -1,4 +1,5 @@
 import { Corners } from "@/components/ui/Corners";
+import { PRICING_SETTINGS } from "@/lib/pricing-settings";
 
 /**
  * حقل بحث القطع البارز في الرئيسية (المرحلة 5). نموذج عادي إلى ‎/parts?q=…‎ — يعمل بلا
@@ -28,7 +29,10 @@ export function HomePartSearch() {
             ابحث
           </button>
         </div>
-        <p className="hint">لكل الماركات · بالاسم الذي تعرفه · أسعار استرشادية تُثبَّت عند التأكيد</p>
+        <p className="hint">
+          لكل الماركات · بالاسم الذي تعرفه ·{" "}
+          {PRICING_SETTINGS.showListPrices ? "أسعار استرشادية تُثبَّت عند التأكيد" : "الأسعار عند التأكيد"}
+        </p>
       </form>
     </section>
   );
