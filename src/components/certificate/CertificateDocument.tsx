@@ -181,7 +181,7 @@ export function CertificateDocument({ data }: { data: CertificateData }) {
       )}
 
       <footer className="cert-foot">
-        <QrCode value={data.verifyUrl} size={104} label="رمز QR للتحقق من الشهادة" />
+        <QrCode value={data.verifyUrl} size={116} label="رمز QR للتحقق من الشهادة" />
         <div>
           <p>صادرة إلكترونياً من نظام ترست درايف — تحقّق من صحتها عبر الرمز.</p>
           <p className="t-data cert-link">{data.verifyUrl.replace(/^https?:\/\//, "")}</p>

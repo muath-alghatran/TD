@@ -46,7 +46,7 @@ export function VerifyView({ data, status }: { data: CertificateData; status: Ce
           السيارة
         </h2>
         <p className="verify-car">
-          {vehicleLabel(data.vehicle)} · الجيل <span className="t-data">{data.vehicle.generationCode}</span>
+          {vehicleLabel(data.vehicle)}، الجيل <span className="t-data">{data.vehicle.generationCode}</span>
         </p>
         <p className="hint">
           رقم الهيكل: <span className="t-data">{data.vehicle.vin}</span>

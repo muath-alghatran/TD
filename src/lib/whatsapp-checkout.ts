@@ -13,6 +13,11 @@ export function buildWhatsAppLink(message: string): string {
   return `https://wa.me/${BUSINESS_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
+/** رابط مشاركة بلا رقم — يختار العميل في واتساب لمن يرسل (مشاركة نموذج الشهادة مع مشترٍ أو صديق) */
+export function buildWhatsAppShareLink(message: string): string {
+  return `https://wa.me/?text=${encodeURIComponent(message)}`;
+}
+
 /**
  * سطر الجيل في رسائل القطع (قاعدة 7). فارغ = لم يحدده العميل («لا أعرف» أو جيل بلا رمز)
  * فيُنبَّه المركز ليحدده من رقم الهيكل؛ undefined = لا سطر.

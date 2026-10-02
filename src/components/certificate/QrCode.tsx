@@ -7,7 +7,8 @@ import QRCode from "qrcode";
 export function QrCode({ value, size = 112, label }: { value: string; size?: number; label: string }) {
   const qr = QRCode.create(value, { errorCorrectionLevel: "M" });
   const n = qr.modules.size;
-  const quiet = 2;
+  // المنطقة الهادئة ٤ وحدات كما يطلب معيار QR — ليُقرأ الرمز على الخلفية الداكنة أيضاً
+  const quiet = 4;
   let d = "";
   for (let y = 0; y < n; y++) {
     for (let x = 0; x < n; x++) {
