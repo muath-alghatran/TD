@@ -1,7 +1,7 @@
 # Product Marketing Context — ترست درايف (TD)
 
-**Document version:** v2
-**Last updated:** 2026-10-01
+**Document version:** v3
+**Last updated:** 2026-10-03
 
 > مسودة كُتبت آلياً من المستودع (`src/lib/center-info.ts` · `docs/concept.md` · نص الهوية المعتمد) ومن طلبات صاحب المركز في أكتوبر 2026.
 > كل ما بين `[للتأكيد]` معلومة ناقصة أو افتراض ينتظر تأكيد المركز — لا تُكتب في الموقع قبل تأكيدها.
@@ -183,5 +183,6 @@
 
 ## Changelog
 *Newest first. One line per revision: what changed and why.*
+- v3 (2026-10-03) — Owner feedback round 1: the order page leads with the in-center install card («الأنسب لك»; perks: one written warranty for part and fitting, days from payment, the «اطلب وركّب» labour discount only when set — licence question open, photos of each stage on WhatsApp) and the confidence gauge («مضمون الوصول» / «متوقع الوصول»); the home-page part search was removed (search lives on the parts page only). No FAQ text changed.
 - v2 (2026-10-01) — Added the digital repair certificate (planned) and the order road to Differentiation, five workshop-pain objections that feed the home FAQ, and the owner's decision to show indicative list prices for all brands in the first stage.
 - v1 (2026-10-01) — Initial context: drafted from the codebase (center-info, docs/concept.md, approved identity text) and the owner's October 2026 requests (facelift packages, bodywork photo tracking, six-brand coverage 2008–2027, parts terminology from the Kia file).
