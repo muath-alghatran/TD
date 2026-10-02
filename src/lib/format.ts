@@ -64,6 +64,13 @@ const WEEKDAY = new Intl.DateTimeFormat("ar-SA-u-ca-gregory-nu-arab", { weekday:
 const MONTH = new Intl.DateTimeFormat("ar-SA-u-ca-gregory-nu-arab", { month: "long" });
 const DAY_NUMBER = new Intl.DateTimeFormat("ar-SA-u-ca-gregory-nu-arab", { day: "numeric" });
 
+const FULL_DATE = new Intl.DateTimeFormat("ar-SA-u-ca-gregory-nu-arab", { day: "numeric", month: "long", year: "numeric" });
+
+/** «١ أكتوبر ٢٠٢٦» — تاريخ بالسنة (الشهادة) */
+export function formatFullDate(date: Date): string {
+  return FULL_DATE.format(date);
+}
+
 /** «الأحد ١٢ أكتوبر» */
 export function formatDayDate(date: Date): string {
   return DAY_DATE.format(date);

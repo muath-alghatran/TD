@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CertificateTeaser } from "@/components/orders/CertificateTeaser";
 import { OrdersScreen } from "@/components/orders/OrdersScreen";
 import { TabBar } from "@/components/shell/TabBar";
 import { TabHead } from "@/components/shell/TabHead";
@@ -14,6 +15,7 @@ export default function OrdersPage() {
         </TabHead>
         <div className="page">
           <OrdersScreen />
+          <CertificateTeaser />
         </div>
       </main>
       <TabBar />
