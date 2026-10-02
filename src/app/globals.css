@@ -1546,7 +1546,7 @@ select:disabled {
 }
 .g-track {
   fill: none;
-  stroke: #ffffff17;
+  stroke: color-mix(in srgb, var(--n-100) 9%, transparent);
   stroke-width: 7;
 }
 .g-fill {
@@ -1557,7 +1557,7 @@ select:disabled {
     stroke 0.4s;
 }
 .g-tick {
-  stroke: #ffffff2e;
+  stroke: color-mix(in srgb, var(--n-100) 18%, transparent);
   stroke-width: 1.4;
 }
 .g-val {
@@ -1573,7 +1573,26 @@ select:disabled {
   font-weight: 600;
   letter-spacing: 0.16em;
   text-anchor: middle;
-  fill: #ffffff66;
+  fill: color-mix(in srgb, var(--n-100) 40%, transparent);
+}
+/* لون العدّاد لحالة التوفر وحدها (قاعدة 1) — المضاءة لأنه على حقل فولاذي في الوضعين */
+.g-fill.ok {
+  stroke: var(--ok-lit);
+}
+.g-fill.wait {
+  stroke: var(--wait-lit);
+}
+.g-fill.spec {
+  stroke: var(--spec-lit);
+}
+.g-val.ok {
+  fill: var(--ok-lit);
+}
+.g-val.wait {
+  fill: var(--wait-lit);
+}
+.g-val.spec {
+  fill: var(--spec-lit);
 }
 
 /*── بطاقة الوعد ──*/
@@ -3960,30 +3979,9 @@ html[data-motion="ok"] .journey-replay {
   }
 }
 
-/* بحث القطع في الرئيسية */
-.home-search {
-  margin-top: 22px;
-  padding-bottom: 28px;
-}
-/* زر المسح الأصلي في حقول البحث لا يتبع الرموز — Escape يمسح */
-.ps-input::-webkit-search-cancel-button,
-.hsearch-row .input::-webkit-search-cancel-button {
+/* زر المسح الأصلي في حقل البحث لا يتبع الرموز — Escape يمسح */
+.ps-input::-webkit-search-cancel-button {
   appearance: none;
-}
-.hsearch-title {
-  display: block;
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 18px;
-  margin-bottom: 10px;
-}
-.hsearch-row {
-  display: flex;
-  gap: 8px;
-}
-.hsearch-row .input {
-  flex: 1;
-  min-width: 0;
 }
 
 /*═══════════════════════════════════════════════════════════════
@@ -4026,34 +4024,231 @@ html[data-motion="ok"] .journey-replay {
   font-size: 11px;
 }
 
-/* ملخص الطلب: الوعد وأجزاؤه ثم تفصيل السعر */
-.order-sum {
+/*── «أين تريدها؟» (ملاحظات المالك، الجولة 1) ──
+   بطاقة التركيب الفاخرة (حقل فولاذي بصورة الواجهة وشعار المركز) وبطاقة التوصيل الأبسط — مجموعة
+   اختيار واحدة؛ المختارة بإطار الهوية وعلامة اختيار، بلا أخضر ولا كهرماني (قاعدة 1). */
+.recv {
+  display: grid;
+  gap: 12px;
+}
+.recv-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: start;
+  color: var(--fg);
+  border: 1px solid var(--divider);
+  transition:
+    border-color 0.15s var(--ease),
+    box-shadow 0.15s var(--ease);
+}
+.recv-card:hover {
+  border-color: var(--accent);
+}
+.recv-card[aria-checked="true"] {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.recv-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+/* علامة الاختيار: مربع فارغ، ويمتلئ بلون الهوية مع ✓ للمختارة */
+.recv-check {
+  position: absolute;
+  z-index: 3;
+  top: 12px;
+  inset-inline-end: 12px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--dash);
+  background: var(--bg);
+  color: transparent;
+}
+.recv-card[aria-checked="true"] .recv-check {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.recv-fit {
+  padding: 0;
+}
+.recv-media {
+  position: relative;
+  display: block;
+  height: 112px;
+}
+.recv-media img {
+  object-fit: cover;
+}
+/* تظليل يحفظ قراءة الشعار فوق الصورة — كما في الواجهة */
+.recv-shade {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 112px;
+  background: linear-gradient(to top, var(--bg) 8%, color-mix(in srgb, var(--bg) 30%, transparent) 70%, transparent);
+}
+.recv-badge {
+  position: absolute;
+  z-index: 3;
+  top: 12px;
+  inset-inline-start: 12px;
+  padding: 3px 9px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.recv-brand {
+  position: absolute;
+  z-index: 3;
+  top: 70px;
+  inset-inline-start: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.recv-body {
+  position: relative;
+  z-index: 2;
+  display: block;
+  padding: 10px 16px 16px;
+}
+.recv-center {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+}
+.recv-title {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 19px;
+  line-height: 1.35;
+}
+.recv-perks {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--divider);
+}
+.recv-perk {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.recv-perk svg {
+  flex: none;
+  color: var(--ink-accent);
+}
+/* التوصيل: الخيار الثاني — فاتح وأبسط، دون أن يبدو معطّلاً */
+.recv-ship {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  padding-inline-end: 50px;
+  background: var(--bg);
+}
+.recv-ship .recv-check {
+  top: 50%;
+  margin-top: -12px;
+}
+.recv-ship-ic {
+  flex: none;
+  color: var(--ink-accent);
+}
+.recv-ship .recv-title {
+  margin-top: 0;
+  font-size: 16px;
+}
+.recv-sub {
+  display: block;
+  margin-top: 3px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+/* مشهد الوعد: حقل فولاذي بعدّاد الثقة (روح PromiseVerdict قبل المرحلة 5) */
+.order-verdict {
   margin-top: 22px;
-  padding: 16px 14px 6px;
+  padding: 20px 18px 12px;
+}
+.order-verdict .gauge-wrap {
+  margin-top: 14px;
+  gap: 18px;
+  flex-wrap: nowrap;
+}
+.order-verdict .gauge {
+  width: 118px;
+  height: 118px;
+}
+.order-verdict-say {
+  flex: 1;
+  min-width: 0;
+}
+.verdict .stat.ok {
+  color: var(--ok-lit);
+}
+.verdict .stat.wait {
+  color: var(--wait-lit);
+}
+.verdict .stat.spec {
+  color: var(--spec-lit);
 }
 .order-days {
-  margin-top: 10px;
+  margin-top: 6px;
   font-size: 15px;
 }
 .order-days b {
   font-family: var(--font-heading);
-  font-size: 22px;
+  font-size: 30px;
   font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.order-days .nowrap {
+  white-space: nowrap;
 }
 .order-legs {
-  margin-top: 8px;
+  margin-top: 12px;
 }
 .order-legs li {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  padding: 6px 0;
+  padding: 7px 0;
   font-size: 13px;
-  color: var(--text-2);
-  border-top: 1px dashed var(--hair);
+  color: var(--glint);
+  border-top: 1px dashed color-mix(in srgb, var(--n-100) 14%, transparent);
 }
-.order-sum .ledger {
-  margin-top: 14px;
+
+/* الفاتورة في ورقة بزوايا — والأسطر غير المحددة مقروءة بوضوح لا باهتة */
+.order-bill {
+  margin-top: 18px;
+}
+.order-bill .ledger {
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  font-size: 14px;
+}
+.order-bill .ledger-row {
+  padding: 6px 0;
+}
+.ledger .pending {
+  direction: rtl;
+  font-weight: 600;
+  color: var(--fg);
+}
+.ledger-sum .pending {
+  font-size: 15px;
 }
 /* حالة المنطقة داخل القراءة الفولاذية: ألوان الحقل المضاءة (التباين على الفولاذي) */
 .field .stat.ok {
